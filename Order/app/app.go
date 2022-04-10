@@ -2,34 +2,38 @@ package app
 
 import (
 	"log"
-	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	_ "github.com/swiggy-2022-bootcamp/cdp-team4/Orders/docs"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/order/docs"
 )
 
-func Start() {
-	// Gin instance
-	r := gin.New()
+func setupRouter() *gin.Engine {
+	router := gin.Default()
+	// health check route
+	HealthCheckRouter(router)
 
-	// Routes
-	r.GET("/", HealthCheck)
-
-	url := ginSwagger.URL("http://localhost:7000/swagger/doc.json") // The url pointing to API definition
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
-
-	// Start server
-	if err := r.Run(":7000"); err != nil {
-		log.Fatal(err)
-	}
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	return router
 }
 
-func HealthCheck(c *gin.Context) {
-	res := map[string]interface{}{
-		"data": "Server is up and running",
-	}
+func configureSwaggerDoc() {
+	docs.SwaggerInfo.Title = "Swagger Order API"
+}
 
-	c.JSON(http.StatusOK, res)
+func Start() {
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	PORT := os.Getenv("ORDER_SERVICE_PORT")
+
+	configureSwaggerDoc()
+	router := setupRouter()
+
+	router.Run(":" + PORT)
 }

@@ -1,23 +1,21 @@
 basePath: /
-host: localhost:3000
+host: localhost:7000
 info:
   contact:
     email: support@swagger.io
     name: API Support
     url: http://www.swagger.io/support
-  description: This is a sample server server.
+  description: Order Service.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
   title: Gin Swagger Example API
-  version: "1.0"
+  version: "2.0"
 paths:
   /:
     get:
-      consumes:
-      - '*/*'
-      description: get the status of server.
+      description: use tocheck whether order service is up and running or not
       produces:
       - application/json
       responses:
@@ -26,9 +24,13 @@ paths:
           schema:
             additionalProperties: true
             type: object
-      summary: Show the status of server.
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Health of order service
       tags:
-      - root
+      - Health
 schemes:
 - http
 swagger: "2.0"

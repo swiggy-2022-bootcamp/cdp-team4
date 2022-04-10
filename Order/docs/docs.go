@@ -27,23 +27,26 @@ const docTemplate = `{
     "paths": {
         "/": {
             "get": {
-                "description": "get the status of server.",
-                "consumes": [
-                    "*/*"
-                ],
+                "description": "use tocheck whether order service is up and running or not",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "root"
+                    "Health"
                 ],
-                "summary": "Show the status of server.",
+                "summary": "Health of order service",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "number"
                         }
                     }
                 }
@@ -54,12 +57,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0",
-	Host:             "localhost:3000",
+	Version:          "2.0",
+	Host:             "localhost:7000",
 	BasePath:         "/",
 	Schemes:          []string{"http"},
 	Title:            "Gin Swagger Example API",
-	Description:      "This is a sample server server.",
+	Description:      "Order Service.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/swiggy-2022-bootcamp/cdp-team4/Orders/app"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/order/app"
 )
 
 // @title Gin Swagger Example API
