@@ -13,7 +13,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o orders-app main.go
+RUN go build -o shipping-app main.go
 
 ##
 ## Deploy
@@ -23,8 +23,8 @@ FROM alpine
 
 WORKDIR /
 
-COPY --from=build /app/orders-app /orders-app
+COPY --from=build /app/shipping-app /shipping-app
 
-EXPOSE 7000
+EXPOSE 7001
 
-ENTRYPOINT ["/orders-app"]
+ENTRYPOINT ["/shipping-app"]

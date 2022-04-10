@@ -24,17 +24,45 @@ const docTemplate = `{
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-    "paths": {}
+    "paths": {
+        "/": {
+            "get": {
+                "description": "use tocheck whether shipping service is up and running or not",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Health of shipping service",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                }
+            }
+        }
+    }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "2.0",
-	Host:             "localhost:7000",
+	Host:             "localhost:7001",
 	BasePath:         "/",
 	Schemes:          []string{"http"},
 	Title:            "Gin Swagger Example API",
-	Description:      "Order Service.",
+	Description:      "Shipping Service.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }
