@@ -1,11 +1,7 @@
 package app
 
 import (
-	"log"
-	"os"
-
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/order/docs"
@@ -25,12 +21,7 @@ func configureSwaggerDoc() {
 }
 
 func Start() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
-	PORT := os.Getenv("ORDER_SERVICE_PORT")
+	PORT := "7000"
 
 	configureSwaggerDoc()
 	router := setupRouter()
