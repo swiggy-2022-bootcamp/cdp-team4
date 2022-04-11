@@ -1,30 +1,17 @@
+FROM golang:1.18-alpine
 
-##
-## Build
-##
+RUN apk update && apk add --no-cache git build-base
 
-FROM golang:1.16-alpine AS build
+WORKDIR /go/github.com/swiggy-2022-bootcamp/cdp-team4/order
 
-WORKDIR /app
+COPY . /go/github.com/swiggy-2022-bootcamp/cdp-team4/order
 
-COPY go.mod .
-COPY go.sum .
-RUN go mod download
+# get all the dependencies
+RUN go get ./...
 
-COPY . .
-
-RUN go build -o orders-app main.go
-
-##
-## Deploy
-##
-
-FROM alpine
-
-WORKDIR /
-
-COPY --from=build /app/orders-app /orders-app
+# build
+RUN go build -o /orderService
 
 EXPOSE 7000
 
-ENTRYPOINT ["/orders-app"]
+CMD [ "/orderService" ] 
