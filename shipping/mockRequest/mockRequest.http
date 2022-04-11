@@ -1,17 +1,77 @@
-FROM golang:1.18-alpine
+# Add Shipping Address
 
-RUN apk update && apk add --no-cache git build-base
+# curl -H "X-API-Key: e0aaf890" -X POST https://my.api.mockaroo.com/shippingaddress
+POST https://my.api.mockaroo.com/shippingaddress
+X-API-Key: e0aaf890
 
-WORKDIR /go/github.com/swiggy-2022-bootcamp/cdp-team4/shipping
+{
+ "firstname": "Naveen",
+ "lastname": "Kumar",
+ "city": "Bengaluru",
+ "address_1": "Demo",
+ "address_2": "Demo",
+ "country_id": "81",
+ "postcode": "560053",
+}
 
-COPY . /go/github.com/swiggy-2022-bootcamp/cdp-team4/shipping
+###
 
-# get all the dependencies
-RUN go get ./...
+# Get Shipping Address
 
-# build
-RUN go build -o /shippingService
+# curl -H "X-API-Key: e0aaf890" https://my.api.mockaroo.com/shippingaddress
+GET https://my.api.mockaroo.com/shippingaddress
+X-API-Key: e0aaf890
 
-EXPOSE 7001
+###
 
-CMD [ "/shippingService" ]
+# Add shipping cost
+
+
+# curl -H "X-API-Key: e0aaf890" -X POST https://my.api.mockaroo.com/shippingcost
+POST https://my.api.mockaroo.com/shippingcost
+X-API-Key: e0aaf890
+
+{
+    "city": "Noida",
+    "shipping_cost":500
+}
+
+###
+
+# Get shipping cost of all cities
+
+# curl -H "X-API-Key: e0aaf890" https://my.api.mockaroo.com/shippingcost/all
+GET https://my.api.mockaroo.com/shippingcost/all
+X-API-Key: e0aaf890
+
+###
+
+# Get shipping cost of a city
+
+# curl -H "X-API-Key: e0aaf890" https://my.api.mockaroo.com/shippingcost/delhi
+GET https://my.api.mockaroo.com/shippingcost/delhi
+X-API-Key: e0aaf890
+
+
+###
+
+# Update shipping cost of a city
+
+# curl -H "X-API-Key: e0aaf890" -X POST https://my.api.mockaroo.com/shippingcost
+PUT https://my.api.mockaroo.com/shippingcost
+X-API-Key: e0aaf890
+
+{
+    "city": "delhi",
+    "shipping_cost":501
+}
+
+###
+
+# Delete shipping cost of a city
+
+# curl -H "X-API-Key: e0aaf890" -X POST https://my.api.mockaroo.com/shippingcost
+DELETE  https://my.api.mockaroo.com/shippingcost/delhi
+X-API-Key: e0aaf890
+
+###
