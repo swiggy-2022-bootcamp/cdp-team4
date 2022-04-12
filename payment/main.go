@@ -1,6 +1,6 @@
 package main
 
-import "github.com/swiggy-2022-bootcamp/cdp-team4/Payment/app"
+import "github.com/swiggy-2022-bootcamp/cdp-team4/payment/app"
 
 // @title Payment API
 // @version 1.0

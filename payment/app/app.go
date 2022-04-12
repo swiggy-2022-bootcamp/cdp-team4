@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/joho/godotenv"
-	"github.com/swiggy-2022-bootcamp/cdp-team4/Payment/docs"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/payment/docs"
 
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
