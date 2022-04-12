@@ -1,0 +1,29 @@
+# Get Users
+
+# curl -H "X-API-Key: 9e4a5970" https://my.api.mockaroo.com/users.json
+GET https://my.api.mockaroo.com/users.json
+X-API-Key: 9e4a5970
+
+###
+
+# Get Users by id
+
+# curl -H "X-API-Key: 9e4a5970" https://my.api.mockaroo.com/users/123.json
+GET https://my.api.mockaroo.com/users/123.json
+X-API-Key: 9e4a5970
+
+###
+
+# Update User by user id
+
+# curl -H "X-API-Key: 9e4a5970" -X PATCH -d '{"first_name":"test"}' https://my.api.mockaroo.com/users/123.json
+PATCH https://my.api.mockaroo.com/users/123.json
+X-API-Key: 9e4a5970
+
+###
+
+# Delete user by user id
+
+# curl -H "X-API-Key: 9e4a5970" -X DELETE https://my.api.mockaroo.com/users/123.json
+DELETE https://my.api.mockaroo.com/users/123.json
+X-API-Key: 9e4a5970
