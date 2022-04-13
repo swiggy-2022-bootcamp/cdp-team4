@@ -1,3 +1,3 @@
 # Payment Service
 
-PORT=8001
+PORT=8002
