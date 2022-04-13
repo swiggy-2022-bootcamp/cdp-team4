@@ -9,10 +9,6 @@ import (
 )
 
 func TestHeathCheck(t *testing.T) {
-
-}
-
-func TestPingRoute(t *testing.T) {
 	router := setupRouter()
 
 	w := httptest.NewRecorder()
