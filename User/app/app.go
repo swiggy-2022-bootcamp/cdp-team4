@@ -7,17 +7,29 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/joho/godotenv"
-	"github.com/swiggy-2022-bootcamp/cdp-team4/User/docs"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/user/docs"
 
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
+
+	"github.com/swiggy-2022-bootcamp/cdp-team4/user/infra"	
+	"github.com/swiggy-2022-bootcamp/cdp-team4/user/domain"		
 )
+
+type Routes struct {
+	router *gin.Engine
+}
+
+var userHandler UserHandler
 
 func setupRouter() *gin.Engine {
 	router := gin.Default()
+	
 	// health check route
 	HealthCheckRouter(router)
 
+	// user route
+	UserRouter(router)
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	return router
 }
@@ -33,6 +45,12 @@ func Start() {
 		return
 	}
 	PORT := os.Getenv("PORT")
+
+	userDynamodbRepository := infra.NewDynamoDBRepository()
+
+	userHandler = UserHandler{
+		userService: domain.NewUserService(userDynamodbRepository),
+	}
 
 	configureSwaggerDoc()
 	router := setupRouter()

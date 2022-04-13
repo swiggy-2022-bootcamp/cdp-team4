@@ -1,6 +1,6 @@
 package main
 
-import "github.com/swiggy-2022-bootcamp/cdp-team4/User/app"
+import "github.com/swiggy-2022-bootcamp/cdp-team4/user/app"
 
 // @title User API
 // @version 1.0
