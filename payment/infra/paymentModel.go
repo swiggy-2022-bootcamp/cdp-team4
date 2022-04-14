@@ -5,18 +5,18 @@ import (
 )
 
 type PayModel struct {
-	Id          string
-	Amount      int16
-	Currency    string
-	Status      string
-	OrderID     string
-	Method      string
-	Description string
-	Bank        string
-	Wallet      string
-	VPA         string
-	UserID      string
-	Notes       []string
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	Id          string    `json:"id"`
+	Amount      int16     `json:"amount"`
+	Currency    string    `json:"currency"`
+	Status      string    `json:"status"`
+	OrderID     string    `json:"order_id"`
+	Method      string    `json:"method"`
+	Description string    `json:"description"`
+	Bank        string    `json:"bank"`
+	Wallet      string    `json:"wallet"`
+	VPA         string    `json:"vpa"`
+	UserID      string    `json:"user_id"`
+	Notes       []string  `json:"notes"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
