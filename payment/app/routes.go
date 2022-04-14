@@ -15,7 +15,7 @@ func PayRouter(gin *gin.Engine) {
 		p.PUT("/", paymentHandler.handleUpdatePayStatus())
 
 		p.GET("/user/{user_id}", paymentHandler.handleGetPayRecordsByUserID())
-		p.GET("/{id}", paymentHandler.handleGetPayRecordByID())
+		p.GET("/:id", paymentHandler.handleGetPayRecordByID())
 
 		p.POST("/paymentMethods", paymentHandler.handleAddPaymentMethods())
 		p.GET("/paymentMethods", paymentHandler.handleGetPaymentMethods())

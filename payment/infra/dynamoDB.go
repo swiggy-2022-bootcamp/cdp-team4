@@ -59,8 +59,8 @@ func (pdr PaymentDynamoRepository) FindById(paymentID string) (*domain.Payment, 
 	input := &dynamodb.GetItemInput{
 		TableName: aws.String("payment"),
 		Key: map[string]*dynamodb.AttributeValue{
-			"Id": {
-				N: aws.String(paymentID),
+			"id": {
+				S: aws.String(paymentID),
 			},
 		},
 	}
@@ -71,7 +71,7 @@ func (pdr PaymentDynamoRepository) FindById(paymentID string) (*domain.Payment, 
 	}
 
 	if result.Item == nil {
-		return nil, fmt.Errorf("item not found - %s", err.Error())
+		return nil, fmt.Errorf("item not found")
 	}
 
 	payModel := domain.Payment{}
@@ -190,34 +190,3 @@ func _toDynamoPayModel(p *domain.Payment, bank, wallet string) PayModel {
 		UpdatedAt:   time.Now(),
 	}
 }
-
-// func (dyr PaymentDynamoRepository) ListTables() ([]string, error) {
-// 	input := &dynamodb.ListTablesInput{}
-
-// 	// if docker container of dynamoDB is not running then code
-// 	// should be blocked indefinitely, that's why using context with time out.
-// 	context, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-// 	defer cancel()
-
-// 	var tableNames []string
-
-// 	result, err := dyr.Session.ListTablesWithContext(context, input)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 		return tableNames, err
-// 	}
-
-// 	for _, n := range result.TableNames {
-// 		tableNames = append(tableNames, *n)
-// 	}
-
-// 	return tableNames, nil
-// }
-
-// func (dyr PaymentDynamoRepository) CreateTable(tableName string) bool {
-// 	// input := &dynamodb.CreateTableInput{}
-
-// 	// context, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-// 	// defer cancel()
-// 	return true
-// }

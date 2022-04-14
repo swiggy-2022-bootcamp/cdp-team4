@@ -11,7 +11,7 @@ type PayHandler struct {
 	PaymentService domain.PaymentService
 }
 
-type PaymentDTO struct {
+type PaymentRecordDTO struct {
 	Amount      int16
 	Currency    string
 	Status      string
@@ -25,7 +25,7 @@ type PaymentDTO struct {
 
 func (ph PayHandler) handlePay() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var paymentDto PaymentDTO
+		var paymentDto PaymentRecordDTO
 
 		if err := ctx.BindJSON(&paymentDto); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
@@ -53,7 +53,14 @@ func (ph PayHandler) handlePay() gin.HandlerFunc {
 
 func (ph PayHandler) handleGetPayRecordByID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		id := ctx.Param("id")
+		record, err := ph.PaymentService.GetPaymentRecordById(id)
 
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			return
+		}
+		ctx.JSON(http.StatusAccepted, gin.H{"record": record})
 	}
 }
 

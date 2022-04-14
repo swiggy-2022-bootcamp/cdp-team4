@@ -14,7 +14,7 @@ type PaymentService interface {
 		string,
 		[]string,
 	) (bool, error)
-	GetPaymentRecordById(string) (Payment, error)
+	GetPaymentRecordById(string) (*Payment, error)
 	GetPaymentAllRecordsByUserId(string) ([]Payment, error)
 	UpdatePaymentStatus(string, string) (bool, error)
 	UpdatePaymentMethod(string, string) (bool, error)
@@ -26,7 +26,7 @@ type paymentService struct {
 }
 
 func _generateUniqueId() string {
-	return primitive.NewObjectID().String()
+	return primitive.NewObjectID().Hex()
 }
 
 func (service paymentService) CreateDynamoPaymentRecord(
@@ -55,8 +55,12 @@ func (service paymentService) CreateDynamoPaymentRecord(
 	return true, nil
 }
 
-func (service paymentService) GetPaymentRecordById(id string) (Payment, error) {
-	return Payment{}, nil
+func (service paymentService) GetPaymentRecordById(id string) (*Payment, error) {
+	paymentRecord, err := service.PaymentDynamoRepository.FindById(id)
+	if err != nil {
+		return nil, err
+	}
+	return paymentRecord, nil
 }
 
 func (service paymentService) GetPaymentAllRecordsByUserId(id string) ([]Payment, error) {
