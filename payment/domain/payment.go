@@ -16,7 +16,7 @@ type Payment struct {
 type PaymentDynamoRepository interface {
 	Insert(Payment) (bool, error)
 	FindById(string) (*Payment, error)
-	FindByUserID(string) ([]*Payment, error)
-	UpdateStatus(string, string) (*Payment, error)
+	FindByUserID(string) ([]Payment, error)
+	UpdateItem(string, string) (bool, error)
 	DeleteByID(string) (bool, error)
 }

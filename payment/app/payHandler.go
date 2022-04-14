@@ -32,3 +32,15 @@ func (ph PayHandler) handleUpdatePayStatus() gin.HandlerFunc {
 
 	}
 }
+
+func (ph PayHandler) handleAddPaymentMethods() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+
+	}
+}
+
+func (ph PayHandler) handleGetPaymentMethods() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+
+	}
+}
