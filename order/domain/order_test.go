@@ -8,7 +8,7 @@ import (
 
 func TestShouldReturnNewShippingAddress(t *testing.T) {
 
-	userid := 12321324
+	userid := "12321324"
 	status := "pending"
 	prodquant := map[string]int{
 		"Origin of life":  1,

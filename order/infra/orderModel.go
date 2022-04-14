@@ -4,13 +4,13 @@ import (
 	"time"
 )
 
-type UserModel struct {
-	ID               int64          `json:"id"`
-	UserID           int64          `json:"user_id"`
-	Status           string         `json:"status"`
-	DateTime         time.Time      `json:"date_time"`
-	ProductsQuantity map[string]int `json:"product_quantity"`
-	ProductsCost     map[string]int `json:"product_cost"`
+type OrderModel struct {
+	ID               string         `json:"id"`
+	UserID           string         `json:"user_id"`
+	Status           string         `json:"order_status"`
+	DateTime         time.Time      `json:"dateTime"`
+	ProductsQuantity map[string]int `json:"products_quantity"`
+	ProductsCost     map[string]int `json:"products_cost"`
 	TotalCost        int            `json:"total_cost"`
 	CreatedAt        time.Time      `json:"created_at"`
 	UpdatedAt        time.Time      `json:"updated_at"`

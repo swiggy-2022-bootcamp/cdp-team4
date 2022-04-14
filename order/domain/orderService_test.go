@@ -15,13 +15,13 @@ var mockOrderRepo = mocks.OrderRepository{}
 var orderService = domain.NewOrderService(&mockOrderRepo)
 
 func TestShouldReturnNewOrderService(t *testing.T) {
-	userService := domain.NewOrderService(nil)
-	assert.NotNil(t, userService)
+	orderService := domain.NewOrderService(nil)
+	assert.NotNil(t, orderService)
 }
 
 func TestShouldCreateNewOrder(t *testing.T) {
 
-	userid := 12321324
+	userid := "12321324"
 	status := "pending"
 	prodquant := map[string]int{
 		"Origin of life":  1,
@@ -41,15 +41,15 @@ func TestShouldCreateNewOrder(t *testing.T) {
 }
 
 func TestShouldDeleteOrderByOrderId(t *testing.T) {
-	orderId := 1
+	orderId := "10293194182"
 	mockOrderRepo.On("DeleteOrderById", orderId).Return(nil)
 	var err = orderService.DeleteOrderById(orderId)
 	assert.Nil(t, err)
 }
 
 func TestShouldGetOrderByOrderId(t *testing.T) {
-	orderId := 1
-	userid := 12321324
+	orderId := "128132121"
+	userid := "12321322"
 	status := "pending"
 	prodquant := map[string]int{
 		"Origin of life":  1,
@@ -74,7 +74,7 @@ func TestShouldGetOrderByOrderId(t *testing.T) {
 }
 
 func TestShouldNotDeleteOrderByOrderIdUponInvalidOrderId(t *testing.T) {
-	orderId := -99
+	orderId := "-99"
 	errMessage := "some error"
 	mockOrderRepo.On("DeleteOrderById", orderId).Return(errs.NewUnexpectedError(errMessage))
 
@@ -83,8 +83,9 @@ func TestShouldNotDeleteOrderByOrderIdUponInvalidOrderId(t *testing.T) {
 }
 
 func TestShouldUpdateOrder(t *testing.T) {
-	userid := 12321324
-	status := "pending"
+	orderid := "31490934"
+	userid := "12321324"
+	status := "confirmed"
 	prodquant := map[string]int{
 		"Origin of life":  1,
 		"Reynolds trimax": 10,
@@ -96,8 +97,8 @@ func TestShouldUpdateOrder(t *testing.T) {
 	totalcost := 1800
 
 	newOrder := domain.NewOrder(userid, status, prodquant, prodcost, totalcost)
-	mockOrderRepo.On("UpdateOrder", *newOrder).Return(newOrder, nil)
-	resOrder, _ := orderService.UpdateOrder(*newOrder)
+	mockOrderRepo.On("UpdateOrderStatus", orderid, status).Return(newOrder, nil)
+	resOrder, _ := orderService.UpdateOrderStatus(orderid, status)
 
 	assert.Equal(t, userid, resOrder.UserID)
 	assert.Equal(t, status, resOrder.Status)
@@ -107,7 +108,7 @@ func TestShouldUpdateOrder(t *testing.T) {
 }
 
 func TestShouldGetOrderByUserId(t *testing.T) {
-	userId := 12321324
+	userId := "12321324"
 	status := "pending"
 	prodquant := map[string]int{
 		"Origin of life":  1,
@@ -121,12 +122,12 @@ func TestShouldGetOrderByUserId(t *testing.T) {
 
 	newOrder := domain.NewOrder(userId, status, prodquant, prodcost, totalcost)
 
-	mockOrderRepo.On("FindOrderByUserId", userId).Return(newOrder, nil)
-	resOrder, _ := orderService.GetOrderByUserId(userId)
+	mockOrderRepo.On("FindOrderByUserId", userId).Return([]domain.Order{*newOrder}, nil)
+	resOrders, _ := orderService.GetOrderByUserId(userId)
 
-	assert.Equal(t, userId, resOrder.UserID)
-	assert.Equal(t, status, resOrder.Status)
-	assert.Equal(t, prodquant, resOrder.ProductsQuantity)
-	assert.Equal(t, prodcost, resOrder.ProductsCost)
-	assert.Equal(t, totalcost, resOrder.TotalCost)
+	assert.Equal(t, userId, resOrders[0].UserID)
+	assert.Equal(t, status, resOrders[0].Status)
+	assert.Equal(t, prodquant, resOrders[0].ProductsQuantity)
+	assert.Equal(t, prodcost, resOrders[0].ProductsCost)
+	assert.Equal(t, totalcost, resOrders[0].TotalCost)
 }

@@ -15,11 +15,11 @@ type OrderRepository struct {
 }
 
 // DeleteOrderById provides a mock function with given fields: _a0
-func (_m *OrderRepository) DeleteOrderById(_a0 int) *errs.AppError {
+func (_m *OrderRepository) DeleteOrderById(_a0 string) *errs.AppError {
 	ret := _m.Called(_a0)
 
 	var r0 *errs.AppError
-	if rf, ok := ret.Get(0).(func(int) *errs.AppError); ok {
+	if rf, ok := ret.Get(0).(func(string) *errs.AppError); ok {
 		r0 = rf(_a0)
 	} else {
 		if ret.Get(0) != nil {
@@ -31,11 +31,11 @@ func (_m *OrderRepository) DeleteOrderById(_a0 int) *errs.AppError {
 }
 
 // FindOrderById provides a mock function with given fields: _a0
-func (_m *OrderRepository) FindOrderById(_a0 int) (*domain.Order, *errs.AppError) {
+func (_m *OrderRepository) FindOrderById(_a0 string) (*domain.Order, *errs.AppError) {
 	ret := _m.Called(_a0)
 
 	var r0 *domain.Order
-	if rf, ok := ret.Get(0).(func(int) *domain.Order); ok {
+	if rf, ok := ret.Get(0).(func(string) *domain.Order); ok {
 		r0 = rf(_a0)
 	} else {
 		if ret.Get(0) != nil {
@@ -44,7 +44,7 @@ func (_m *OrderRepository) FindOrderById(_a0 int) (*domain.Order, *errs.AppError
 	}
 
 	var r1 *errs.AppError
-	if rf, ok := ret.Get(1).(func(int) *errs.AppError); ok {
+	if rf, ok := ret.Get(1).(func(string) *errs.AppError); ok {
 		r1 = rf(_a0)
 	} else {
 		if ret.Get(1) != nil {
@@ -56,20 +56,20 @@ func (_m *OrderRepository) FindOrderById(_a0 int) (*domain.Order, *errs.AppError
 }
 
 // FindOrderByUserId provides a mock function with given fields: _a0
-func (_m *OrderRepository) FindOrderByUserId(_a0 int) (*domain.Order, *errs.AppError) {
+func (_m *OrderRepository) FindOrderByUserId(_a0 string) ([]domain.Order, *errs.AppError) {
 	ret := _m.Called(_a0)
 
-	var r0 *domain.Order
-	if rf, ok := ret.Get(0).(func(int) *domain.Order); ok {
+	var r0 []domain.Order
+	if rf, ok := ret.Get(0).(func(string) []domain.Order); ok {
 		r0 = rf(_a0)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*domain.Order)
+			r0 = ret.Get(0).([]domain.Order)
 		}
 	}
 
 	var r1 *errs.AppError
-	if rf, ok := ret.Get(1).(func(int) *errs.AppError); ok {
+	if rf, ok := ret.Get(1).(func(string) *errs.AppError); ok {
 		r1 = rf(_a0)
 	} else {
 		if ret.Get(1) != nil {
@@ -103,13 +103,13 @@ func (_m *OrderRepository) InsertOrder(_a0 domain.Order) (domain.Order, *errs.Ap
 	return r0, r1
 }
 
-// UpdateOrder provides a mock function with given fields: _a0
-func (_m *OrderRepository) UpdateOrder(_a0 domain.Order) (*domain.Order, *errs.AppError) {
-	ret := _m.Called(_a0)
+// UpdateOrderStatus provides a mock function with given fields: _a0, _a1
+func (_m *OrderRepository) UpdateOrderStatus(_a0 string, _a1 string) (*domain.Order, *errs.AppError) {
+	ret := _m.Called(_a0, _a1)
 
 	var r0 *domain.Order
-	if rf, ok := ret.Get(0).(func(domain.Order) *domain.Order); ok {
-		r0 = rf(_a0)
+	if rf, ok := ret.Get(0).(func(string, string) *domain.Order); ok {
+		r0 = rf(_a0, _a1)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*domain.Order)
@@ -117,8 +117,8 @@ func (_m *OrderRepository) UpdateOrder(_a0 domain.Order) (*domain.Order, *errs.A
 	}
 
 	var r1 *errs.AppError
-	if rf, ok := ret.Get(1).(func(domain.Order) *errs.AppError); ok {
-		r1 = rf(_a0)
+	if rf, ok := ret.Get(1).(func(string, string) *errs.AppError); ok {
+		r1 = rf(_a0, _a1)
 	} else {
 		if ret.Get(1) != nil {
 			r1 = ret.Get(1).(*errs.AppError)
