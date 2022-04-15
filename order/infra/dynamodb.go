@@ -21,14 +21,9 @@ type OrderDynamoRepository struct {
 }
 
 func connect() *dynamodb.DynamoDB {
-	sess, err := session.NewSession(&aws.Config{
-		Region:   aws.String("us-east-1"),
-		Endpoint: aws.String("http://localhost:8042"),
-	})
-
-	if err != nil {
-		panic(err.Error())
-	}
+	sess := session.Must(session.NewSessionWithOptions(session.Options{
+		SharedConfigState: session.SharedConfigEnable,
+	}))
 
 	// create dynamo client
 	svc := dynamodb.New(sess)
