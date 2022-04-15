@@ -2,7 +2,8 @@ package domain
 
 import (
 	"golang.org/x/crypto/bcrypt"
-	"fmt"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	// "fmt"
 )
 
 type UserService interface {
@@ -16,23 +17,20 @@ type service struct {
 	userDynamodbRepository UserDynamoDBRepository
 }
 
-
-func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	if err != nil {
-		return string(bytes), err
+func NewUserService(userDynamodbRepository UserDynamoDBRepository) UserService {
+	return &service{
+		userDynamodbRepository: userDynamodbRepository,
 	}
-	return string(bytes), nil
 }
 
 
 func (s service) CreateUserInDynamodb(firstName, lastName, username, phone, email, password string, role Role) (User, error) {
+	id := _generateUniqueId()
 	hashedPassword, err := HashPassword(password)
 	if err != nil {
 		return User{}, err
 	}
-	fmt.Println("here")
-	user := NewUser(firstName, lastName, username, phone, email, hashedPassword, role)
+	user := NewUser(id, firstName, lastName, username, phone, email, hashedPassword, role)
 	persistedUser, err1 := s.userDynamodbRepository.Save(*user)
 	if err1 != nil {
 		return User{}, err1
@@ -68,8 +66,14 @@ func (s service) DeleteUserById(userId string) (bool, *error) {
 }
 
 
-func NewUserService(userDynamodbRepository UserDynamoDBRepository) UserService {
-	return &service{
-		userDynamodbRepository: userDynamodbRepository,
+func _generateUniqueId() string {
+	return primitive.NewObjectID().Hex()
+}
+
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	if err != nil {
+		return string(bytes), err
 	}
+	return string(bytes), nil
 }

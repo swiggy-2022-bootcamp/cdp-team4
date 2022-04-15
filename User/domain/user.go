@@ -32,7 +32,7 @@ func GetEnumByIndex(idx int) (Role, *errs.AppError) {
 }
 
 type User struct {
-	Id              int                `json:"id"`
+	UserID          string             `json:"user_id"`
 	FirstName       string             `json:"first_name"`
 	LastName        string             `json:"last_name"`
 	Username        string             `json:"username"`
@@ -44,7 +44,7 @@ type User struct {
 
 func (u User) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
-		"id":               u.Id,
+		"user_id":          u.UserID,
 		"firstName":        u.FirstName,
 		"lastName":         u.LastName,
 		"email":            u.Email,
@@ -55,8 +55,9 @@ func (u User) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func NewUser(firstName, lastName, username, phone, email, password string, role Role) *User {
+func NewUser(userId, firstName, lastName, username, phone, email, password string, role Role) *User {
 	return &User{
+		UserID:			 userId,
 		FirstName:       firstName,
 		LastName:        lastName,
 		Username:        username,

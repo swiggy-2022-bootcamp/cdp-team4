@@ -65,8 +65,8 @@ func (repo UserDynamoDBRepository) FindByID(id string) (*domain.User, error) {
 	input := &dynamodb.GetItemInput{
 		TableName: aws.String(repo.TableName),
 		Key: map[string]*dynamodb.AttributeValue{
-			"id": {
-				N: aws.String(id),
+			"user_id": {
+				S: aws.String(id),
 			},
 		},
 	}
@@ -123,8 +123,8 @@ func (repo UserDynamoDBRepository) DeleteByID(id string) (bool, error) {
 	defer cancel()
 	input := &dynamodb.DeleteItemInput{
 		Key: map[string]*dynamodb.AttributeValue{
-			"id": {
-				N: aws.String(id),
+			"user_id": {
+				S: aws.String(id),
 			},
 		},
 		TableName: aws.String(repo.TableName),
@@ -140,6 +140,7 @@ func (repo UserDynamoDBRepository) DeleteByID(id string) (bool, error) {
 
 func toPersistedDynamodbEntity(u domain.User) *UserModel {
 	return &UserModel{
+		UserID:          u.UserID,
 		FirstName:       u.FirstName,
 		LastName:        u.LastName,
 		Phone:           u.Phone,
@@ -151,13 +152,3 @@ func toPersistedDynamodbEntity(u domain.User) *UserModel {
 		UpdatedAt:       time.Now(),
 	}
 }
-
-
-
-
-
-// // Delete: TODO
-// func (repo *dynamoDBRepo) Delete(post *entity.Post) error {
-// 	return nil
-// }
-

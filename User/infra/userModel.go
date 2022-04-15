@@ -7,7 +7,7 @@ import (
 )
 
 type UserModel struct {
-	ID    			int64   		   `json:"id"`
+	UserID          string             `json:"user_id"`
 	FirstName       string             `json:"first_name"`
 	LastName        string             `json:"last_name"`
 	Username        string             `json:"username"`
