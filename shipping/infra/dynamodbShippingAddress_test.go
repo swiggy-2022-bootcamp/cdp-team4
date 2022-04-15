@@ -8,7 +8,7 @@ import (
 	"github.com/swiggy-2022-bootcamp/cdp-team4/shipping/infra"
 )
 
-var testShippingAddresssService = infra.NewDynamoShippingAddressRepository()
+var testShippingAddressService = infra.NewDynamoShippingAddressRepository()
 var insertedid string
 
 func TestShouldCreateNewShippingAddresssinDynamoDB(t *testing.T) {
@@ -21,7 +21,7 @@ func TestShouldCreateNewShippingAddresssinDynamoDB(t *testing.T) {
 	postcode := 560063
 
 	newShippingAddress := domain.NewShippingAddress(firstname, lastname, city, address1, address2, countryid, postcode)
-	res, err := testShippingAddresssService.InsertShippingAddress(*newShippingAddress)
+	res, err := testShippingAddressService.InsertShippingAddress(*newShippingAddress)
 	insertedid = res
 	t.Logf("Inserted Id is %s\n", insertedid)
 	assert.NotNil(t, res)
@@ -30,7 +30,7 @@ func TestShouldCreateNewShippingAddresssinDynamoDB(t *testing.T) {
 
 func TestShouldGetShippingAddresssByShippingAddresssIdDynamoDB(t *testing.T) {
 	t.Logf("Inserted Id is %s Reading\n", insertedid)
-	res, err := testShippingAddresssService.FindShippingAddressById(insertedid)
+	res, err := testShippingAddressService.FindShippingAddressById(insertedid)
 	assert.NotNil(t, res)
 	assert.Nil(t, err)
 }
@@ -45,13 +45,13 @@ func TestShouldUpdateShippingAddresssStatusDynamoDB(t *testing.T) {
 	postcode := 560012
 
 	newShippingAddress := domain.NewShippingAddress(firstname, lastname, city, address1, address2, countryid, postcode)
-	res, err := testShippingAddresssService.UpdateShippingAddressById(insertedid, *newShippingAddress)
+	res, err := testShippingAddressService.UpdateShippingAddressById(insertedid, *newShippingAddress)
 	assert.NotNil(t, res)
 	assert.Nil(t, err)
 }
 
 func TestShouldDeleteShippingAddresssByShippingAddresssIdDynamoDB(t *testing.T) {
-	res, err := testShippingAddresssService.DeleteShippingAddressById(insertedid)
+	res, err := testShippingAddressService.DeleteShippingAddressById(insertedid)
 	assert.NotNil(t, res)
 	assert.Nil(t, err)
 }
