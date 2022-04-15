@@ -1,0 +1,51 @@
+GET http://localhost:6001/order/user/1c63d67e-5631-4c08-8c36-656ef5698845
+
+
+###
+
+POST http://localhost:6001/order
+content-type: application/json
+
+{
+    "user_id":"482b7e39-da41-461d-8676-cee6bf3654f7",
+    "status":"confirmed",
+    "products": [
+        {
+        "name":"origin of life",
+        "cost": 123,
+        "quantity":4
+        },
+        {
+        "name":"Trimas",
+        "cost":  70,
+        "quantity":4
+        }
+    ],
+    "total_cost":800
+}
+
+###
+
+GET http://localhost:6001/order/36cf851e-62da-4507-9800-78b778025b3b
+
+
+###
+
+GET http://localhost:6001/orders
+
+
+###
+GET http://localhost:6001/order/status/confirmed
+
+####
+PUT http://localhost:6001/order/status
+Content-Type: application/json
+
+{
+    "id":"79d97b2c-6dd7-4a75-893a-f958e2f82a91",
+    "status":"declined"
+}
+
+####
+DELETE http://localhost:6001/order/79d97b2c-6dd7-4a75-893a-f958e2f82a91
+

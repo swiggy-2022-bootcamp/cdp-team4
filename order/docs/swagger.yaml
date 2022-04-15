@@ -2,15 +2,14 @@ basePath: /
 host: localhost:7000
 info:
   contact:
-    email: support@swagger.io
-    name: API Support
-    url: http://www.swagger.io/support
+    email: suhas7thfeb2000@gmail.com
+    name: Suhas R
   description: Order Service.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
-  title: Gin Swagger Example API
+  title: Gin Swagger
   version: "2.0"
 paths:
   /:
@@ -31,6 +30,130 @@ paths:
       summary: Health of order service
       tags:
       - Health
+  /order:
+    post:
+      description: This Handle allows admin to create new Order
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Create Order
+      tags:
+      - Order
+  /order/:id:
+    get:
+      description: This Handle returns Order given order id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Get Order by id
+      tags:
+      - Order
+  /order/status/:status:
+    get:
+      description: This Handle returns Order given status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Get Order by status
+      tags:
+      - Order
+  /order/user/:userid:
+    get:
+      description: This Handle returns Order given user id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Get Order by user id
+      tags:
+      - Order
+  /orders:
+    delete:
+      description: This Handle deletes order given order id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Delete order
+      tags:
+      - Order
+    get:
+      description: This Handle returns all of the orders
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Get All Order records
+      tags:
+      - Order
+    put:
+      description: This Handle Update order status given order id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Update order status
+      tags:
+      - Order
 schemes:
 - http
 swagger: "2.0"

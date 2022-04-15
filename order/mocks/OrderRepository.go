@@ -15,19 +15,51 @@ type OrderRepository struct {
 }
 
 // DeleteOrderById provides a mock function with given fields: _a0
-func (_m *OrderRepository) DeleteOrderById(_a0 string) *errs.AppError {
+func (_m *OrderRepository) DeleteOrderById(_a0 string) (bool, *errs.AppError) {
 	ret := _m.Called(_a0)
 
-	var r0 *errs.AppError
-	if rf, ok := ret.Get(0).(func(string) *errs.AppError); ok {
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(string) bool); ok {
 		r0 = rf(_a0)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*errs.AppError)
+		r0 = ret.Get(0).(bool)
+	}
+
+	var r1 *errs.AppError
+	if rf, ok := ret.Get(1).(func(string) *errs.AppError); ok {
+		r1 = rf(_a0)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*errs.AppError)
 		}
 	}
 
-	return r0
+	return r0, r1
+}
+
+// FindAllOrders provides a mock function with given fields:
+func (_m *OrderRepository) FindAllOrders() ([]domain.Order, *errs.AppError) {
+	ret := _m.Called()
+
+	var r0 []domain.Order
+	if rf, ok := ret.Get(0).(func() []domain.Order); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]domain.Order)
+		}
+	}
+
+	var r1 *errs.AppError
+	if rf, ok := ret.Get(1).(func() *errs.AppError); ok {
+		r1 = rf()
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*errs.AppError)
+		}
+	}
+
+	return r0, r1
 }
 
 // FindOrderById provides a mock function with given fields: _a0
@@ -40,6 +72,31 @@ func (_m *OrderRepository) FindOrderById(_a0 string) (*domain.Order, *errs.AppEr
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*domain.Order)
+		}
+	}
+
+	var r1 *errs.AppError
+	if rf, ok := ret.Get(1).(func(string) *errs.AppError); ok {
+		r1 = rf(_a0)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*errs.AppError)
+		}
+	}
+
+	return r0, r1
+}
+
+// FindOrderByStatus provides a mock function with given fields: _a0
+func (_m *OrderRepository) FindOrderByStatus(_a0 string) ([]domain.Order, *errs.AppError) {
+	ret := _m.Called(_a0)
+
+	var r0 []domain.Order
+	if rf, ok := ret.Get(0).(func(string) []domain.Order); ok {
+		r0 = rf(_a0)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]domain.Order)
 		}
 	}
 
@@ -81,14 +138,14 @@ func (_m *OrderRepository) FindOrderByUserId(_a0 string) ([]domain.Order, *errs.
 }
 
 // InsertOrder provides a mock function with given fields: _a0
-func (_m *OrderRepository) InsertOrder(_a0 domain.Order) (domain.Order, *errs.AppError) {
+func (_m *OrderRepository) InsertOrder(_a0 domain.Order) (string, *errs.AppError) {
 	ret := _m.Called(_a0)
 
-	var r0 domain.Order
-	if rf, ok := ret.Get(0).(func(domain.Order) domain.Order); ok {
+	var r0 string
+	if rf, ok := ret.Get(0).(func(domain.Order) string); ok {
 		r0 = rf(_a0)
 	} else {
-		r0 = ret.Get(0).(domain.Order)
+		r0 = ret.Get(0).(string)
 	}
 
 	var r1 *errs.AppError
@@ -104,16 +161,14 @@ func (_m *OrderRepository) InsertOrder(_a0 domain.Order) (domain.Order, *errs.Ap
 }
 
 // UpdateOrderStatus provides a mock function with given fields: _a0, _a1
-func (_m *OrderRepository) UpdateOrderStatus(_a0 string, _a1 string) (*domain.Order, *errs.AppError) {
+func (_m *OrderRepository) UpdateOrderStatus(_a0 string, _a1 string) (bool, *errs.AppError) {
 	ret := _m.Called(_a0, _a1)
 
-	var r0 *domain.Order
-	if rf, ok := ret.Get(0).(func(string, string) *domain.Order); ok {
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(string, string) bool); ok {
 		r0 = rf(_a0, _a1)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*domain.Order)
-		}
+		r0 = ret.Get(0).(bool)
 	}
 
 	var r1 *errs.AppError

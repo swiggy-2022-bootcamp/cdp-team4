@@ -9,7 +9,7 @@ import (
 type Order struct {
 	ID               string         `json:"id"`
 	UserID           string         `json:"user_id"`
-	Status           string         `json:"status"`
+	Status           string         `json:"order_status"`
 	DateTime         time.Time      `json:"date_time"`
 	ProductsQuantity map[string]int `json:"product_quantity"`
 	ProductsCost     map[string]int `json:"product_cost"`
@@ -17,11 +17,13 @@ type Order struct {
 }
 
 type OrderRepository interface {
-	InsertOrder(Order) (Order, *errs.AppError)
+	InsertOrder(Order) (string, *errs.AppError)
 	FindOrderById(string) (*Order, *errs.AppError)
 	FindOrderByUserId(string) ([]Order, *errs.AppError)
-	DeleteOrderById(string) *errs.AppError
-	UpdateOrderStatus(string, string) (*Order, *errs.AppError)
+	FindOrderByStatus(string) ([]Order, *errs.AppError)
+	FindAllOrders() ([]Order, *errs.AppError)
+	DeleteOrderById(string) (bool, *errs.AppError)
+	UpdateOrderStatus(string, string) (bool, *errs.AppError)
 }
 
 func NewOrder(userId string, status string, products_quantity map[string]int, products_cost map[string]int, total_cost int) *Order {

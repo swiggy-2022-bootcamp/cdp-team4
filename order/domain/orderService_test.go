@@ -20,7 +20,7 @@ func TestShouldReturnNewOrderService(t *testing.T) {
 }
 
 func TestShouldCreateNewOrder(t *testing.T) {
-
+	orderid := "1203712"
 	userid := "12321324"
 	status := "pending"
 	prodquant := map[string]int{
@@ -33,18 +33,19 @@ func TestShouldCreateNewOrder(t *testing.T) {
 	}
 	totalcost := 1700
 
-	newOrder := domain.NewOrder(userid, status, prodquant, prodcost, totalcost)
+	_ = domain.NewOrder(userid, status, prodquant, prodcost, totalcost)
 
-	mockOrderRepo.On("InsertOrder", mock.Anything).Return(*newOrder, nil)
+	mockOrderRepo.On("InsertOrder", mock.Anything).Return(orderid, nil)
 	orderService.CreateOrder(userid, status, prodquant, prodcost, totalcost)
 	mockOrderRepo.AssertNumberOfCalls(t, "InsertOrder", 1)
 }
 
 func TestShouldDeleteOrderByOrderId(t *testing.T) {
 	orderId := "10293194182"
-	mockOrderRepo.On("DeleteOrderById", orderId).Return(nil)
-	var err = orderService.DeleteOrderById(orderId)
+	mockOrderRepo.On("DeleteOrderById", orderId).Return(true, nil)
+	res, err := orderService.DeleteOrderById(orderId)
 	assert.Nil(t, err)
+	assert.Equal(t, res, true)
 }
 
 func TestShouldGetOrderByOrderId(t *testing.T) {
@@ -76,9 +77,10 @@ func TestShouldGetOrderByOrderId(t *testing.T) {
 func TestShouldNotDeleteOrderByOrderIdUponInvalidOrderId(t *testing.T) {
 	orderId := "-99"
 	errMessage := "some error"
-	mockOrderRepo.On("DeleteOrderById", orderId).Return(errs.NewUnexpectedError(errMessage))
+	mockOrderRepo.On("DeleteOrderById", orderId).Return(false, errs.NewUnexpectedError(errMessage))
 
-	err := orderService.DeleteOrderById(orderId)
+	res, err := orderService.DeleteOrderById(orderId)
+	assert.Equal(t, res, false)
 	assert.Error(t, err.Error(), errMessage)
 }
 
@@ -96,15 +98,12 @@ func TestShouldUpdateOrder(t *testing.T) {
 	}
 	totalcost := 1800
 
-	newOrder := domain.NewOrder(userid, status, prodquant, prodcost, totalcost)
-	mockOrderRepo.On("UpdateOrderStatus", orderid, status).Return(newOrder, nil)
-	resOrder, _ := orderService.UpdateOrderStatus(orderid, status)
+	_ = domain.NewOrder(userid, status, prodquant, prodcost, totalcost)
+	mockOrderRepo.On("UpdateOrderStatus", orderid, status).Return(true, nil)
+	res, err := orderService.UpdateOrderStatus(orderid, status)
 
-	assert.Equal(t, userid, resOrder.UserID)
-	assert.Equal(t, status, resOrder.Status)
-	assert.Equal(t, prodquant, resOrder.ProductsQuantity)
-	assert.Equal(t, prodcost, resOrder.ProductsCost)
-	assert.Equal(t, totalcost, resOrder.TotalCost)
+	assert.Nil(t, err)
+	assert.Equal(t, res, true)
 }
 
 func TestShouldGetOrderByUserId(t *testing.T) {
@@ -124,6 +123,56 @@ func TestShouldGetOrderByUserId(t *testing.T) {
 
 	mockOrderRepo.On("FindOrderByUserId", userId).Return([]domain.Order{*newOrder}, nil)
 	resOrders, _ := orderService.GetOrderByUserId(userId)
+
+	assert.Equal(t, userId, resOrders[0].UserID)
+	assert.Equal(t, status, resOrders[0].Status)
+	assert.Equal(t, prodquant, resOrders[0].ProductsQuantity)
+	assert.Equal(t, prodcost, resOrders[0].ProductsCost)
+	assert.Equal(t, totalcost, resOrders[0].TotalCost)
+}
+
+func TestShouldGetOrderByStatus(t *testing.T) {
+	userId := "12321324"
+	status := "pending"
+	prodquant := map[string]int{
+		"Origin of life":  1,
+		"Reynolds trimax": 10,
+	}
+	prodcost := map[string]int{
+		"Origin of life":  999,
+		"Reynolds trimax": 60,
+	}
+	totalcost := 1700
+
+	newOrder := domain.NewOrder(userId, status, prodquant, prodcost, totalcost)
+
+	mockOrderRepo.On("FindOrderByStatus", status).Return([]domain.Order{*newOrder}, nil)
+	resOrders, _ := orderService.GetOrderByStatus(status)
+
+	assert.Equal(t, userId, resOrders[0].UserID)
+	assert.Equal(t, status, resOrders[0].Status)
+	assert.Equal(t, prodquant, resOrders[0].ProductsQuantity)
+	assert.Equal(t, prodcost, resOrders[0].ProductsCost)
+	assert.Equal(t, totalcost, resOrders[0].TotalCost)
+}
+
+func TestShouldGetAllOrders(t *testing.T) {
+	userId := "12321324"
+	status := "pending"
+	prodquant := map[string]int{
+		"Origin of life":  1,
+		"Reynolds trimax": 10,
+	}
+	prodcost := map[string]int{
+		"Origin of life":  999,
+		"Reynolds trimax": 60,
+	}
+	totalcost := 1700
+
+	newOrder := domain.NewOrder(userId, status, prodquant, prodcost, totalcost)
+
+	mockOrderRepo.On("FindAllOrders").Return([]domain.Order{*newOrder}, nil)
+	resOrders, _ := orderService.GetAllOrders()
 
 	assert.Equal(t, userId, resOrders[0].UserID)
 	assert.Equal(t, status, resOrders[0].Status)
