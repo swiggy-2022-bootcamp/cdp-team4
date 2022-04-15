@@ -3,25 +3,25 @@ package domain
 import "github.com/swiggy-2022-bootcamp/cdp-team4/shipping/utils/errs"
 
 type ShippingAddressService interface {
-	CreateShippingAddress(string, string, string, string, string, int, int) (ShippingAddress, *errs.AppError)
-	GetShippingAddressById(int) (*ShippingAddress, *errs.AppError)
-	DeleteShippingAddressById(int) *errs.AppError
-	UpdateShippingAddress(ShippingAddress) (*ShippingAddress, *errs.AppError)
+	CreateShippingAddress(string, string, string, string, string, int, int) (string, *errs.AppError)
+	GetShippingAddressById(string) (*ShippingAddress, *errs.AppError)
+	DeleteShippingAddressById(string) (bool, *errs.AppError)
+	UpdateShippingAddressById(string, ShippingAddress) (bool, *errs.AppError)
 }
 
 type service1 struct {
 	shippingAddressRepository ShippingAddressRepository
 }
 
-func (s service1) CreateShippingAddress(firstname, lastname, city, address1, address2 string, countryid, postcode int) (ShippingAddress, *errs.AppError) {
+func (s service1) CreateShippingAddress(firstname, lastname, city, address1, address2 string, countryid, postcode int) (string, *errs.AppError) {
 	shippingAddress := NewShippingAddress(firstname, lastname, city, address1, address2, countryid, postcode)
-	persistedShippingAddress, err := s.shippingAddressRepository.InsertShippingAddress(*shippingAddress)
+	resid, err := s.shippingAddressRepository.InsertShippingAddress(*shippingAddress)
 	if err != nil {
-		return ShippingAddress{}, err
+		return "", err
 	}
-	return persistedShippingAddress, nil
+	return resid, nil
 }
-func (s service1) GetShippingAddressById(shippingAddressId int) (*ShippingAddress, *errs.AppError) {
+func (s service1) GetShippingAddressById(shippingAddressId string) (*ShippingAddress, *errs.AppError) {
 	res, err := s.shippingAddressRepository.FindShippingAddressById(shippingAddressId)
 	if err != nil {
 		return nil, err
@@ -29,20 +29,20 @@ func (s service1) GetShippingAddressById(shippingAddressId int) (*ShippingAddres
 	return res, nil
 }
 
-func (s service1) DeleteShippingAddressById(shippingAddressId int) *errs.AppError {
-	err := s.shippingAddressRepository.DeleteShippingAddressById(shippingAddressId)
+func (s service1) DeleteShippingAddressById(shippingAddressId string) (bool, *errs.AppError) {
+	_, err := s.shippingAddressRepository.DeleteShippingAddressById(shippingAddressId)
 	if err != nil {
-		return err
+		return false, err
 	}
-	return nil
+	return true, nil
 }
 
-func (s service1) UpdateShippingAddress(sa ShippingAddress) (*ShippingAddress, *errs.AppError) {
-	res, err := s.shippingAddressRepository.UpdateShippingAddress(sa)
+func (s service1) UpdateShippingAddressById(shippingAddressId string, newShippingAddress ShippingAddress) (bool, *errs.AppError) {
+	_, err := s.shippingAddressRepository.UpdateShippingAddressById(shippingAddressId, newShippingAddress)
 	if err != nil {
-		return nil, err
+		return false, err
 	}
-	return res, nil
+	return true, nil
 }
 
 func NewShippingAddressService(shippingAddressRepository ShippingAddressRepository) ShippingAddressService {

@@ -3,7 +3,7 @@ package domain
 import "github.com/swiggy-2022-bootcamp/cdp-team4/shipping/utils/errs"
 
 type ShippingAddress struct {
-	Id        int    `json:"id"`
+	Id        string `json:"id"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
 	City      string `json:"city"`
@@ -26,8 +26,8 @@ func NewShippingAddress(firstname, lastname, city, address1, address2 string, co
 }
 
 type ShippingAddressRepository interface {
-	InsertShippingAddress(ShippingAddress) (ShippingAddress, *errs.AppError)
-	FindShippingAddressById(int) (*ShippingAddress, *errs.AppError)
-	DeleteShippingAddressById(int) *errs.AppError
-	UpdateShippingAddress(ShippingAddress) (*ShippingAddress, *errs.AppError)
+	InsertShippingAddress(ShippingAddress) (string, *errs.AppError)
+	FindShippingAddressById(string) (*ShippingAddress, *errs.AppError)
+	DeleteShippingAddressById(string) (bool, *errs.AppError)
+	UpdateShippingAddressById(string, ShippingAddress) (bool, *errs.AppError)
 }

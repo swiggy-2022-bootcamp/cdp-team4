@@ -14,28 +14,35 @@ type ShippingCostRepository struct {
 	mock.Mock
 }
 
-// DeleteShippingCostById provides a mock function with given fields: _a0
-func (_m *ShippingCostRepository) DeleteShippingCostById(_a0 int) *errs.AppError {
+// DeleteShippingCostByCity provides a mock function with given fields: _a0
+func (_m *ShippingCostRepository) DeleteShippingCostByCity(_a0 string) (bool, *errs.AppError) {
 	ret := _m.Called(_a0)
 
-	var r0 *errs.AppError
-	if rf, ok := ret.Get(0).(func(int) *errs.AppError); ok {
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(string) bool); ok {
 		r0 = rf(_a0)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*errs.AppError)
+		r0 = ret.Get(0).(bool)
+	}
+
+	var r1 *errs.AppError
+	if rf, ok := ret.Get(1).(func(string) *errs.AppError); ok {
+		r1 = rf(_a0)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*errs.AppError)
 		}
 	}
 
-	return r0
+	return r0, r1
 }
 
-// FindShippingCostById provides a mock function with given fields: _a0
-func (_m *ShippingCostRepository) FindShippingCostById(_a0 int) (*domain.ShippingCost, *errs.AppError) {
+// FindShippingCostByCity provides a mock function with given fields: _a0
+func (_m *ShippingCostRepository) FindShippingCostByCity(_a0 string) (*domain.ShippingCost, *errs.AppError) {
 	ret := _m.Called(_a0)
 
 	var r0 *domain.ShippingCost
-	if rf, ok := ret.Get(0).(func(int) *domain.ShippingCost); ok {
+	if rf, ok := ret.Get(0).(func(string) *domain.ShippingCost); ok {
 		r0 = rf(_a0)
 	} else {
 		if ret.Get(0) != nil {
@@ -44,7 +51,7 @@ func (_m *ShippingCostRepository) FindShippingCostById(_a0 int) (*domain.Shippin
 	}
 
 	var r1 *errs.AppError
-	if rf, ok := ret.Get(1).(func(int) *errs.AppError); ok {
+	if rf, ok := ret.Get(1).(func(string) *errs.AppError); ok {
 		r1 = rf(_a0)
 	} else {
 		if ret.Get(1) != nil {
@@ -56,14 +63,14 @@ func (_m *ShippingCostRepository) FindShippingCostById(_a0 int) (*domain.Shippin
 }
 
 // InsertShippingCost provides a mock function with given fields: _a0
-func (_m *ShippingCostRepository) InsertShippingCost(_a0 domain.ShippingCost) (domain.ShippingCost, *errs.AppError) {
+func (_m *ShippingCostRepository) InsertShippingCost(_a0 domain.ShippingCost) (bool, *errs.AppError) {
 	ret := _m.Called(_a0)
 
-	var r0 domain.ShippingCost
-	if rf, ok := ret.Get(0).(func(domain.ShippingCost) domain.ShippingCost); ok {
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(domain.ShippingCost) bool); ok {
 		r0 = rf(_a0)
 	} else {
-		r0 = ret.Get(0).(domain.ShippingCost)
+		r0 = ret.Get(0).(bool)
 	}
 
 	var r1 *errs.AppError
@@ -79,16 +86,14 @@ func (_m *ShippingCostRepository) InsertShippingCost(_a0 domain.ShippingCost) (d
 }
 
 // UpdateShippingCost provides a mock function with given fields: _a0
-func (_m *ShippingCostRepository) UpdateShippingCost(_a0 domain.ShippingCost) (*domain.ShippingCost, *errs.AppError) {
+func (_m *ShippingCostRepository) UpdateShippingCost(_a0 domain.ShippingCost) (bool, *errs.AppError) {
 	ret := _m.Called(_a0)
 
-	var r0 *domain.ShippingCost
-	if rf, ok := ret.Get(0).(func(domain.ShippingCost) *domain.ShippingCost); ok {
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(domain.ShippingCost) bool); ok {
 		r0 = rf(_a0)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*domain.ShippingCost)
-		}
+		r0 = ret.Get(0).(bool)
 	}
 
 	var r1 *errs.AppError

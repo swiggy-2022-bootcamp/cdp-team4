@@ -15,27 +15,34 @@ type ShippingAddressRepository struct {
 }
 
 // DeleteShippingAddressById provides a mock function with given fields: _a0
-func (_m *ShippingAddressRepository) DeleteShippingAddressById(_a0 int) *errs.AppError {
+func (_m *ShippingAddressRepository) DeleteShippingAddressById(_a0 string) (bool, *errs.AppError) {
 	ret := _m.Called(_a0)
 
-	var r0 *errs.AppError
-	if rf, ok := ret.Get(0).(func(int) *errs.AppError); ok {
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(string) bool); ok {
 		r0 = rf(_a0)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*errs.AppError)
+		r0 = ret.Get(0).(bool)
+	}
+
+	var r1 *errs.AppError
+	if rf, ok := ret.Get(1).(func(string) *errs.AppError); ok {
+		r1 = rf(_a0)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*errs.AppError)
 		}
 	}
 
-	return r0
+	return r0, r1
 }
 
 // FindShippingAddressById provides a mock function with given fields: _a0
-func (_m *ShippingAddressRepository) FindShippingAddressById(_a0 int) (*domain.ShippingAddress, *errs.AppError) {
+func (_m *ShippingAddressRepository) FindShippingAddressById(_a0 string) (*domain.ShippingAddress, *errs.AppError) {
 	ret := _m.Called(_a0)
 
 	var r0 *domain.ShippingAddress
-	if rf, ok := ret.Get(0).(func(int) *domain.ShippingAddress); ok {
+	if rf, ok := ret.Get(0).(func(string) *domain.ShippingAddress); ok {
 		r0 = rf(_a0)
 	} else {
 		if ret.Get(0) != nil {
@@ -44,7 +51,7 @@ func (_m *ShippingAddressRepository) FindShippingAddressById(_a0 int) (*domain.S
 	}
 
 	var r1 *errs.AppError
-	if rf, ok := ret.Get(1).(func(int) *errs.AppError); ok {
+	if rf, ok := ret.Get(1).(func(string) *errs.AppError); ok {
 		r1 = rf(_a0)
 	} else {
 		if ret.Get(1) != nil {
@@ -56,14 +63,14 @@ func (_m *ShippingAddressRepository) FindShippingAddressById(_a0 int) (*domain.S
 }
 
 // InsertShippingAddress provides a mock function with given fields: _a0
-func (_m *ShippingAddressRepository) InsertShippingAddress(_a0 domain.ShippingAddress) (domain.ShippingAddress, *errs.AppError) {
+func (_m *ShippingAddressRepository) InsertShippingAddress(_a0 domain.ShippingAddress) (string, *errs.AppError) {
 	ret := _m.Called(_a0)
 
-	var r0 domain.ShippingAddress
-	if rf, ok := ret.Get(0).(func(domain.ShippingAddress) domain.ShippingAddress); ok {
+	var r0 string
+	if rf, ok := ret.Get(0).(func(domain.ShippingAddress) string); ok {
 		r0 = rf(_a0)
 	} else {
-		r0 = ret.Get(0).(domain.ShippingAddress)
+		r0 = ret.Get(0).(string)
 	}
 
 	var r1 *errs.AppError
@@ -78,22 +85,20 @@ func (_m *ShippingAddressRepository) InsertShippingAddress(_a0 domain.ShippingAd
 	return r0, r1
 }
 
-// UpdateShippingAddress provides a mock function with given fields: _a0
-func (_m *ShippingAddressRepository) UpdateShippingAddress(_a0 domain.ShippingAddress) (*domain.ShippingAddress, *errs.AppError) {
-	ret := _m.Called(_a0)
+// UpdateShippingAddressById provides a mock function with given fields: _a0, _a1
+func (_m *ShippingAddressRepository) UpdateShippingAddressById(_a0 string, _a1 domain.ShippingAddress) (bool, *errs.AppError) {
+	ret := _m.Called(_a0, _a1)
 
-	var r0 *domain.ShippingAddress
-	if rf, ok := ret.Get(0).(func(domain.ShippingAddress) *domain.ShippingAddress); ok {
-		r0 = rf(_a0)
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(string, domain.ShippingAddress) bool); ok {
+		r0 = rf(_a0, _a1)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*domain.ShippingAddress)
-		}
+		r0 = ret.Get(0).(bool)
 	}
 
 	var r1 *errs.AppError
-	if rf, ok := ret.Get(1).(func(domain.ShippingAddress) *errs.AppError); ok {
-		r1 = rf(_a0)
+	if rf, ok := ret.Get(1).(func(string, domain.ShippingAddress) *errs.AppError); ok {
+		r1 = rf(_a0, _a1)
 	} else {
 		if ret.Get(1) != nil {
 			r1 = ret.Get(1).(*errs.AppError)

@@ -24,40 +24,41 @@ func TestShouldCreateNewShippingCost(t *testing.T) {
 	city := "Banglore"
 	cost := 199
 
-	newShippingCost := domain.NewShippingCost(city, cost)
+	_ = domain.NewShippingCost(city, cost)
 
-	mockShippingCostRepo.On("InsertShippingCost", mock.Anything).Return(*newShippingCost, nil)
+	mockShippingCostRepo.On("InsertShippingCost", mock.Anything).Return(true, nil)
 	shippingCostService.CreateShippingCost(city, cost)
 	mockShippingCostRepo.AssertNumberOfCalls(t, "InsertShippingCost", 1)
 }
 
-func TestShouldDeleteShippingCostByShippingCostId(t *testing.T) {
-	shippingCostId := 1
-	mockShippingCostRepo.On("DeleteShippingCostById", shippingCostId).Return(nil)
-	var err = shippingCostService.DeleteShippingCostById(shippingCostId)
+func TestShouldDeleteShippingCostByCity(t *testing.T) {
+	city := "Banglore"
+	mockShippingCostRepo.On("DeleteShippingCostByCity", city).Return(true, nil)
+	res, err := shippingCostService.DeleteShippingCostByCity(city)
+	assert.Equal(t, res, true)
 	assert.Nil(t, err)
 }
 
-func TestShouldGetShippingCostByShippingCostId(t *testing.T) {
-	shippingCostId := 1
+func TestShouldGetShippingCostByCity(t *testing.T) {
 	city := "Banglore"
 	cost := 199
 
 	newShippingCost := domain.NewShippingCost(city, cost)
 
-	mockShippingCostRepo.On("FindShippingCostById", shippingCostId).Return(newShippingCost, nil)
-	resShippingCost, _ := shippingCostService.GetShippingCostById(shippingCostId)
+	mockShippingCostRepo.On("FindShippingCostByCity", city).Return(newShippingCost, nil)
+	resShippingCost, _ := shippingCostService.GetShippingCostByCity(city)
 
 	assert.Equal(t, city, resShippingCost.City)
 	assert.Equal(t, cost, resShippingCost.ShippingCost)
 }
 
-func TestShouldNotDeleteShippingCostByShippingCostIdUponInvalidShippingCostId(t *testing.T) {
-	shippingCostId := -99
+func TestShouldNotDeleteShippingCostByCityUponInvalidCity(t *testing.T) {
+	non_existing_city := "fsdjf"
 	errMessage := "some error"
-	mockShippingCostRepo.On("DeleteShippingCostById", shippingCostId).Return(errs.NewUnexpectedError(errMessage))
+	mockShippingCostRepo.On("DeleteShippingCostByCity", non_existing_city).Return(false, errs.NewUnexpectedError(errMessage))
 
-	err := shippingCostService.DeleteShippingCostById(shippingCostId)
+	res, err := shippingCostService.DeleteShippingCostByCity(non_existing_city)
+	assert.Equal(t, res, false)
 	assert.Error(t, err.Error(), errMessage)
 }
 
@@ -66,9 +67,9 @@ func TestShouldUpdateShippingCost(t *testing.T) {
 	cost := 290
 
 	newShippingCost := domain.NewShippingCost(city, cost)
-	mockShippingCostRepo.On("UpdateShippingCost", *newShippingCost).Return(newShippingCost, nil)
-	updatedShippingCost, _ := shippingCostService.UpdateShippingCost(*newShippingCost)
+	mockShippingCostRepo.On("UpdateShippingCost", *newShippingCost).Return(true, nil)
+	res, err := shippingCostService.UpdateShippingCost(*newShippingCost)
 
-	assert.Equal(t, newShippingCost.City, updatedShippingCost.City)
-	assert.Equal(t, newShippingCost.ShippingCost, updatedShippingCost.ShippingCost)
+	assert.Equal(t, res, true)
+	assert.Nil(t, err)
 }

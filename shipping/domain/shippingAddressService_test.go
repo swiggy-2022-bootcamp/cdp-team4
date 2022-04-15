@@ -20,7 +20,7 @@ func TestShouldReturnNewShippingAddressService(t *testing.T) {
 }
 
 func TestShouldCreateNewShippingAddress(t *testing.T) {
-
+	resultid := "94713094"
 	firstname := "Naveen"
 	lastname := "Kumar"
 	city := "Banglore"
@@ -29,22 +29,23 @@ func TestShouldCreateNewShippingAddress(t *testing.T) {
 	countryid := 81
 	postcode := 560063
 
-	newShippingAddress := domain.NewShippingAddress(firstname, lastname, city, address1, address2, countryid, postcode)
+	//newShippingAddress := domain.NewShippingAddress(firstname, lastname, city, address1, address2, countryid, postcode)
 
-	mockShippingAddressRepo.On("InsertShippingAddress", mock.Anything).Return(*newShippingAddress, nil)
+	mockShippingAddressRepo.On("InsertShippingAddress", mock.Anything).Return(resultid, nil)
 	shippingAddresService.CreateShippingAddress(firstname, lastname, city, address1, address2, countryid, postcode)
 	mockShippingAddressRepo.AssertNumberOfCalls(t, "InsertShippingAddress", 1)
 }
 
-func TestShouldDeleteShippingAddressByShippingAddressId(t *testing.T) {
-	shippingAdressId := 1
-	mockShippingAddressRepo.On("DeleteShippingAddressById", shippingAdressId).Return(nil)
-	var err = shippingAddresService.DeleteShippingAddressById(shippingAdressId)
+func TestShouldDeleteShippingAddressById(t *testing.T) {
+	shippinAddressId := "1"
+	mockShippingAddressRepo.On("DeleteShippingAddressById", shippinAddressId).Return(true, nil)
+	res, err := shippingAddresService.DeleteShippingAddressById(shippinAddressId)
+	assert.Equal(t, res, true)
 	assert.Nil(t, err)
 }
 
-func TestShouldGetShippingAddressByShippingAddressId(t *testing.T) {
-	shippingAdressId := 1
+func TestShouldGetShippingAddressById(t *testing.T) {
+	shippinAddressId := "1"
 	firstname := "Naveen"
 	lastname := "Kumar"
 	city := "Banglore"
@@ -55,8 +56,8 @@ func TestShouldGetShippingAddressByShippingAddressId(t *testing.T) {
 
 	newShippingAddress := domain.NewShippingAddress(firstname, lastname, city, address1, address2, countryid, postcode)
 
-	mockShippingAddressRepo.On("FindShippingAddressById", shippingAdressId).Return(newShippingAddress, nil)
-	resShippingAddress, _ := shippingAddresService.GetShippingAddressById(shippingAdressId)
+	mockShippingAddressRepo.On("FindShippingAddressById", shippinAddressId).Return(newShippingAddress, nil)
+	resShippingAddress, _ := shippingAddresService.GetShippingAddressById(shippinAddressId)
 
 	assert.Equal(t, firstname, resShippingAddress.FirstName)
 	assert.Equal(t, lastname, resShippingAddress.LastName)
@@ -68,15 +69,16 @@ func TestShouldGetShippingAddressByShippingAddressId(t *testing.T) {
 }
 
 func TestShouldNotDeleteShippingAddressByShippingAddressIdUponInvalidShippingAddressId(t *testing.T) {
-	shippingAddressId := -99
+	shippinAddressId := "-99"
 	errMessage := "some error"
-	mockShippingAddressRepo.On("DeleteShippingAddressById", shippingAddressId).Return(errs.NewUnexpectedError(errMessage))
+	mockShippingAddressRepo.On("DeleteShippingAddressById", shippinAddressId).Return(false, errs.NewUnexpectedError(errMessage))
 
-	err := shippingAddresService.DeleteShippingAddressById(shippingAddressId)
+	res, err := shippingAddresService.DeleteShippingAddressById(shippinAddressId)
+	assert.Equal(t, res, false)
 	assert.Error(t, err.Error(), errMessage)
 }
 
-func TestShouldUpdateShippingAddress(t *testing.T) {
+func TestShouldUpdateShippingAddressById(t *testing.T) {
 	firstname := "Naveen"
 	lastname := "Kumar"
 	city := "Banglore"
@@ -86,14 +88,9 @@ func TestShouldUpdateShippingAddress(t *testing.T) {
 	postcode := 560063
 
 	newShippingAddress := domain.NewShippingAddress(firstname, lastname, city, address1, address2, countryid, postcode)
-	mockShippingAddressRepo.On("UpdateShippingAddress", *newShippingAddress).Return(newShippingAddress, nil)
-	updatedShippingAddress, _ := shippingAddresService.UpdateShippingAddress(*newShippingAddress)
+	mockShippingAddressRepo.On("UpdateShippingAddressById", "112324", *newShippingAddress).Return(true, nil)
+	res, err := shippingAddresService.UpdateShippingAddressById("112324", *newShippingAddress)
 
-	assert.Equal(t, newShippingAddress.FirstName, updatedShippingAddress.FirstName)
-	assert.Equal(t, newShippingAddress.LastName, updatedShippingAddress.LastName)
-	assert.Equal(t, newShippingAddress.City, updatedShippingAddress.City)
-	assert.Equal(t, newShippingAddress.Address1, updatedShippingAddress.Address1)
-	assert.Equal(t, newShippingAddress.Address2, updatedShippingAddress.Address2)
-	assert.Equal(t, newShippingAddress.CountryID, updatedShippingAddress.CountryID)
-	assert.Equal(t, newShippingAddress.PostCode, updatedShippingAddress.PostCode)
+	assert.Equal(t, res, true)
+	assert.Nil(t, err)
 }
