@@ -20,3 +20,10 @@ type PayModel struct {
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
+
+type PaymentMethodModel struct {
+	Id      string   `json:"id"`
+	Methods []string `json:"methods"`
+	Agree   string   `json:"agree"`
+	Comment string   `json:"comment"`
+}

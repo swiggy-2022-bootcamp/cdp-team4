@@ -28,7 +28,7 @@ func connect() *dynamodb.DynamoDB {
 	return svc
 }
 
-func (pdr PaymentDynamoRepository) Insert(p domain.Payment) (bool, error) {
+func (pdr PaymentDynamoRepository) InsertPaymentRecord(p domain.Payment) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	payRecord := _toDynamoPayModel(&p, "XYZ", "0")
@@ -52,7 +52,9 @@ func (pdr PaymentDynamoRepository) Insert(p domain.Payment) (bool, error) {
 	return true, nil
 }
 
-func (pdr PaymentDynamoRepository) FindById(paymentID string) (*domain.Payment, error) {
+func (pdr PaymentDynamoRepository) FindPaymentRecordById(
+	paymentID string,
+) (*domain.Payment, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -84,7 +86,9 @@ func (pdr PaymentDynamoRepository) FindById(paymentID string) (*domain.Payment, 
 	return &payModel, nil
 }
 
-func (pdr PaymentDynamoRepository) FindByUserID(userId string) ([]domain.Payment, error) {
+func (pdr PaymentDynamoRepository) FindPaymentRecordByUserID(
+	userId string,
+) ([]domain.Payment, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -122,7 +126,7 @@ func (pdr PaymentDynamoRepository) FindByUserID(userId string) ([]domain.Payment
 	return paymentRecords, nil
 }
 
-func (pdr PaymentDynamoRepository) UpdateItem(id, attributeValue string) (bool, error) {
+func (pdr PaymentDynamoRepository) UpdatePaymentRecord(id, attributeValue string) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	input := &dynamodb.UpdateItemInput{
@@ -132,11 +136,11 @@ func (pdr PaymentDynamoRepository) UpdateItem(id, attributeValue string) (bool, 
 			},
 		},
 		Key: map[string]*dynamodb.AttributeValue{
-			"Id": {
+			"id": {
 				S: aws.String(id),
 			},
 		},
-		ReturnValues:     aws.String("UPDATE_NEW"),
+		ReturnValues:     aws.String("UPDATED_NEW"),
 		UpdateExpression: aws.String("set Status = :s"),
 		TableName:        aws.String("payment"),
 	}
@@ -148,7 +152,7 @@ func (pdr PaymentDynamoRepository) UpdateItem(id, attributeValue string) (bool, 
 	return true, nil
 }
 
-func (pdr PaymentDynamoRepository) DeleteByID(id string) (bool, error) {
+func (pdr PaymentDynamoRepository) DeletePaymentRecordByID(id string) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	input := &dynamodb.DeleteItemInput{
@@ -163,6 +167,97 @@ func (pdr PaymentDynamoRepository) DeleteByID(id string) (bool, error) {
 	_, err := pdr.Session.DeleteItemWithContext(ctx, input)
 	if err != nil {
 		return false, fmt.Errorf("unable to delete - %s", err.Error())
+	}
+	return true, nil
+}
+
+func (pdr PaymentDynamoRepository) InsertPaymentMethod(pm domain.PaymentMethod) (bool, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	payMethodModel := _toDynamoPayMethodModel(&pm)
+	av, err := dynamodbattribute.MarshalMap(payMethodModel)
+	if err != nil {
+		return false, fmt.Errorf("unable to marshal - %s", err.Error())
+	}
+
+	input := &dynamodb.PutItemInput{
+		Item:      av,
+		TableName: aws.String("paymentmethod"),
+	}
+
+	_, err = pdr.Session.PutItemWithContext(ctx, input)
+	if err != nil {
+		return false, fmt.Errorf("unable to put the item - %s", err.Error())
+	}
+
+	return true, nil
+}
+
+func (pdr PaymentDynamoRepository) GetPaymentMethods(id string) ([]string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	input := &dynamodb.GetItemInput{
+		TableName: aws.String("paymentmethod"),
+		Key: map[string]*dynamodb.AttributeValue{
+			"id": {
+				S: aws.String(id),
+			},
+		},
+	}
+
+	result, err := pdr.Session.GetItemWithContext(ctx, input)
+	if err != nil {
+		return nil, fmt.Errorf("unable to get the item - %s", err.Error())
+	}
+
+	if result.Item == nil {
+		return nil, fmt.Errorf("item not found")
+	}
+
+	payMethodModel := PaymentMethodModel{}
+	err = dynamodbattribute.UnmarshalMap(result.Item, &payMethodModel)
+
+	if err != nil {
+		return nil, fmt.Errorf("unmarshal map - %s", err.Error())
+	}
+
+	return payMethodModel.Methods, nil
+}
+func (pdr PaymentDynamoRepository) UpdatePaymentMethods(id, paymentMethod string) (bool, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	av := &dynamodb.AttributeValue{
+		S: aws.String(paymentMethod),
+	}
+
+	var methodList []*dynamodb.AttributeValue
+	methodList = append(methodList, av)
+
+	input := &dynamodb.UpdateItemInput{
+		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
+			":method": {
+				L: methodList,
+			},
+			":methodStr": av,
+		},
+		Key: map[string]*dynamodb.AttributeValue{
+			"id": {
+				S: aws.String(id),
+			},
+		},
+		ReturnValues: aws.String("UPDATED_NEW"),
+		UpdateExpression: aws.String(
+			"set methods = list_append (methods, :method)",
+		),
+		ConditionExpression: aws.String("not contains (methods, :methodStr)"),
+		TableName:           aws.String("paymentmethod"),
+	}
+
+	_, err := pdr.Session.UpdateItemWithContext(ctx, input)
+	if err != nil {
+		return false, fmt.Errorf("unable to update - %s", err.Error())
 	}
 	return true, nil
 }
@@ -188,5 +283,14 @@ func _toDynamoPayModel(p *domain.Payment, bank, wallet string) PayModel {
 		Notes:       p.Notes,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
+	}
+}
+
+func _toDynamoPayMethodModel(p *domain.PaymentMethod) PaymentMethodModel {
+	return PaymentMethodModel{
+		Id:      p.Id,
+		Methods: p.Method,
+		Agree:   p.Agree,
+		Comment: p.Comment,
 	}
 }
