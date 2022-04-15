@@ -75,3 +75,30 @@ func (h UserHandler) HandleGetUserByID() gin.HandlerFunc {
 		ctx.JSON(http.StatusAccepted, gin.H{"record": record})
 	}
 }
+
+
+func (h UserHandler) HandleGetAllUsers() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		records, err := h.userService.GetAllUsers()
+
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			return
+		}
+		ctx.JSON(http.StatusAccepted, gin.H{"records": records})
+	}
+}
+
+
+func (h UserHandler) HandleDeleteUserByID() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		id := ctx.Param("id")
+		ok, err := h.userService.DeleteUserById(id)
+
+		if !ok {
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": (*err).Error()})
+			return
+		}
+		ctx.JSON(http.StatusAccepted, gin.H{"message": "user deleted"})
+	}
+}

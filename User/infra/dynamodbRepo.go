@@ -21,7 +21,6 @@ func NewDynamoRepository() UserDynamoDBRepository {
 	return UserDynamoDBRepository{Session: svc, TableName: "users"}
 }
 
-
 func connect() *dynamodb.DynamoDB {
 	// Create AWS Session
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
@@ -31,6 +30,7 @@ func connect() *dynamodb.DynamoDB {
 	// Return DynamoDB client
 	return dynamodb.New(sess)
 }
+
 
 func (repo UserDynamoDBRepository) Save(user domain.User) (domain.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -57,6 +57,7 @@ func (repo UserDynamoDBRepository) Save(user domain.User) (domain.User, error) {
 	return user, err
 }
 
+
 func (repo UserDynamoDBRepository) FindByID(id string) (*domain.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -80,7 +81,6 @@ func (repo UserDynamoDBRepository) FindByID(id string) (*domain.User, error) {
 	}
 
 	user := domain.User{}
-
 	err = dynamodbattribute.UnmarshalMap(result.Item, &user)
 
 	if err != nil {
@@ -89,6 +89,54 @@ func (repo UserDynamoDBRepository) FindByID(id string) (*domain.User, error) {
 
 	return &user, nil
 }
+
+
+func (repo UserDynamoDBRepository) FindAll() ([]domain.User, error) {
+
+	// Build the query input parameters
+	params := &dynamodb.ScanInput{
+		TableName: aws.String(repo.TableName),
+	}
+
+	// Make the DynamoDB Query API call
+	result, err := repo.Session.Scan(params)
+	if err != nil {
+		return nil, err
+	}
+	var users []domain.User = []domain.User{}
+	for _, i := range result.Items {
+		user := domain.User{}
+
+		err = dynamodbattribute.UnmarshalMap(i, &user)
+
+		if err != nil {
+			panic(err)
+		}
+		users = append(users, user)
+	}
+	return users, nil
+}
+
+
+func (repo UserDynamoDBRepository) DeleteByID(id string) (bool, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	input := &dynamodb.DeleteItemInput{
+		Key: map[string]*dynamodb.AttributeValue{
+			"id": {
+				N: aws.String(id),
+			},
+		},
+		TableName: aws.String(repo.TableName),
+	}
+
+	_, err := repo.Session.DeleteItemWithContext(ctx, input)
+	if err != nil {
+		return false, fmt.Errorf("unable to delete - %s", err.Error())
+	}
+	return true, nil
+}
+
 
 func toPersistedDynamodbEntity(u domain.User) *UserModel {
 	return &UserModel{
@@ -104,33 +152,7 @@ func toPersistedDynamodbEntity(u domain.User) *UserModel {
 	}
 }
 
-// func (repo *dynamoDBRepo) FindAll() ([]entity.Post, error) {
-// 	// Get a new DynamoDB client
-// 	dynamoDBClient := connect()
 
-// 	// Build the query input parameters
-// 	params := &dynamodb.ScanInput{
-// 		TableName: aws.String(repo.tableName),
-// 	}
-
-// 	// Make the DynamoDB Query API call
-// 	result, err := dynamoDBClient.Scan(params)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	var posts []entity.Post = []entity.Post{}
-// 	for _, i := range result.Items {
-// 		post := entity.Post{}
-
-// 		err = dynamodbattribute.UnmarshalMap(i, &post)
-
-// 		if err != nil {
-// 			panic(err)
-// 		}
-// 		posts = append(posts, post)
-// 	}
-// 	return posts, nil
-// }
 
 
 

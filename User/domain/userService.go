@@ -2,11 +2,14 @@ package domain
 
 import (
 	"golang.org/x/crypto/bcrypt"
+	"fmt"
 )
 
 type UserService interface {
 	CreateUserInDynamodb(string, string, string, string, string, string, Role) (User, error)
 	GetUserById(string) (*User, error)
+	GetAllUsers() ([]User, error)
+	DeleteUserById(string) (bool, *error)
 }
 
 type service struct {
@@ -28,6 +31,7 @@ func (s service) CreateUserInDynamodb(firstName, lastName, username, phone, emai
 	if err != nil {
 		return User{}, err
 	}
+	fmt.Println("here")
 	user := NewUser(firstName, lastName, username, phone, email, hashedPassword, role)
 	persistedUser, err1 := s.userDynamodbRepository.Save(*user)
 	if err1 != nil {
@@ -44,6 +48,25 @@ func (s service) GetUserById(userId string) (*User, error) {
 	}
 	return res, nil
 }
+
+
+func (s service) GetAllUsers() ([]User, error) {
+	res, err := s.userDynamodbRepository.FindAll()
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+
+func (s service) DeleteUserById(userId string) (bool, *error) {
+	_, err := s.userDynamodbRepository.DeleteByID(userId)
+	if err != nil {
+		return false, &err
+	}
+	return true, nil
+}
+
 
 func NewUserService(userDynamodbRepository UserDynamoDBRepository) UserService {
 	return &service{

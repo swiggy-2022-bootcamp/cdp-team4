@@ -70,5 +70,7 @@ func NewUser(firstName, lastName, username, phone, email, password string, role 
 type UserDynamoDBRepository interface {
 	Save(User) (User, error)
 	FindByID(string) (*User, error)
+	DeleteByID(string) (bool, error)
+	FindAll() ([]User, error)
 }
 
