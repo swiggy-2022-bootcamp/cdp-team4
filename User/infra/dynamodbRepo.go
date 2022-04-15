@@ -7,33 +7,22 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/user/domain"
 	"time"
+	"context"
+	"fmt"
 )
 
 type UserDynamoDBRepository struct {
-	tableName string
+	Session   *dynamodb.DynamoDB
+	TableName string
 }
 
-func NewDynamoDBRepository() UserDynamoDBRepository {
-	return UserDynamoDBRepository{
-		tableName: "users",
-	}
+func NewDynamoRepository() UserDynamoDBRepository {
+	svc := connect()
+	return UserDynamoDBRepository{Session: svc, TableName: "users"}
 }
 
-// To use local dynamodb
-// func createDynamoDBClient() *dynamodb.DynamoDB {
-// 	// Create AWS Session
-// 	sess, err := session.NewSession(&aws.Config{
-// 		Region:   aws.String("ap-southeast-2"),
-// 		Endpoint: aws.String("http://localhost:8000")})
 
-// 	if err != nil {
-// 		fmt.Println(err)
-// 	}
-// 	// Return DynamoDB client
-// 	return dynamodb.New(sess)
-// }
-
-func createDynamoDBClient() *dynamodb.DynamoDB {
+func connect() *dynamodb.DynamoDB {
 	// Create AWS Session
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
@@ -44,7 +33,9 @@ func createDynamoDBClient() *dynamodb.DynamoDB {
 }
 
 func (repo UserDynamoDBRepository) Save(user domain.User) (domain.User, error) {
-	dynamoDBClient := createDynamoDBClient()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
 	dynamodbUser := toPersistedDynamodbEntity(user)
 
 	attributeValue, err := dynamodbattribute.MarshalMap(dynamodbUser)
@@ -54,15 +45,49 @@ func (repo UserDynamoDBRepository) Save(user domain.User) (domain.User, error) {
 
 	item := &dynamodb.PutItemInput{
 		Item:      attributeValue,
-		TableName: aws.String(repo.tableName),
+		TableName: aws.String(repo.TableName),
 	}
 
-	_, err = dynamoDBClient.PutItem(item)
+	_, err = repo.Session.PutItemWithContext(ctx, item)
+
 	if err != nil {
 		return domain.User{}, err
 	}
 
 	return user, err
+}
+
+func (repo UserDynamoDBRepository) FindByID(id string) (*domain.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	input := &dynamodb.GetItemInput{
+		TableName: aws.String(repo.TableName),
+		Key: map[string]*dynamodb.AttributeValue{
+			"id": {
+				N: aws.String(id),
+			},
+		},
+	}
+
+	result, err := repo.Session.GetItemWithContext(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	if result.Item == nil {
+		return nil, fmt.Errorf("item not found")
+	}
+
+	user := domain.User{}
+
+	err = dynamodbattribute.UnmarshalMap(result.Item, &user)
+
+	if err != nil {
+		return nil, fmt.Errorf("unmarshal map - %s", err.Error())
+	}
+
+	return &user, nil
 }
 
 func toPersistedDynamodbEntity(u domain.User) *UserModel {
@@ -81,7 +106,7 @@ func toPersistedDynamodbEntity(u domain.User) *UserModel {
 
 // func (repo *dynamoDBRepo) FindAll() ([]entity.Post, error) {
 // 	// Get a new DynamoDB client
-// 	dynamoDBClient := createDynamoDBClient()
+// 	dynamoDBClient := connect()
 
 // 	// Build the query input parameters
 // 	params := &dynamodb.ScanInput{
@@ -107,28 +132,7 @@ func toPersistedDynamodbEntity(u domain.User) *UserModel {
 // 	return posts, nil
 // }
 
-// func (repo *dynamoDBRepo) FindByID(id string) (*entity.Post, error) {
-// 	// Get a new DynamoDB client
-// 	dynamoDBClient := createDynamoDBClient()
 
-// 	result, err := dynamoDBClient.GetItem(&dynamodb.GetItemInput{
-// 		TableName: aws.String(repo.tableName),
-// 		Key: map[string]*dynamodb.AttributeValue{
-// 			"id": {
-// 				N: aws.String(id),
-// 			},
-// 		},
-// 	})
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	post := entity.Post{}
-// 	err = dynamodbattribute.UnmarshalMap(result.Item, &post)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	return &post, nil
-// }
 
 // // Delete: TODO
 // func (repo *dynamoDBRepo) Delete(post *entity.Post) error {

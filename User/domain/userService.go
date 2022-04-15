@@ -6,11 +6,13 @@ import (
 
 type UserService interface {
 	CreateUserInDynamodb(string, string, string, string, string, string, Role) (User, error)
+	GetUserById(string) (*User, error)
 }
 
 type service struct {
 	userDynamodbRepository UserDynamoDBRepository
 }
+
 
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
@@ -19,6 +21,7 @@ func HashPassword(password string) (string, error) {
 	}
 	return string(bytes), nil
 }
+
 
 func (s service) CreateUserInDynamodb(firstName, lastName, username, phone, email, password string, role Role) (User, error) {
 	hashedPassword, err := HashPassword(password)
@@ -31,6 +34,15 @@ func (s service) CreateUserInDynamodb(firstName, lastName, username, phone, emai
 		return User{}, err1
 	}
 	return persistedUser, nil
+}
+
+
+func (s service) GetUserById(userId string) (*User, error) {
+	res, err := s.userDynamodbRepository.FindByID(userId)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }
 
 func NewUserService(userDynamodbRepository UserDynamoDBRepository) UserService {

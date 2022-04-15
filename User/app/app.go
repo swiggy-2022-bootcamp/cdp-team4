@@ -46,7 +46,7 @@ func Start() {
 	}
 	PORT := os.Getenv("PORT")
 
-	userDynamodbRepository := infra.NewDynamoDBRepository()
+	userDynamodbRepository := infra.NewDynamoRepository()
 
 	userHandler = UserHandler{
 		userService: domain.NewUserService(userDynamodbRepository),

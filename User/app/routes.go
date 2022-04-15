@@ -10,4 +10,5 @@ func HealthCheckRouter(gin *gin.Engine) {
 
 func UserRouter(gin *gin.Engine) {
 	gin.POST("/user", userHandler.HandleUserCreation())
+	gin.GET("/user/:id", userHandler.HandleGetUserByID())
 }
