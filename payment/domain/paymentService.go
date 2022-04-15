@@ -1,6 +1,8 @@
 package domain
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type PaymentService interface {
 	CreateDynamoPaymentRecord(
@@ -19,6 +21,7 @@ type PaymentService interface {
 	UpdatePaymentStatus(string, string) (bool, error)
 	UpdatePaymentMethod(string, string) (bool, error)
 	GetPaymentMethods(string) ([]string, error)
+	AddPaymentMethod(string, string, string, string) (bool, error)
 }
 
 type paymentService struct {
@@ -48,7 +51,7 @@ func (service paymentService) CreateDynamoPaymentRecord(
 		Notes:       notes,
 	}
 
-	ok, err := service.PaymentDynamoRepository.Insert(paymentRecord)
+	ok, err := service.PaymentDynamoRepository.InsertPaymentRecord(paymentRecord)
 	if !ok {
 		return false, err
 	}
@@ -56,7 +59,7 @@ func (service paymentService) CreateDynamoPaymentRecord(
 }
 
 func (service paymentService) GetPaymentRecordById(id string) (*Payment, error) {
-	paymentRecord, err := service.PaymentDynamoRepository.FindById(id)
+	paymentRecord, err := service.PaymentDynamoRepository.FindPaymentRecordById(id)
 	if err != nil {
 		return nil, err
 	}
@@ -72,13 +75,43 @@ func (service paymentService) UpdatePaymentMethod(id, method string) (bool, erro
 }
 
 func (service paymentService) GetPaymentMethods(id string) ([]string, error) {
-	return []string{}, nil
+	methods, err := service.PaymentDynamoRepository.GetPaymentMethods(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return methods, nil
 }
 
 func (service paymentService) UpdatePaymentStatus(
 	paymentID string,
 	paymentStatus string,
 ) (bool, error) {
+	return true, nil
+}
+
+func (service paymentService) AddPaymentMethod(id, method, agree, comment string) (bool, error) {
+	var paymentRecord = PaymentMethod{
+		Id:      id,
+		Agree:   agree,
+		Comment: comment,
+		Method:  []string{method},
+	}
+	_, err := service.PaymentDynamoRepository.GetPaymentMethods(id)
+
+	if err != nil {
+		ok, err := service.PaymentDynamoRepository.InsertPaymentMethod(paymentRecord)
+		if !ok {
+			return false, err
+		}
+		return ok, nil
+	}
+
+	ok, err := service.PaymentDynamoRepository.UpdatePaymentMethods(id, method)
+	if !ok {
+		return ok, err
+	}
+
 	return true, nil
 }
 

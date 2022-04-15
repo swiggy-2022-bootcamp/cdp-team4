@@ -13,10 +13,20 @@ type Payment struct {
 	Notes       []string
 }
 
+type PaymentMethod struct {
+	Id      string
+	Method  []string
+	Agree   string
+	Comment string
+}
+
 type PaymentDynamoRepository interface {
-	Insert(Payment) (bool, error)
-	FindById(string) (*Payment, error)
-	FindByUserID(string) ([]Payment, error)
-	UpdateItem(string, string) (bool, error)
-	DeleteByID(string) (bool, error)
+	InsertPaymentRecord(Payment) (bool, error)
+	FindPaymentRecordById(string) (*Payment, error)
+	FindPaymentRecordByUserID(string) ([]Payment, error)
+	UpdatePaymentRecord(string, string) (bool, error)
+	UpdatePaymentMethods(string, string) (bool, error)
+	DeletePaymentRecordByID(string) (bool, error)
+	InsertPaymentMethod(PaymentMethod) (bool, error)
+	GetPaymentMethods(string) ([]string, error)
 }

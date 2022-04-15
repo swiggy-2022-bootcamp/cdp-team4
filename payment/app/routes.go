@@ -11,13 +11,13 @@ func HealthCheckRouter(gin *gin.Engine) {
 func PayRouter(gin *gin.Engine) {
 	p := gin.Group("/pay")
 	{
-		p.POST("/", paymentHandler.handlePay())
+		p.POST("/", paymentHandler.HandlePay())
 		p.PUT("/", paymentHandler.handleUpdatePayStatus())
 
-		p.GET("/user/{user_id}", paymentHandler.handleGetPayRecordsByUserID())
-		p.GET("/:id", paymentHandler.handleGetPayRecordByID())
+		p.GET("/user/:user_id", paymentHandler.handleGetPayRecordsByUserID())
+		p.GET("/:id", paymentHandler.HandleGetPayRecordByID())
 
 		p.POST("/paymentMethods", paymentHandler.handleAddPaymentMethods())
-		p.GET("/paymentMethods", paymentHandler.handleGetPaymentMethods())
+		p.GET("/paymentMethods/:id", paymentHandler.handleGetPaymentMethods())
 	}
 }
