@@ -2,6 +2,7 @@ package app
 
 import (
 	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -35,7 +36,7 @@ func Start() {
 		log.Fatal(err)
 		return
 	}
-	PORT := "6001"
+	PORT := os.Getenv("ORDER_SERVICE_PORT")
 	router := setupRouter()
 	configureSwaggerDoc()
 

@@ -174,7 +174,7 @@ func (oh OrderHandler) HandleGetAllRecords() gin.HandlerFunc {
 // @Produce      json
 // @Success      200  {object}  map[string]interface{}
 // @Failure      400  {number} 	http.StatusBadRequest
-// @Router       /orders    [put]
+// @Router       /order/status    [put]
 func (oh OrderHandler) handleUpdateOrderStatus() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var requestDTO struct {
@@ -202,7 +202,7 @@ func (oh OrderHandler) handleUpdateOrderStatus() gin.HandlerFunc {
 // @Produce      json
 // @Success      200  {object}  map[string]interface{}
 // @Failure      400  {number} 	http.StatusBadRequest
-// @Router       /orders    [delete]
+// @Router       /order/:id   [delete]
 func (oh OrderHandler) HandleDeleteOrderById() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("id")
@@ -231,7 +231,7 @@ func convertProductsDTOtoMaps(products []ProductRecordDTO) (map[string]int, map[
 func convertOrderModeltoOrderDTO(order domain.Order) OrderRecordDTO {
 	var prodcts []ProductRecordDTO
 	for k, v := range order.ProductsQuantity {
-		prodcts = append(prodcts, ProductRecordDTO{Product: k, Cost: int16(v), Quantity: order.ProductsQuantity[k]})
+		prodcts = append(prodcts, ProductRecordDTO{Product: k, Cost: int16(order.ProductsCost[k]), Quantity: v})
 	}
 	return OrderRecordDTO{
 		UserID:    order.UserID,
