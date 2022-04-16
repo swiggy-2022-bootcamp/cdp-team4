@@ -25,6 +25,11 @@ func connect() *dynamodb.DynamoDB {
 		SharedConfigState: session.SharedConfigEnable,
 	}))
 
+	// sess, _ := session.NewSession(&aws.Config{
+	// 	Region:   aws.String("us-east-1"),
+	// 	Endpoint: aws.String("http://localhost:8042"),
+	// })
+
 	// create dynamo client
 	svc := dynamodb.New(sess)
 
@@ -190,6 +195,8 @@ func (odr OrderDynamoRepository) UpdateOrderStatus(id, attributeValue string) (b
 		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
 			":s": {
 				S: aws.String(attributeValue),
+			}, ":s1": {
+				S: aws.String(time.Now().String()),
 			},
 		},
 		Key: map[string]*dynamodb.AttributeValue{
@@ -198,7 +205,7 @@ func (odr OrderDynamoRepository) UpdateOrderStatus(id, attributeValue string) (b
 			},
 		},
 		ReturnValues:     aws.String("UPDATED_NEW"),
-		UpdateExpression: aws.String("set order_status = :s"),
+		UpdateExpression: aws.String("set order_status = :s,updated_at = :s1"),
 		TableName:        aws.String("Order"),
 	}
 

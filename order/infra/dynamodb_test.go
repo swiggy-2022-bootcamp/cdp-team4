@@ -12,6 +12,7 @@ import (
 var testOrderService = infra.NewDynamoRepository()
 var insertedid string
 var inserteduserid string
+var insertedid2 string
 
 func TestShouldCreateNewOrderinDynamoDB(t *testing.T) {
 	userid := uuid.New().String()
@@ -50,7 +51,8 @@ func TestShouldCreateNewOrder2inDynamoDB(t *testing.T) {
 
 	newOrder := domain.NewOrder(userid, status, prodquant, prodcost, totalcost)
 	res, err := testOrderService.InsertOrder(*newOrder)
-	t.Logf("Inserted Id is %s\n", insertedid)
+	insertedid2 = res
+	t.Logf("Inserted Id is %s\n", insertedid2)
 	assert.NotNil(t, res)
 	assert.Nil(t, err)
 }
@@ -106,6 +108,12 @@ func TestShouldGetOrderByUserIdDynamoDB(t *testing.T) {
 
 func TestShouldUpdateOrderStatusDynamoDB(t *testing.T) {
 	res, err := testOrderService.UpdateOrderStatus(insertedid, "declined")
+	assert.NotNil(t, res)
+	assert.Nil(t, err)
+}
+
+func TestShouldUpdateOrder2StatusDynamoDB(t *testing.T) {
+	res, err := testOrderService.UpdateOrderStatus(insertedid2, "declined")
 	assert.NotNil(t, res)
 	assert.Nil(t, err)
 }
