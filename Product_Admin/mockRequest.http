@@ -1,0 +1,35 @@
+#Get list of products
+
+#curl -H "X-API-Key: 571d6920" https://my.api.mockaroo.com/products
+GET https://my.api.mockaroo.com/products?key=571d6920
+X-API-Key: 571d6920
+
+-----------------------------------------------------------------------
+#Add a product
+
+#curl -H "X-API-Key: 571d6920" -X POST https://my.api.mockaroo.com/products
+POST https://my.api.mockaroo.com/products?key=571d6920&__method=POST
+X-API-Key: 571d6920
+-----------------------------------------------------------------------
+#Get product by ID
+
+#curl -H "X-API-Key: 571d6920" https://my.api.mockaroo.com/products/123
+GET https://my.api.mockaroo.com/products/123?key=571d6920
+X-API-Key: 571d6920
+
+-----------------------------------------------------------------------
+#Update product by ID
+
+#curl -H "X-API-Key: 571d6920" -X PUT https://my.api.mockaroo.com/products/123
+PUT https://my.api.mockaroo.com/products/123?key=571d6920&__method=PUT
+X-API-Key: 571d6920
+
+-----------------------------------------------------------------------
+#Delete product by ID
+
+#curl -H "X-API-Key: 571d6920" -X DELETE https://my.api.mockaroo.com/products/123
+DELETE https://my.api.mockaroo.com/products/123?key=571d6920&__method=DELETE
+X-API-Key: 571d6920
+
+-----------------------------------------------------------------------
+#Search product
