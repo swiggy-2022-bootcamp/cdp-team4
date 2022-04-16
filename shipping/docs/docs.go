@@ -51,6 +51,214 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/shippingaddress": {
+            "post": {
+                "description": "This Handler allow user to create new Shipping Address",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Shipping Address"
+                ],
+                "summary": "Create Shipping Address",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                }
+            }
+        },
+        "/shippingaddress/:id": {
+            "get": {
+                "description": "This Handle returns shippingAddress given id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Shipping Address"
+                ],
+                "summary": "Get Shipping Address by id",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "This Handle Update shippingAddress given id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Shipping Address"
+                ],
+                "summary": "Update Shipping Address",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "This Handle deletes Delete Shipping Address given sid",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Shipping Address"
+                ],
+                "summary": "Delete Shipping Address",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                }
+            }
+        },
+        "/shippingcost": {
+            "put": {
+                "description": "This Handle Update allows admin to update shipping cost of a city",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Shipping Cost"
+                ],
+                "summary": "Update Shipping Cost",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "This Handle allows admin to create new Shipping Cost of a city",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Shipping Cost"
+                ],
+                "summary": "Create Shipping Cost",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "This Handle deletes Shipping Cost of a city",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Shipping Cost"
+                ],
+                "summary": "Delete Shipping Cost",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                }
+            }
+        },
+        "/shippingcost/:city": {
+            "get": {
+                "description": "This Handle returns Shipping Cost given city",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Shipping Cost"
+                ],
+                "summary": "Get Shipping Cost given city",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                }
+            }
         }
     }
 }`

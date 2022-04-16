@@ -31,6 +31,146 @@ paths:
       summary: Health of shipping service
       tags:
       - Health
+  /shippingaddress:
+    post:
+      description: This Handler allow user to create new Shipping Address
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Create Shipping Address
+      tags:
+      - Shipping Address
+  /shippingaddress/:id:
+    delete:
+      description: This Handle deletes Delete Shipping Address given sid
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Delete Shipping Address
+      tags:
+      - Shipping Address
+    get:
+      description: This Handle returns shippingAddress given id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Get Shipping Address by id
+      tags:
+      - Shipping Address
+    put:
+      description: This Handle Update shippingAddress given id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Update Shipping Address
+      tags:
+      - Shipping Address
+  /shippingcost:
+    delete:
+      description: This Handle deletes Shipping Cost of a city
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Delete Shipping Cost
+      tags:
+      - Shipping Cost
+    post:
+      description: This Handle allows admin to create new Shipping Cost of a city
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Create Shipping Cost
+      tags:
+      - Shipping Cost
+    put:
+      description: This Handle Update allows admin to update shipping cost of a city
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Update Shipping Cost
+      tags:
+      - Shipping Cost
+  /shippingcost/:city:
+    get:
+      description: This Handle returns Shipping Cost given city
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Get Shipping Cost given city
+      tags:
+      - Shipping Cost
 schemes:
 - http
 swagger: "2.0"

@@ -13,7 +13,7 @@ func ShippingRouter(router *gin.Engine) {
 	router.POST("/shippingaddress", shippingHandler.handleShippingAddress())
 	router.GET("/shippingaddress/:id", shippingHandler.HandleGetShippingAddrssByID())
 	router.PUT("/shippingaddress/:id", shippingHandler.HandleUpdateShippingAddressByID())
-	router.DELETE("/shippingaddress/:id", shippingHandler.HandleDeleteOrderById())
+	router.DELETE("/shippingaddress/:id", shippingHandler.HandleDeleteShippingAddressById())
 
 	router.POST("/shippingcost", shippingHandler.handleShippingCost())
 	router.GET("/shippingcost/:city", shippingHandler.HandleGetShippingCostByCity())

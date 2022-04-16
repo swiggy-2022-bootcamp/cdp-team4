@@ -23,14 +23,14 @@ type ShippingAddressRecordDTO struct {
 	PostCode  int    `json:"postcode"`
 }
 
-// Create Order
-// @Summary      Create Order
-// @Description  This Handle allows admin to create new Order
-// @Tags         Order
+// Create Shipping Address
+// @Summary      Create Shipping Address
+// @Description  This Handler allow user to create new Shipping Address
+// @Tags         Shipping Address
 // @Produce      json
 // @Success      200  {object}  map[string]interface{}
 // @Failure      400  {number} 	http.StatusBadRequest
-// @Router       /order    [post]
+// @Router       /shippingaddress    [post]
 func (sh ShippingHandler) handleShippingAddress() gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
@@ -54,18 +54,18 @@ func (sh ShippingHandler) handleShippingAddress() gin.HandlerFunc {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			return
 		}
-		ctx.JSON(http.StatusAccepted, gin.H{"message": "Order Record Added", "order id": res})
+		ctx.JSON(http.StatusAccepted, gin.H{"message": "Shipping Address Record Added", "Shipping Address id": res})
 	}
 }
 
-// Get Order by ID
-// @Summary      Get Order by id
-// @Description  This Handle returns Order given order id
-// @Tags         Order
+// Get Shipping Address by Id
+// @Summary      Get Shipping Address by id
+// @Description  This Handle returns shippingAddress given id
+// @Tags         Shipping Address
 // @Produce      json
 // @Success      200  {object}  map[string]interface{}
 // @Failure      400  {number} 	http.StatusBadRequest
-// @Router       /order/:id    [get]
+// @Router       /shippingaddress/:id    [get]
 func (sh ShippingHandler) HandleGetShippingAddrssByID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("id")
@@ -80,14 +80,14 @@ func (sh ShippingHandler) HandleGetShippingAddrssByID() gin.HandlerFunc {
 	}
 }
 
-// Update order status
-// @Summary      Update order status
-// @Description  This Handle Update order status given order id
-// @Tags         Order
+// Update Shipping Address
+// @Summary      Update Shipping Address
+// @Description  This Handle Update shippingAddress given id
+// @Tags         Shipping Address
 // @Produce      json
 // @Success      200  {object}  map[string]interface{}
 // @Failure      400  {number} 	http.StatusBadRequest
-// @Router       /orders    [put]
+// @Router       /shippingaddress/:id     [put]
 func (sh ShippingHandler) HandleUpdateShippingAddressByID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var saDto ShippingAddressRecordDTO
@@ -107,15 +107,15 @@ func (sh ShippingHandler) HandleUpdateShippingAddressByID() gin.HandlerFunc {
 	}
 }
 
-// Delete order
-// @Summary      Delete order
-// @Description  This Handle deletes order given order id
-// @Tags         Order
+// Delete Shipping Address
+// @Summary      Delete Shipping Address
+// @Description  This Handle deletes Delete Shipping Address given sid
+// @Tags         Shipping Address
 // @Produce      json
 // @Success      200  {object}  map[string]interface{}
 // @Failure      400  {number} 	http.StatusBadRequest
-// @Router       /orders    [delete]
-func (sh ShippingHandler) HandleDeleteOrderById() gin.HandlerFunc {
+// @Router       /shippingaddress/:id   [delete]
+func (sh ShippingHandler) HandleDeleteShippingAddressById() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("id")
 		fmt.Println(id)

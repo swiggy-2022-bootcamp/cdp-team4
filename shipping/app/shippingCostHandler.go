@@ -12,14 +12,14 @@ type ShippingCostRecordDTO struct {
 	Cost int    `json:"cost"`
 }
 
-// Create Order
-// @Summary      Create Order
-// @Description  This Handle allows admin to create new Order
-// @Tags         Order
+// Create Shipping Cost
+// @Summary      Create Shipping Cost
+// @Description  This Handle allows admin to create new Shipping Cost of a city
+// @Tags         Shipping Cost
 // @Produce      json
 // @Success      200  {object}  map[string]interface{}
 // @Failure      400  {number} 	http.StatusBadRequest
-// @Router       /order    [post]
+// @Router       /shippingcost    [post]
 func (sh ShippingHandler) handleShippingCost() gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
@@ -39,14 +39,14 @@ func (sh ShippingHandler) handleShippingCost() gin.HandlerFunc {
 	}
 }
 
-// Get Order by ID
-// @Summary      Get Order by id
-// @Description  This Handle returns Order given order id
-// @Tags         Order
+// Get Shipping Cost given city
+// @Summary      Get Shipping Cost given city
+// @Description  This Handle returns Shipping Cost given city
+// @Tags         Shipping Cost
 // @Produce      json
 // @Success      200  {object}  map[string]interface{}
 // @Failure      400  {number} 	http.StatusBadRequest
-// @Router       /order/:id    [get]
+// @Router       /shippingcost/:city    [get]
 func (sh ShippingHandler) HandleGetShippingCostByCity() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		city := ctx.Param("city")
@@ -60,14 +60,14 @@ func (sh ShippingHandler) HandleGetShippingCostByCity() gin.HandlerFunc {
 	}
 }
 
-// Update order status
-// @Summary      Update order status
-// @Description  This Handle Update order status given order id
-// @Tags         Order
+// Update Shipping Cost
+// @Summary      Update Shipping Cost
+// @Description  This Handle Update allows admin to update shipping cost of a city
+// @Tags         Shipping Cost
 // @Produce      json
 // @Success      200  {object}  map[string]interface{}
 // @Failure      400  {number} 	http.StatusBadRequest
-// @Router       /orders    [put]
+// @Router       /shippingcost    [put]
 func (sh ShippingHandler) HandleUpdateShippingCostByCity() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var scDto ShippingCostRecordDTO
@@ -89,14 +89,14 @@ func (sh ShippingHandler) HandleUpdateShippingCostByCity() gin.HandlerFunc {
 	}
 }
 
-// Delete order
-// @Summary      Delete order
-// @Description  This Handle deletes order given order id
-// @Tags         Order
+// Delete Shipping Cost
+// @Summary      Delete Shipping Cost
+// @Description  This Handle deletes Shipping Cost of a city
+// @Tags         Shipping Cost
 // @Produce      json
 // @Success      200  {object}  map[string]interface{}
 // @Failure      400  {number} 	http.StatusBadRequest
-// @Router       /orders    [delete]
+// @Router       /shippingcost    [delete]
 func (sh ShippingHandler) HandleDeleteShippingCostByCity() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		city := ctx.Param("city")
