@@ -21,13 +21,13 @@ type ShippingAddressDynamoRepository struct {
 }
 
 func connect() *dynamodb.DynamoDB {
-	// sess := session.Must(session.NewSessionWithOptions(session.Options{
-	// 	SharedConfigState: session.SharedConfigEnable,
-	// }))
-	sess, _ := session.NewSession(&aws.Config{
-		Region:   aws.String("us-east-1"),
-		Endpoint: aws.String("http://localhost:8042"),
-	})
+	sess := session.Must(session.NewSessionWithOptions(session.Options{
+		SharedConfigState: session.SharedConfigEnable,
+	}))
+	// sess, _ := session.NewSession(&aws.Config{
+	// 	Region:   aws.String("us-east-1"),
+	// 	Endpoint: aws.String("http://localhost:8042"),
+	// })
 
 	// create dynamo client
 	svc := dynamodb.New(sess)
