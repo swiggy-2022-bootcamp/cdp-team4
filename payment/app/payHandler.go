@@ -40,7 +40,7 @@ func (ph PayHandler) HandlePay() gin.HandlerFunc {
 			return
 		}
 
-		ok, err := ph.PaymentService.CreateDynamoPaymentRecord(
+		data, err := ph.PaymentService.CreateDynamoPaymentRecord(
 			paymentDto.Amount,
 			paymentDto.Currency,
 			paymentDto.Status,
@@ -51,11 +51,15 @@ func (ph PayHandler) HandlePay() gin.HandlerFunc {
 			paymentDto.VPA,
 			paymentDto.Notes,
 		)
-		if !ok {
+		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			return
 		}
-		ctx.JSON(http.StatusAccepted, gin.H{"message": "payment record added"})
+		if data == nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": "unable to create payment link"})
+			return
+		}
+		ctx.JSON(http.StatusAccepted, gin.H{"message": "payment record added", "data": data})
 	}
 }
 

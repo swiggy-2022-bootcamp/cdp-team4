@@ -1,7 +1,13 @@
 package domain
 
 import (
+	"os"
+
 	"go.mongodb.org/mongo-driver/bson/primitive"
+
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	razorpay "github.com/razorpay/razorpay-go"
 )
 
 type PaymentService interface {
@@ -15,7 +21,7 @@ type PaymentService interface {
 		string,
 		string,
 		[]string,
-	) (bool, error)
+	) (map[string]interface{}, error)
 	GetPaymentRecordById(string) (*Payment, error)
 	GetPaymentAllRecordsByUserId(string) ([]Payment, error)
 	UpdatePaymentStatus(string, string) (bool, error)
@@ -32,11 +38,41 @@ func _generateUniqueId() string {
 	return primitive.NewObjectID().Hex()
 }
 
+func _getRazorpayPaymentLink(p Payment) (map[string]interface{}, error) {
+	err := godotenv.Load(".env")
+	if err != nil {
+		return nil, nil
+	}
+
+	key_id := os.Getenv("RAZORPAY_KEY_ID")
+	key_secret := os.Getenv("RAZORPAY_KEY_SECRET")
+	client := razorpay.NewClient(key_id, key_secret)
+	data := gin.H{
+		"amount":       p.Amount,
+		"currency":     p.Currency,
+		"reference_id": _generateUniqueId(),
+		"customer": struct {
+			userId  string
+			orderId string
+		}{
+			userId:  p.UserID,
+			orderId: p.OrderID,
+		},
+		// "customer":
+		"notes": p.Notes,
+	}
+	body, err := client.PaymentLink.Create(data, nil)
+	if err != nil {
+		return nil, err
+	}
+	return body, err
+}
+
 func (service paymentService) CreateDynamoPaymentRecord(
 	amount int16,
 	currency, status, order_id, user_id, method, description, vpa string,
 	notes []string,
-) (bool, error) {
+) (map[string]interface{}, error) {
 	id := _generateUniqueId()
 	paymentRecord := Payment{
 		Id:          id,
@@ -53,9 +89,13 @@ func (service paymentService) CreateDynamoPaymentRecord(
 
 	ok, err := service.PaymentDynamoRepository.InsertPaymentRecord(paymentRecord)
 	if !ok {
-		return false, err
+		return nil, err
 	}
-	return true, nil
+	data, err := _getRazorpayPaymentLink(paymentRecord)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
 }
 
 func (service paymentService) GetPaymentRecordById(id string) (*Payment, error) {
