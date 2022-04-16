@@ -78,14 +78,14 @@ func (ph PayHandler) HandleGetPayRecordByID() gin.HandlerFunc {
 
 func (ph PayHandler) handleGetPayRecordsByUserID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		id := ctx.Param("user_id")
-		record, err := ph.PaymentService.GetPaymentAllRecordsByUserId(id)
+		// id := ctx.Param("user_id")
+		// record, err := ph.PaymentService.GetPaymentAllRecordsByUserId(id)
 
-		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-			return
-		}
-		ctx.JSON(http.StatusAccepted, gin.H{"record": record})
+		// if err != nil {
+		// 	ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		// 	return
+		// }
+		// ctx.JSON(http.StatusAccepted, gin.H{"record": record})
 	}
 }
 

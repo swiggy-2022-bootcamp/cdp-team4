@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"fmt"
 	"os"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -23,9 +24,9 @@ type PaymentService interface {
 		[]string,
 	) (map[string]interface{}, error)
 	GetPaymentRecordById(string) (*Payment, error)
-	GetPaymentAllRecordsByUserId(string) ([]Payment, error)
+	// GetPaymentAllRecordsByUserId(string) ([]Payment, error)
 	UpdatePaymentStatus(string, string) (bool, error)
-	UpdatePaymentMethod(string, string) (bool, error)
+	// UpdatePaymentMethod(string, string) (bool, error)
 	GetPaymentMethods(string) ([]string, error)
 	AddPaymentMethod(string, string, string, string) (bool, error)
 }
@@ -34,11 +35,11 @@ type paymentService struct {
 	PaymentDynamoRepository PaymentDynamoRepository
 }
 
-func _generateUniqueId() string {
+func GenerateUniqueId() string {
 	return primitive.NewObjectID().Hex()
 }
 
-func _getRazorpayPaymentLink(p Payment) (map[string]interface{}, error) {
+func GetRazorpayPaymentLink(p Payment) (map[string]interface{}, error) {
 	err := godotenv.Load(".env")
 	if err != nil {
 		return nil, nil
@@ -50,7 +51,7 @@ func _getRazorpayPaymentLink(p Payment) (map[string]interface{}, error) {
 	data := gin.H{
 		"amount":       p.Amount,
 		"currency":     p.Currency,
-		"reference_id": _generateUniqueId(),
+		"reference_id": GenerateUniqueId(),
 		"customer": struct {
 			userId  string
 			orderId string
@@ -58,7 +59,6 @@ func _getRazorpayPaymentLink(p Payment) (map[string]interface{}, error) {
 			userId:  p.UserID,
 			orderId: p.OrderID,
 		},
-		// "customer":
 		"notes": p.Notes,
 	}
 	body, err := client.PaymentLink.Create(data, nil)
@@ -73,7 +73,7 @@ func (service paymentService) CreateDynamoPaymentRecord(
 	currency, status, order_id, user_id, method, description, vpa string,
 	notes []string,
 ) (map[string]interface{}, error) {
-	id := _generateUniqueId()
+	id := GenerateUniqueId()
 	paymentRecord := Payment{
 		Id:          id,
 		Amount:      amount,
@@ -91,7 +91,7 @@ func (service paymentService) CreateDynamoPaymentRecord(
 	if !ok {
 		return nil, err
 	}
-	data, err := _getRazorpayPaymentLink(paymentRecord)
+	data, err := GetRazorpayPaymentLink(paymentRecord)
 	if err != nil {
 		return nil, err
 	}
@@ -106,13 +106,13 @@ func (service paymentService) GetPaymentRecordById(id string) (*Payment, error) 
 	return paymentRecord, nil
 }
 
-func (service paymentService) GetPaymentAllRecordsByUserId(id string) ([]Payment, error) {
-	return []Payment{}, nil
-}
+// func (service paymentService) GetPaymentAllRecordsByUserId(id string) ([]Payment, error) {
+// 	return []Payment{}, nil
+// }
 
-func (service paymentService) UpdatePaymentMethod(id, method string) (bool, error) {
-	return true, nil
-}
+// func (service paymentService) UpdatePaymentMethod(id, method string) (bool, error) {
+// 	return true, nil
+// }
 
 func (service paymentService) GetPaymentMethods(id string) ([]string, error) {
 	methods, err := service.PaymentDynamoRepository.GetPaymentMethods(id)
@@ -139,6 +139,7 @@ func (service paymentService) AddPaymentMethod(id, method, agree, comment string
 	}
 	_, err := service.PaymentDynamoRepository.GetPaymentMethods(id)
 
+	fmt.Print(err)
 	if err != nil {
 		ok, err := service.PaymentDynamoRepository.InsertPaymentMethod(paymentRecord)
 		if !ok {

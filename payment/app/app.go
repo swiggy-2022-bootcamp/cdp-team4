@@ -28,15 +28,15 @@ func setupRouter() *gin.Engine {
 	return router
 }
 
-func configureSwaggerDoc() {
+func ConfigureSwaggerDoc() {
 	docs.SwaggerInfo.Title = "Swagger Payment API"
 }
 
-func Start() {
+func Start(testMode bool) {
 	dynamoRepository := infra.NewDynamoRepository()
 	paymentHandler = PayHandler{PaymentService: domain.NewPaymentService(dynamoRepository)}
 
-	configureSwaggerDoc()
+	ConfigureSwaggerDoc()
 	router := setupRouter()
 
 	err := godotenv.Load(".env")
@@ -45,5 +45,7 @@ func Start() {
 		return
 	}
 	PORT := os.Getenv("PORT")
-	router.Run(":" + PORT)
+	if !testMode {
+		router.Run(":" + PORT)
+	}
 }

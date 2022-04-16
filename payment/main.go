@@ -16,5 +16,5 @@ import "github.com/swiggy-2022-bootcamp/cdp-team4/payment/app"
 
 // @BasePath /
 func main() {
-	app.Start()
+	app.Start(false /*testMode*/)
 }
