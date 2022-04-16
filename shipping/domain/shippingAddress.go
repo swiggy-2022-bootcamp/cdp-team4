@@ -4,11 +4,11 @@ import "github.com/swiggy-2022-bootcamp/cdp-team4/shipping/utils/errs"
 
 type ShippingAddress struct {
 	Id        string `json:"id"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
+	FirstName string `json:"firstname"`
+	LastName  string `json:"lastname"`
 	City      string `json:"city"`
-	Address1  string `json:"address1"`
-	Address2  string `json:"address2"`
+	Address1  string `json:"address_1"`
+	Address2  string `json:"address_2"`
 	CountryID int    `json:"country_id"`
 	PostCode  int    `json:"postcode"`
 }

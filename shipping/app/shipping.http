@@ -1,0 +1,60 @@
+POST http://localhost:7002/shippingaddress
+Content-Type: application/json
+
+{
+ "firstname": "Naveen",
+ "lastname": "Kumar",
+ "city": "Bengaluru",
+ "address_1": "Demo",
+ "address_2": "Demo",
+ "country_id": 81,
+ "postcode": 560068
+}
+
+
+###
+
+GET http://localhost:7002/shippingaddress/2ae72080-59f8-43b9-b514-af0ea970c242
+###
+
+PUT http://localhost:7002/shippingaddress/2ae72080-59f8-43b9-b514-af0ea970c242
+
+{
+ "firstname": "Naveen",
+ "lastname": "Kumar",
+ "city": "Bengaluru",
+ "address_1": "Demo",
+ "address_2": "Demo",
+ "country_id": 69,
+ "postcode": 567893
+}
+
+###
+
+DELETE http://localhost:7002/shippingaddress/2ae72080-59f8-43b9-b514-af0ea970c242
+
+
+###
+
+POST http://localhost:7002/shippingcost
+Content-Type: application/json
+
+{
+ "city":"Mumbai",
+ "cost":777
+}
+
+###
+GET http://localhost:7002/shippingcost/Mumbai
+
+###
+PUT http://localhost:7002/shippingcost
+Content-Type: application/json
+
+{
+ "city":"Mumbai",
+ "cost":7899
+}
+
+###
+DELETE  http://localhost:7002/shippingcost/Mumbai

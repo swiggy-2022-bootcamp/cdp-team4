@@ -22,6 +22,18 @@ func TestShouldCreateNewShippingCostinDynamoDB(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func TestShouldCreateNewShippingCost2inDynamoDB(t *testing.T) {
+
+	city := "Chennai"
+	cost := 109
+
+	newShippingCost := domain.NewShippingCost(city, cost)
+	res, err := testShippingCostService.InsertShippingCost(*newShippingCost)
+	t.Logf("Inserted Id is %s\n", insertedid)
+	assert.NotNil(t, res)
+	assert.Nil(t, err)
+}
+
 func TestShouldGetShippingCostsByShippingCostinDynamoDB(t *testing.T) {
 	t.Logf("Inserted Id is %s Reading\n", insertedid)
 	res, err := testShippingCostService.FindShippingCostByCity("Banglore")

@@ -7,3 +7,17 @@ import (
 func HealthCheckRouter(gin *gin.Engine) {
 	gin.GET("/", HealthCheck())
 }
+
+func ShippingRouter(router *gin.Engine) {
+
+	router.POST("/shippingaddress", shippingHandler.handleShippingAddress())
+	router.GET("/shippingaddress/:id", shippingHandler.HandleGetShippingAddrssByID())
+	router.PUT("/shippingaddress/:id", shippingHandler.HandleUpdateShippingAddressByID())
+	router.DELETE("/shippingaddress/:id", shippingHandler.HandleDeleteOrderById())
+
+	router.POST("/shippingcost", shippingHandler.handleShippingCost())
+	router.GET("/shippingcost/:city", shippingHandler.HandleGetShippingCostByCity())
+	router.PUT("/shippingcost", shippingHandler.HandleUpdateShippingCostByCity())
+	router.DELETE("/shippingcost/:city", shippingHandler.HandleDeleteShippingCostByCity())
+
+}

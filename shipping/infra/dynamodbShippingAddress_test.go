@@ -29,10 +29,24 @@ func TestShouldCreateNewShippingAddresssinDynamoDB(t *testing.T) {
 }
 
 func TestShouldGetShippingAddresssByShippingAddresssIdDynamoDB(t *testing.T) {
-	t.Logf("Inserted Id is %s Reading\n", insertedid)
+	firstname := "Naveen"
+	lastname := "Kumar"
+	city := "Banglore"
+	address1 := "Address1"
+	address2 := "Address2"
+	countryid := 81
+	postcode := 560063
+	//t.Logf("Inserted Id is %s Reading\n", insertedid)
 	res, err := testShippingAddressService.FindShippingAddressById(insertedid)
 	assert.NotNil(t, res)
 	assert.Nil(t, err)
+	assert.Equal(t, firstname, res.FirstName)
+	assert.Equal(t, lastname, res.LastName)
+	assert.Equal(t, city, res.City)
+	assert.Equal(t, address1, res.Address1)
+	assert.Equal(t, address2, res.Address2)
+	assert.Equal(t, countryid, res.CountryID)
+	assert.Equal(t, postcode, res.PostCode)
 }
 
 func TestShouldUpdateShippingAddresssStatusDynamoDB(t *testing.T) {
@@ -50,8 +64,8 @@ func TestShouldUpdateShippingAddresssStatusDynamoDB(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func TestShouldDeleteShippingAddresssByShippingAddresssIdDynamoDB(t *testing.T) {
-	res, err := testShippingAddressService.DeleteShippingAddressById(insertedid)
-	assert.NotNil(t, res)
-	assert.Nil(t, err)
-}
+// func TestShouldDeleteShippingAddresssByShippingAddresssIdDynamoDB(t *testing.T) {
+// 	res, err := testShippingAddressService.DeleteShippingAddressById(insertedid)
+// 	assert.NotNil(t, res)
+// 	assert.Nil(t, err)
+// }

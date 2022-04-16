@@ -9,31 +9,40 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/shipping/docs"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/shipping/domain"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/shipping/infra"
 )
+
+var shippingHandler ShippingHandler
 
 func setupRouter() *gin.Engine {
 	router := gin.Default()
 	// health check route
 	HealthCheckRouter(router)
-
+	ShippingRouter(router)
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	return router
 }
 
 func configureSwaggerDoc() {
-	docs.SwaggerInfo.Title = "Swagger Shipping API"
+	docs.SwaggerInfo.Title = "Swagger Order API"
 }
 
 func Start() {
+	dynamoRepository := infra.NewDynamoShippingAddressRepository()
+	dynamoRepository1 := infra.NewShippingCostDynamoRepository()
+	shippingHandler = ShippingHandler{
+		ShippingAddressService: domain.NewShippingAddressService(dynamoRepository),
+		ShippingCostService:    domain.NewShippingCostService(dynamoRepository1),
+	}
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 	PORT := os.Getenv("SHIPPING_SERVICE_PORT")
-
-	configureSwaggerDoc()
 	router := setupRouter()
+	configureSwaggerDoc()
 
 	router.Run(":" + PORT)
 }

@@ -3,13 +3,13 @@ package infra
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/shipping/domain"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/shipping/utils/errs"
 )
 
 type ShippingCostDynamoRepository struct {
@@ -17,13 +17,13 @@ type ShippingCostDynamoRepository struct {
 	Tablename string
 }
 
-func (sdr ShippingCostDynamoRepository) InsertShippingCost(p domain.ShippingCost) (bool, error) {
+func (sdr ShippingCostDynamoRepository) InsertShippingCost(p domain.ShippingCost) (bool, *errs.AppError) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	ShippingCostRecord := toPersistedDynamodbEntitySC(p)
 	av, err := dynamodbattribute.MarshalMap(ShippingCostRecord)
 	if err != nil {
-		return false, fmt.Errorf("unable to marshal - %s", err.Error())
+		return false, &errs.AppError{Message: fmt.Sprintf("unable to marshal - %s", err.Error())}
 	}
 
 	input := &dynamodb.PutItemInput{
@@ -34,13 +34,13 @@ func (sdr ShippingCostDynamoRepository) InsertShippingCost(p domain.ShippingCost
 	_, err = sdr.Session.PutItemWithContext(ctx, input)
 
 	if err != nil {
-		return false, fmt.Errorf("unable to put the item - %s", err.Error())
+		return false, &errs.AppError{Message: fmt.Sprintf("unable to put the item - %s", err.Error())}
 	}
 
 	return true, nil
 }
 
-func (sdr ShippingCostDynamoRepository) FindShippingCostByCity(city string) (*domain.ShippingCost, error) {
+func (sdr ShippingCostDynamoRepository) FindShippingCostByCity(city string) (*domain.ShippingCost, *errs.AppError) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -55,50 +55,80 @@ func (sdr ShippingCostDynamoRepository) FindShippingCostByCity(city string) (*do
 
 	result, err := sdr.Session.GetItemWithContext(ctx, input)
 	if err != nil {
-		return nil, fmt.Errorf("unable to get the item - %s", err.Error())
+		return nil, &errs.AppError{Message: fmt.Sprintf("unable to get the item - %s", err.Error())}
 	}
 
 	if result.Item == nil {
-		return nil, fmt.Errorf("item not found")
+		return nil, &errs.AppError{Message: "item not found"}
 	}
 
 	ShippingCostModel := domain.ShippingCost{}
 	err = dynamodbattribute.UnmarshalMap(result.Item, &ShippingCostModel)
 
 	if err != nil {
-		return nil, fmt.Errorf("unmarshal map - %s", err.Error())
+		return nil, &errs.AppError{Message: fmt.Sprintf("unmarshal map - %s", err.Error())}
 	}
 
 	return &ShippingCostModel, nil
 }
 
-func (sdr ShippingCostDynamoRepository) UpdateShippingCost(sh domain.ShippingCost) (bool, error) {
+func (sdr ShippingCostDynamoRepository) UpdateShippingCost(sh domain.ShippingCost) (bool, *errs.AppError) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	input := &dynamodb.UpdateItemInput{
-		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
-			":s": {
-				S: aws.String(strconv.Itoa(sh.ShippingCost)),
-			},
-		},
+	// Not a right way to do
+	// input := &dynamodb.UpdateItemInput{
+	// 	ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
+	// 		":s": {
+	// 			S: aws.String(strconv.Itoa(sh.ShippingCost)),
+	// 		},
+	// 	},
+	// 	Key: map[string]*dynamodb.AttributeValue{
+	// 		"city": {
+	// 			S: aws.String(sh.City),
+	// 		},
+	// 	},
+	// 	ReturnValues:     aws.String("UPDATED_NEW"),
+	// 	UpdateExpression: aws.String("set shipping_cost=:s"),
+	// 	TableName:        aws.String("ShippingCost"),
+	// }
+
+	// _, err := sdr.Session.UpdateItemWithContext(ctx, input)
+	// if err != nil {
+	// 	return false, &errs.AppError{Message: fmt.Sprintf("unable to update - %s", err.Error())}
+	// }
+	input := &dynamodb.DeleteItemInput{
 		Key: map[string]*dynamodb.AttributeValue{
 			"city": {
 				S: aws.String(sh.City),
 			},
 		},
-		ReturnValues:     aws.String("UPDATED_NEW"),
-		UpdateExpression: aws.String("set cost=:s"),
-		TableName:        aws.String("ShippingCost"),
+		TableName: aws.String("ShippingCost"),
 	}
 
-	_, err := sdr.Session.UpdateItemWithContext(ctx, input)
+	_, err := sdr.Session.DeleteItemWithContext(ctx, input)
 	if err != nil {
-		return false, fmt.Errorf("unable to update - %s", err.Error())
+		return false, &errs.AppError{Message: fmt.Sprintf("unable to update - %s", err.Error())}
+	}
+	ShippingCostRecord := toPersistedDynamodbEntitySC(sh)
+	av, err := dynamodbattribute.MarshalMap(ShippingCostRecord)
+	if err != nil {
+		return false, &errs.AppError{Message: fmt.Sprintf("unable to marshal - %s", err.Error())}
+	}
+
+	input1 := &dynamodb.PutItemInput{
+		Item:      av,
+		TableName: aws.String("ShippingCost"),
+	}
+
+	_, err = sdr.Session.PutItemWithContext(ctx, input1)
+
+	if err != nil {
+		return false, &errs.AppError{Message: fmt.Sprintf("unable to update the item - %s", err.Error())}
 	}
 	return true, nil
 }
 
-func (sdr ShippingCostDynamoRepository) DeleteShippingCostByCity(city string) (bool, error) {
+func (sdr ShippingCostDynamoRepository) DeleteShippingCostByCity(city string) (bool, *errs.AppError) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	input := &dynamodb.DeleteItemInput{
@@ -112,15 +142,17 @@ func (sdr ShippingCostDynamoRepository) DeleteShippingCostByCity(city string) (b
 
 	_, err := sdr.Session.DeleteItemWithContext(ctx, input)
 	if err != nil {
-		return false, fmt.Errorf("unable to delete - %s", err.Error())
+		return false, &errs.AppError{Message: fmt.Sprintf("unable to delete - %s", err.Error())}
 	}
 	return true, nil
 }
 
 func toPersistedDynamodbEntitySC(o domain.ShippingCost) *ShippingCostModel {
 	return &ShippingCostModel{
-		City: o.City,
-		Cost: o.ShippingCost,
+		City:      o.City,
+		Cost:      o.ShippingCost,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 }
 
