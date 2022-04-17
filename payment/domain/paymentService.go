@@ -42,26 +42,32 @@ func GenerateUniqueId() string {
 func GetRazorpayPaymentLink(p Payment) (map[string]interface{}, error) {
 	err := godotenv.Load(".env")
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	key_id := os.Getenv("RAZORPAY_KEY_ID")
 	key_secret := os.Getenv("RAZORPAY_KEY_SECRET")
+	fmt.Print("secret done")
 	client := razorpay.NewClient(key_id, key_secret)
+	fmt.Print("razorpay client done")
 	data := gin.H{
 		"amount":       p.Amount,
 		"currency":     p.Currency,
 		"reference_id": GenerateUniqueId(),
-		"customer": struct {
-			userId  string
-			orderId string
-		}{
-			userId:  p.UserID,
-			orderId: p.OrderID,
-		},
-		"notes": p.Notes,
+		// "customer": struct {
+		// 	userId  string
+		// 	orderId string
+		// }{
+		// 	userId:  p.UserID,
+		// 	orderId: p.OrderID,
+		// },
+		// "notes": p.Notes,
 	}
+	fmt.Print("razorpay data done")
+
 	body, err := client.PaymentLink.Create(data, nil)
+	fmt.Printf("\n%+v \n", body)
+	fmt.Printf("%+v", err)
 	if err != nil {
 		return nil, err
 	}

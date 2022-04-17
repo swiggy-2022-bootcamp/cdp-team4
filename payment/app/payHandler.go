@@ -3,10 +3,12 @@ package app
 import (
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/payment/domain"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/payment/infra/gokafka"
 )
 
 type PayHandler struct {
@@ -30,6 +32,17 @@ type PaymentMethodDTO struct {
 	Method  string
 	Agree   string
 	Comment string
+}
+
+func simulatePaymentDone(data interface{}) {
+	time.Sleep(10 * time.Second)
+	ok, err := gokafka.WriteMsgToKafka("payment", data)
+	if !ok {
+		log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+			Error("unable to write message to kafka")
+	}
+
+	log.Debug("write message to kafka")
 }
 
 func (ph PayHandler) HandlePay() gin.HandlerFunc {
@@ -69,6 +82,9 @@ func (ph PayHandler) HandlePay() gin.HandlerFunc {
 		ctx.JSON(http.StatusOK, gin.H{"message": "payment record added", "data": data})
 		log.WithFields(logrus.Fields{"data": data, "status": http.StatusOK}).
 			Info("payment record added")
+
+		// simulatoin of successful payment
+		go simulatePaymentDone(data)
 	}
 }
 
