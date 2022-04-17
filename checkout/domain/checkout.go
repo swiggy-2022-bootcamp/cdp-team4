@@ -2,7 +2,6 @@ package domain
 
 import (
 	context "context"
-	"fmt"
 )
 
 type Checkout struct {
@@ -16,9 +15,12 @@ func (ch *Checkout) OrderOverview(
 	ctx context.Context,
 	rq *OverviewRequest,
 ) (*OverviewResponse, error) {
-	fmt.Print("request received!")
+	// Get the User Cart details by ID 		[grpc call to Cart service]
+	// Get the Reward points details by ID 	[grpc call to Reward service]
+	// Get the Shipping details by ID 		[grpc call to Shipping service]
+
 	return &OverviewResponse{
-		UserID:               "abs",
+		UserID:               rq.GetUserID(),
 		TotalPrice:           15,
 		ShippingPrice:        5,
 		RewardPointsConsumed: 2,
@@ -28,6 +30,4 @@ func (ch *Checkout) OrderOverview(
 	}, nil
 }
 
-func (ch *Checkout) mustEmbedUnimplementedCheckoutServer() {
-
-}
+func (ch *Checkout) mustEmbedUnimplementedCheckoutServer() {}
