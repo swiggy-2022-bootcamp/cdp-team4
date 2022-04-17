@@ -118,6 +118,92 @@ func (repo UserDynamoDBRepository) FindAll() ([]domain.User, error) {
 }
 
 
+func (repo UserDynamoDBRepository) UpdateById(user domain.User) (bool, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	prevUserInput := &dynamodb.GetItemInput{
+		TableName: aws.String(repo.TableName),
+		Key: map[string]*dynamodb.AttributeValue{
+			"user_id": {
+				S: aws.String(user.UserID),
+			},
+		},
+	}
+
+	prevUserResult, err := repo.Session.GetItemWithContext(ctx, prevUserInput)
+	if err != nil {
+		return false, err
+	}
+
+	oldUser := domain.User{}
+	err = dynamodbattribute.UnmarshalMap(prevUserResult.Item, &oldUser)
+
+	if err != nil {
+		return false, fmt.Errorf("unmarshal map - %s", err.Error())
+	}
+
+	if user.FirstName == "" {
+		user.FirstName = oldUser.FirstName
+	}
+
+	if user.LastName == "" {
+		user.LastName = oldUser.LastName
+	}
+
+	if user.Phone == "" {
+		user.Phone = oldUser.Phone
+	}
+
+	if user.Email == "" {
+		user.Email = oldUser.Email
+	}
+
+	if user.Username == "" {
+		user.Username = oldUser.Username
+	}
+
+	if user.Password == "" {
+		user.Password = oldUser.Password
+	}
+
+	input := &dynamodb.UpdateItemInput{
+		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
+			":s": {
+				S: aws.String(user.FirstName),
+			}, ":s1": {
+				S: aws.String(user.LastName),
+			}, ":s2": {
+				S: aws.String(user.Phone),
+			}, ":s3": {
+				S: aws.String(user.Email),
+			}, ":s4": {
+				S: aws.String(user.Username),
+			}, ":s5": {
+				S: aws.String(user.Password),
+			}, ":s6": {
+				S: aws.String(time.Now().String()),
+			},
+		},
+		Key: map[string]*dynamodb.AttributeValue{
+			"user_id": {
+				S: aws.String(user.UserID),
+			},
+		},
+		ReturnValues:     aws.String("UPDATED_NEW"),
+		UpdateExpression: aws.String("set first_name =:s, last_name = :s1, phone = :s2, email = :s3, username = :s4, password = :s5, updated_at =:s6"),
+		TableName:        aws.String(repo.TableName),
+	}
+
+	_, err1 := repo.Session.UpdateItemWithContext(ctx, input)
+	if err1 != nil {
+		return false, err1
+	}
+	return true, err1
+}
+
+
+
 func (repo UserDynamoDBRepository) DeleteByID(id string) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

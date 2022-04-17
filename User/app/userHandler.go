@@ -90,6 +90,42 @@ func (h UserHandler) HandleGetAllUsers() gin.HandlerFunc {
 }
 
 
+func (h UserHandler) HandleUpdateUserByID() gin.HandlerFunc {
+	return func (ctx *gin.Context) {
+		var newUpdatedUser userDTO
+		userId := ctx.Param("id")
+
+		if err := ctx.BindJSON(&newUpdatedUser); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			return
+		}
+
+		role, err := domain.GetEnumByIndex(newUpdatedUser.Role) 
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+			return
+		}
+
+		_, err1 := h.userService.UpdateUserById(
+			userId,
+			newUpdatedUser.FirstName, 
+			newUpdatedUser.LastName, 
+			newUpdatedUser.Username, 
+			newUpdatedUser.Phone, 
+			newUpdatedUser.Email, 
+			newUpdatedUser.Password, 
+			role,
+		)
+		
+		if err1 != nil {
+			ctx.JSON(http.StatusInternalServerError, err1)
+		} else {
+			ctx.JSON(http.StatusAccepted, gin.H{"message": "user updated"})
+		}
+	}
+}
+
+
 func (h UserHandler) HandleDeleteUserByID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("id")

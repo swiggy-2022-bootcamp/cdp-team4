@@ -12,7 +12,7 @@ var testUserService = infra.NewDynamoRepository()
 var insertedid string
 var inserteduserid string
 
-func TestShouldCreateNewOrderinDynamoDB(t *testing.T) {
+func TestShouldCreateNewUserinDynamoDB(t *testing.T) {
 	userID := "afshsjgj14151joi"
 	firstName := "Swastik"
 	lastName := "Sahoo"
@@ -30,7 +30,7 @@ func TestShouldCreateNewOrderinDynamoDB(t *testing.T) {
 }
 
 
-func TestShouldGetOrderByUserIdDynamoDB(t *testing.T) {
+func TestShouldGetUserByUserIdDynamoDB(t *testing.T) {
 	userID := "afshsjgj14151joi"
 	firstName := "Swastik"
 	lastName := "Sahoo"
@@ -57,6 +57,49 @@ func TestShouldGetOrderByUserIdDynamoDB(t *testing.T) {
 	assert.Equal(t, res.Role, user.Role)
 }
 
+func TestShouldUpdateUserByIdDynamoDB(t *testing.T) {
+	userID := "afshsjgj14151joi"
+	firstName := "SwastikU"
+	lastName := "SahooU"
+	phone := "1234567890U"
+	email := "swastiksahoo22@gmail.comU"
+	username := "swastik153U"
+	password, _ := domain.HashPassword("Pass!23U")
+	role := domain.Admin
+
+	user := domain.NewUser(userID, firstName, lastName, username, phone, email, password, role)
+
+	t.Logf("Inserted User Id is %s Reading\n", userID)
+	res, err := testUserService.UpdateById(*user)
+	t.Logf("Read %v", res)
+
+	assert.NotNil(t, res)
+	assert.Nil(t, err)
+
+	assert.Equal(t, res,true)
+}
+
+func TestShouldUpdateUserByIdDynamoDB2(t *testing.T) {
+	userID := "afshsjgj14151joi"
+	firstName := ""
+	lastName := ""
+	phone := ""
+	email := ""
+	username := ""
+	password := ""
+	role := domain.Admin
+
+	user := domain.NewUser(userID, firstName, lastName, username, phone, email, password, role)
+
+	t.Logf("Inserted User Id is %s Reading\n", userID)
+	res, err := testUserService.UpdateById(*user)
+	t.Logf("Read %v", res)
+
+	assert.NotNil(t, res)
+	assert.Nil(t, err)
+
+	assert.Equal(t, res,true)
+}
 
 func TestShouldGetAllUsersDynamoDB(t *testing.T) {
 	res, err := testUserService.FindAll()

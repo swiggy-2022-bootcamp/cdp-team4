@@ -3,13 +3,14 @@ package domain
 import (
 	"golang.org/x/crypto/bcrypt"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	// "fmt"
+	"fmt"
 )
 
 type UserService interface {
 	CreateUserInDynamodb(string, string, string, string, string, string, Role) (User, error)
 	GetUserById(string) (*User, error)
 	GetAllUsers() ([]User, error)
+	UpdateUserById(user_id, firstName, lastName, username, phone, email, password string, role Role) (bool, error)
 	DeleteUserById(string) (bool, *error)
 }
 
@@ -54,6 +55,20 @@ func (s service) GetAllUsers() ([]User, error) {
 		return nil, err
 	}
 	return res, nil
+}
+
+
+func (s service) UpdateUserById(user_id, firstName, lastName, username, phone, email, password string, role Role) (bool, error) {
+	// oldUser, err := s.userDynamodbRepository.FindByID(user_id)
+	fmt.Println(user_id, firstName, lastName, username, phone, email, password, role)
+	
+	
+	user := NewUser(user_id, firstName, lastName, username, phone, email, password, role)
+	_, err := s.userDynamodbRepository.UpdateById(*user)
+	if err != nil {
+		return false, err
+	}
+	return true, err
 }
 
 
