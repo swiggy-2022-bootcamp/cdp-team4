@@ -66,6 +66,23 @@ func TestShouldGetAllUsers(t *testing.T) {
 	mockUserRepo.AssertNumberOfCalls(t, "FindAll", 1)
 }
 
+
+func TestShouldUpdateUserByUserId(t *testing.T) {
+	userID := "1"
+	firstName := "Swastik"
+	lastName := "Sahoo"
+	phone := "1234567890"
+	email := "swastiksahoo22@gmail.com"
+	username := "swastik153"
+	password, _ := domain.HashPassword("Pass!23")
+	role := domain.Admin
+	mockUserRepo.On("UpdateById", mock.Anything).Return(true, nil)
+
+	var _, err = userService.UpdateUserById(userID, firstName, lastName, username, phone, email, password, role)
+	assert.Nil(t, err)
+}
+
+
 func TestShouldDeleteUserByUserId(t *testing.T) {
 	userId := "1"
 	mockUserRepo.On("DeleteByID", userId).Return(true, nil)

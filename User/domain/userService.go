@@ -11,7 +11,7 @@ type UserService interface {
 	GetUserById(string) (*User, error)
 	GetAllUsers() ([]User, error)
 	UpdateUserById(user_id, firstName, lastName, username, phone, email, password string, role Role) (bool, error)
-	DeleteUserById(string) (bool, *error)
+	DeleteUserById(string) (bool, error)
 }
 
 type service struct {
@@ -72,12 +72,12 @@ func (s service) UpdateUserById(user_id, firstName, lastName, username, phone, e
 }
 
 
-func (s service) DeleteUserById(userId string) (bool, *error) {
+func (s service) DeleteUserById(userId string) (bool, error) {
 	_, err := s.userDynamodbRepository.DeleteByID(userId)
 	if err != nil {
-		return false, &err
+		return false, err
 	}
-	return true, nil
+	return true, err
 }
 
 
