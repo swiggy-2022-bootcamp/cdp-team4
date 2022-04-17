@@ -1,16 +1,20 @@
 package app
 
 import (
-	"log"
+	"fmt"
+	"net"
 	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	pb "github.com/swiggy-2022-bootcamp/cdp-team4/shipping/app/protobuf"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/shipping/docs"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/shipping/domain"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/shipping/infra"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 var shippingHandler ShippingHandler
@@ -35,9 +39,10 @@ func Start() {
 		ShippingAddressService: domain.NewShippingAddressService(dynamoRepository),
 		ShippingCostService:    domain.NewShippingCostService(dynamoRepository1),
 	}
+	go startGrpcCostServer(shippingHandler)
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatal(err)
+		fmt.Print(err)
 		return
 	}
 	PORT := os.Getenv("SHIPPING_SERVICE_PORT")
@@ -46,3 +51,43 @@ func Start() {
 
 	router.Run(":" + PORT)
 }
+
+func startGrpcCostServer(sh ShippingHandler) {
+	gs := grpc.NewServer()
+	ss := NewShippingGrpcAddressServer()
+	pb.RegisterShippingServer(gs, ss)
+	reflection.Register(gs)
+	err := godotenv.Load(".env")
+	if err != nil {
+		fmt.Print(err)
+		return
+	}
+	GRPC_COST_PORT := os.Getenv("GRPC_PORT")
+	l, err := net.Listen("tcp", ":"+GRPC_COST_PORT)
+	if err != nil {
+		fmt.Print(err)
+		os.Exit(1)
+	}
+
+	gs.Serve(l)
+}
+
+// func startGrpcAddressServer(sh ShippingHandler) {
+// 	gs := grpc.NewServer()
+// 	ss := NewShippingGrpcAddressServer()
+// 	pb.RegisterShippingAddressServer(gs, ss)
+// 	reflection.Register(gs)
+// 	err := godotenv.Load(".env")
+// 	if err != nil {
+// 		fmt.Print(err)
+// 		return
+// 	}
+// 	GRPC_ADDRESSS_PORT := os.Getenv("GRPC_ADDRESSS_PORT")
+// 	l, err := net.Listen("tcp", ":"+GRPC_ADDRESSS_PORT)
+// 	if err != nil {
+// 		fmt.Print(err)
+// 		os.Exit(1)
+// 	}
+
+// 	gs.Serve(l)
+// }

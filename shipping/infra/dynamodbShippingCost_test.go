@@ -25,7 +25,7 @@ func TestShouldCreateNewShippingCostinDynamoDB(t *testing.T) {
 func TestShouldCreateNewShippingCost2inDynamoDB(t *testing.T) {
 
 	city := "Chennai"
-	cost := 109
+	cost := 199
 
 	newShippingCost := domain.NewShippingCost(city, cost)
 	res, err := testShippingCostService.InsertShippingCost(*newShippingCost)

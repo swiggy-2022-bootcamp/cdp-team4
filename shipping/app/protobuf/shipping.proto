@@ -1,0 +1,31 @@
+syntax = "proto3";
+package protobuf;
+option go_package ="./;protobuf";
+
+message ShippingAddressResponse {
+    string firstname = 1;
+    string lastname  = 2;
+    string city      = 3;
+    string address1  = 4;
+    string address2  = 5;
+    uint32 countryid = 6;
+    uint32 postcode  = 7;
+}
+
+message ShippingAddressRequest {
+    string shippingAddressID = 1;
+}
+
+message ShippingCostResponse {
+    string city = 1;
+    uint32 cost = 2;
+}
+
+message ShippingCostRequest {
+    string city = 1;
+}
+
+service Shipping {
+    rpc GetShippingAddress (ShippingAddressRequest) returns (ShippingAddressResponse);
+    rpc GetShippingCost (ShippingCostRequest) returns (ShippingCostResponse);
+}
