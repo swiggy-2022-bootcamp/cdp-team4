@@ -85,7 +85,8 @@ func TestGetPaymentRecordById(t *testing.T) {
 }
 
 func TestFailGetPaymentRecordById(t *testing.T) {
-	mockDynamoRepo.On("FindPaymentRecordById", "abcd").Return(nil, fmt.Errorf("element id not found"))
+	mockDynamoRepo.On("FindPaymentRecordById", "abcd").
+		Return(nil, fmt.Errorf("element id not found"))
 	service.GetPaymentRecordById("abcd")
 
 	mockDynamoRepo.AssertNumberOfCalls(t, "FindPaymentRecordById", 2)

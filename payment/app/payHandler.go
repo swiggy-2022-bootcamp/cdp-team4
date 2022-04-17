@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/payment/domain"
 )
 
@@ -37,6 +38,8 @@ func (ph PayHandler) HandlePay() gin.HandlerFunc {
 
 		if err := ctx.BindJSON(&paymentDto); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+				Error("bind json")
 			return
 		}
 
@@ -53,13 +56,19 @@ func (ph PayHandler) HandlePay() gin.HandlerFunc {
 		)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+				Error("create payment record")
 			return
 		}
 		if data == nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": "unable to create payment link"})
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+				Error("unable create payment link")
 			return
 		}
-		ctx.JSON(http.StatusAccepted, gin.H{"message": "payment record added", "data": data})
+		ctx.JSON(http.StatusOK, gin.H{"message": "payment record added", "data": data})
+		log.WithFields(logrus.Fields{"data": data, "status": http.StatusOK}).
+			Info("payment record added")
 	}
 }
 
@@ -70,9 +79,13 @@ func (ph PayHandler) HandleGetPayRecordByID() gin.HandlerFunc {
 
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+				Error("unable to fetch payment record")
 			return
 		}
-		ctx.JSON(http.StatusAccepted, gin.H{"record": record})
+		ctx.JSON(http.StatusOK, gin.H{"record": record})
+		log.WithFields(logrus.Fields{"record": record, "status": http.StatusOK}).
+			Info("payment record by id")
 	}
 }
 
@@ -97,15 +110,21 @@ func (ph PayHandler) handleUpdatePayStatus() gin.HandlerFunc {
 		}
 		if err := ctx.BindJSON(&requestDTO); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+				Error("unable to json bind")
 			return
 		}
 
 		ok, err := ph.PaymentService.UpdatePaymentStatus(requestDTO.Id, requestDTO.Status)
 		if !ok {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+				Error("unable update payment status")
 			return
 		}
-		ctx.JSON(http.StatusAccepted, gin.H{"message": "payment record updated"})
+		ctx.JSON(http.StatusOK, gin.H{"message": "payment record updated"})
+		log.WithFields(logrus.Fields{"status": http.StatusOK}).
+			Info("payment record updated")
 	}
 }
 
@@ -114,6 +133,8 @@ func (ph PayHandler) handleAddPaymentMethods() gin.HandlerFunc {
 		var paymentMethodDTO PaymentMethodDTO
 		if err := ctx.BindJSON(&paymentMethodDTO); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+				Error("unable to json bind")
 			return
 		}
 
@@ -127,12 +148,18 @@ func (ph PayHandler) handleAddPaymentMethods() gin.HandlerFunc {
 		if !ok {
 			if strings.Contains(err.Error(), "ConditionalCheckFailedException") {
 				ctx.JSON(http.StatusBadRequest, gin.H{"message": "method already exists"})
+				log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+					Debug("method already exists")
 				return
 			}
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+				Error("unable to add payment method")
 			return
 		}
-		ctx.JSON(http.StatusAccepted, gin.H{"message": "payment method added"})
+		ctx.JSON(http.StatusOK, gin.H{"message": "payment method added"})
+		log.WithFields(logrus.Fields{"status": http.StatusOK}).
+			Info("payment method added")
 	}
 }
 
@@ -143,8 +170,12 @@ func (ph PayHandler) handleGetPaymentMethods() gin.HandlerFunc {
 
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+				Error("unable to fetch payment methods")
 			return
 		}
-		ctx.JSON(http.StatusAccepted, gin.H{"record": methods})
+		ctx.JSON(http.StatusAccepted, gin.H{"methods": methods})
+		log.WithFields(logrus.Fields{"methods": methods, "status": http.StatusOK}).
+			Info("fetch payment methods")
 	}
 }

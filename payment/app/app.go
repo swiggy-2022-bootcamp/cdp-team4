@@ -1,20 +1,22 @@
 package app
 
 import (
-	"log"
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 
 	"github.com/joho/godotenv"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/payment/docs"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/payment/domain"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/payment/infra"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/payment/infra/logger"
 
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
 )
 
+var log logrus.Logger = *logger.GetLogger()
 var paymentHandler PayHandler
 
 func setupRouter() *gin.Engine {
@@ -46,6 +48,7 @@ func Start(testMode bool) {
 	}
 	PORT := os.Getenv("PORT")
 	if !testMode {
+		log.WithFields(logrus.Fields{"PORT": PORT}).Info("Running on PORT")
 		router.Run(":" + PORT)
 	}
 }
