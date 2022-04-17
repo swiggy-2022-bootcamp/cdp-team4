@@ -20,14 +20,16 @@ type userDTO struct {
 	Role      int    `json:"role"`
 }
 
-// Create User
-// @Summary      Create Customer
-// @Description  to create a customere
-// @Tags         Customer
-// @Produce      json
-// @Success      200  {object}  map[string]interface{}
-// @Failure      400  {number} 	http.StatusBadRequest
-// @Router       /    [get]
+// @Summary Create User
+// @Description To register a new user for the app.
+// @Tags User
+// @Schemes
+// @Accept json
+// @Produce json
+// @Param        user	body	domain.User  true  "User structure"
+// @Success	201  {string} 	http.StatusCreated
+// @Failure	400  {number} 	http.http.StatusBadRequest
+// @Router /user [POST]
 func (h UserHandler) HandleUserCreation() gin.HandlerFunc {
 	return func (ctx *gin.Context) {
 		var newUser userDTO
@@ -62,7 +64,17 @@ func (h UserHandler) HandleUserCreation() gin.HandlerFunc {
 	}
 }
 
-
+// @Summary Get User
+// @Description To get user details.
+// @Tags User
+// @Schemes
+// @Accept json
+// @Param id path string true "User Name"
+// @Produce json
+// @Success	202  {object} 	domain.User
+// @Failure	400  {number} 	http.StatusBadRequest
+// @Security Bearer Token
+// @Router /user/{id} [GET]
 func (h UserHandler) HandleGetUserByID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("id")
@@ -77,6 +89,15 @@ func (h UserHandler) HandleGetUserByID() gin.HandlerFunc {
 }
 
 
+// @Summary Get all User details
+// @Description To get every user detail.
+// @Tags User
+// @Schemes
+// @Accept json
+// @Produce json
+// @Success	200  {array} 	domain.User
+// @Failure	400  {number} 	http.StatusBadRequest
+// @Router /users [GET]
 func (h UserHandler) HandleGetAllUsers() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		records, err := h.userService.GetAllUsers()
@@ -90,6 +111,17 @@ func (h UserHandler) HandleGetAllUsers() gin.HandlerFunc {
 }
 
 
+// @Summary Update User
+// @Description To update user
+// @Tags User
+// @Schemes
+// @Accept json
+// @Param id path string true "User Name"
+// @Param        user	body	domain.User  true  "User structure"
+// @Produce json
+// @Success	202  {string} 	domain.User
+// @Failure	500  {number} 	http.StatusInternalServerError
+// @Router /user/{id} [PATCH]
 func (h UserHandler) HandleUpdateUserByID() gin.HandlerFunc {
 	return func (ctx *gin.Context) {
 		var newUpdatedUser userDTO
@@ -126,13 +158,23 @@ func (h UserHandler) HandleUpdateUserByID() gin.HandlerFunc {
 }
 
 
+// @Summary Delete User
+// @Description To remove a particular user.
+// @Tags User
+// @Schemes
+// @Accept json
+// @Param id path string true "User Name"
+// @Produce json
+// @Success	202  {string} 	http.StatusAccepted
+// @Failure	400  {number} 	http.StatusBadRequest
+// @Router /user/{id} [DELETE]
 func (h UserHandler) HandleDeleteUserByID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("id")
 		ok, err := h.userService.DeleteUserById(id)
 
 		if !ok {
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": (*err).Error()})
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			return
 		}
 		ctx.JSON(http.StatusAccepted, gin.H{"message": "user deleted"})

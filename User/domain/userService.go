@@ -59,7 +59,6 @@ func (s service) GetAllUsers() ([]User, error) {
 
 
 func (s service) UpdateUserById(user_id, firstName, lastName, username, phone, email, password string, role Role) (bool, error) {
-	// oldUser, err := s.userDynamodbRepository.FindByID(user_id)
 	fmt.Println(user_id, firstName, lastName, username, phone, email, password, role)
 	
 	
