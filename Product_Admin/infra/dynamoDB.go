@@ -18,36 +18,39 @@ type ProductAdminDynamoRepository struct {
 }
 
 func connect() *dynamodb.DynamoDB {
-	// sess := session.Must(session.NewSessionWithOptions(session.Options{
-	// 	SharedConfigState: session.SharedConfigEnable,
-	// }))
+	sess := session.Must(session.NewSessionWithOptions(session.Options{
+		SharedConfigState: session.SharedConfigEnable,
+	}))
 
-	// // create dynamo client
-	// svc := dynamodb.New(sess)
-
-	// return svc
-	sess, err := session.NewSession(&aws.Config{
-		Region:   aws.String("us-east-1"),
-		Endpoint: aws.String("http://localhost:8000"),
-	})
-	if err != nil {
-		panic(err.Error())
-	}
 	// create dynamo client
 	svc := dynamodb.New(sess)
+
 	return svc
+	// sess, err := session.NewSession(&aws.Config{
+	// 	Region:   aws.String("us-east-1"),
+	// 	Endpoint: aws.String("http://localhost:8000"),
+	// })
+	// if err != nil {
+	// 	panic(err.Error())
+	// }
+	// // create dynamo client
+	// svc := dynamodb.New(sess)
+	// return svc
+}
+
+type ProductCategory struct {
+	CategoryId string `json:"category_id"`
+	ProductId  string `json:"product_id"`
 }
 
 func (padr ProductAdminDynamoRepository) Insert(product domain.Product) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	productRecord := _toDynamoProductModel(&product)
-
 	av, err := dynamodbattribute.MarshalMap(productRecord)
 	if err != nil {
 		return false, fmt.Errorf("unable to marshal - %s", err.Error())
 	}
-
 	input := &dynamodb.PutItemInput{
 		Item:      av,
 		TableName: aws.String("Product"),
@@ -59,13 +62,32 @@ func (padr ProductAdminDynamoRepository) Insert(product domain.Product) (bool, e
 		return false, fmt.Errorf("unable to insert the item - %s", err.Error())
 	}
 
+	//add product categories in relation table
+	if product.ProductCategories != nil {
+		for _, categoryid := range product.ProductCategories {
+			productCategory := ProductCategory{CategoryId: categoryid, ProductId: product.Id}
+			av, err := dynamodbattribute.MarshalMap(productCategory)
+			if err != nil {
+				return false, fmt.Errorf("unable to marshal - %s", err.Error())
+			}
+			input := &dynamodb.PutItemInput{
+				Item:      av,
+				TableName: aws.String("ProductCategoryRelation"),
+			}
+			_, err = padr.Session.PutItemWithContext(ctx, input)
+
+			if err != nil {
+				return false, fmt.Errorf("unable to insert the item - %s", err.Error())
+			}
+		}
+	}
+
 	return true, nil
 }
 
 func (padr ProductAdminDynamoRepository) Find() ([]domain.Product, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	fmt.Print("find function in dynamodb.go")
 	input := &dynamodb.ScanInput{
 		TableName: aws.String("Product"),
 	}
@@ -77,7 +99,7 @@ func (padr ProductAdminDynamoRepository) Find() ([]domain.Product, error) {
 	var products = []domain.Product{}
 	for _, item := range result.Items {
 		product := domain.Product{}
-		if err := dynamodbattribute.UnmarshalMap(item, product); err != nil {
+		if err := dynamodbattribute.UnmarshalMap(item, &product); err != nil {
 			return []domain.Product{}, err
 		}
 		products = append(products, product)
@@ -108,11 +130,9 @@ func (padr ProductAdminDynamoRepository) FindByID(productID string) (domain.Prod
 
 	productModel := domain.Product{}
 	err = dynamodbattribute.UnmarshalMap(result.Item, &productModel)
-
 	if err != nil {
 		return domain.Product{}, fmt.Errorf("unmarshal map - %s", err.Error())
 	}
-
 	return productModel, nil
 
 }
@@ -134,7 +154,7 @@ func (padr ProductAdminDynamoRepository) UpdateItem(productID string, quantiyRed
 			},
 		},
 		Key: map[string]*dynamodb.AttributeValue{
-			"Id": {
+			"id": {
 				S: aws.String(productID),
 			},
 		},
@@ -185,10 +205,11 @@ func _toDynamoProductModel(p *domain.Product) ProductModel {
 			Description: item.Description, MetaTitle: item.MetaTitle, MetaDescription: item.MetaDescription, MetaKeyword: item.MetaKeyword,
 			Tag: item.Tag})
 	}
-	var productCategoriesModel []ProductCategoryModel
+	var productCategoriesModel []string
 	for _, item := range p.ProductCategories {
-		productCategoriesModel = append(productCategoriesModel, ProductCategoryModel{CategoryID: item.CategoryID})
+		productCategoriesModel = append(productCategoriesModel, item)
 	}
+
 	return ProductModel{
 		Id:                  p.Id,
 		Model:               p.Model,

@@ -1,9 +1,10 @@
-package domain
+package domain_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/Product_Admin/domain"
 )
 
 func TestShouldReturnNewShippingAddress(t *testing.T) {
@@ -13,7 +14,7 @@ func TestShouldReturnNewShippingAddress(t *testing.T) {
 	price := float64(299)
 	manufacturerID := "boat_company_id"
 	sku := "ZG011AQA"
-	productSEOURLs := []ProductSEOURL{}
+	productSEOURLs := []domain.ProductSEOURL{}
 	points := int64(15)
 	rewards := int64(20)
 	imageURL := "http://usnews.com/vivamus/metus/arcu/adipiscing.json?luctus=placerat&ultricies=praesent"
@@ -24,10 +25,10 @@ func TestShouldReturnNewShippingAddress(t *testing.T) {
 	height := 30.5
 	minimumQuantity := int64(2)
 	relatedProducts := []string{"boat bassheads 102", "boat bassheads 152"}
-	productDescription := []ProductDescription{}
-	productCategories := []ProductCategory{}
+	productDescription := []domain.ProductDescription{}
+	productCategories := []string{}
 
-	newProduct := NewProductObject(model, quantity, price, manufacturerID, sku, productSEOURLs, points, rewards,
+	newProduct := domain.NewProductObject(model, quantity, price, manufacturerID, sku, productSEOURLs, points, rewards,
 		imageURL, isShippable, weight, length, width, height, minimumQuantity, relatedProducts, productDescription,
 		productCategories)
 

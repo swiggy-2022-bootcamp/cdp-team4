@@ -1,141 +1,192 @@
-package domain
+package domain_test
 
-// import (
-// 	"testing"
+import (
+	"errors"
+	"testing"
 
-// 	"github.com/stretchr/testify/assert"
-// 	"github.com/stretchr/testify/mock"
-// 	"github.com/swiggy-2022-bootcamp/cdp-team4/Product_Admin/mocks"
-// )
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/Product_Admin/domain"
+	mocks "github.com/swiggy-2022-bootcamp/cdp-team4/Product_Admin/mocks"
+)
 
-// var mockProductAdminRepo = mocks.ProductAdminRepository{}
-// var orderService = NewProductAdminService(&mockProductAdminRepo)
+var mockProductAdminRepo = mocks.ProductAdminDynamoRepository{}
+var productService = domain.NewProductAdminService(&mockProductAdminRepo)
 
-// func TestShouldReturnNewProductAdminService(t *testing.T) {
-// 	productAdminService := NewProductAdminService(nil)
-// 	assert.NotNil(t, productAdminService)
-// }
+func TestShouldReturnNewProductAdminService(t *testing.T) {
+	productAdminService := domain.NewProductAdminService(nil)
+	assert.NotNil(t, productAdminService)
+}
 
-// func TestShouldCreateNewProduct(t *testing.T) {
-// 	productid := "1203712"
-// 	model := "boat bassheads 100"
-// 	quantity := int64(100)
-// 	price := float64(299)
-// 	manufacturerID := "boat_company_id"
-// 	sku := "ZG011AQA"
-// 	productSEOURLs := []ProductSEOURL{}
-// 	points := int64(15)
-// 	rewards := int64(20)
-// 	imageURL := "http://usnews.com/vivamus/metus/arcu/adipiscing.json?luctus=placerat&ultricies=praesent"
-// 	isShippable := true
-// 	weight := 120.25
-// 	length := 0.0
-// 	width := 0.0
-// 	height := 30.5
-// 	minimumQuantity := int64(2)
-// 	relatedProducts := []string{"boat bassheads 102", "boat bassheads 152"}
-// 	productDescription := []ProductDescription{}
-// 	productCategories := []ProductCategory{}
+func TestShouldCreateNewProduct(t *testing.T) {
+	model := "boat bassheads 100"
+	quantity := int64(100)
+	price := float64(299)
+	manufacturerID := "boat_company_id"
+	sku := "ZG011AQA"
+	productSEOURLs := []domain.ProductSEOURL{}
+	points := int64(15)
+	rewards := int64(20)
+	imageURL := "http://usnews.com/vivamus/metus/arcu/adipiscing.json?luctus=placerat&ultricies=praesent"
+	isShippable := true
+	weight := 120.25
+	length := 0.0
+	width := 0.0
+	height := 30.5
+	minimumQuantity := int64(2)
+	relatedProducts := []string{"boat bassheads 102", "boat bassheads 152"}
+	productDescription := []domain.ProductDescription{}
+	productCategories := []string{}
 
-// 	_ = NewProductObject(model, quantity, price, manufacturerID, sku, productSEOURLs, points, rewards,
-// 		imageURL, isShippable, weight, length, width, height, minimumQuantity, relatedProducts, productDescription,
-// 		productCategories)
+	_ = domain.NewProductObject(model, quantity, price, manufacturerID, sku, productSEOURLs, points, rewards,
+		imageURL, isShippable, weight, length, width, height, minimumQuantity, relatedProducts, productDescription,
+		productCategories)
 
-// 	mockProductAdminRepo.On("InsertProduct", mock.Anything).Return(productid, nil)
-// 	// productAdminService.CreateDynamoProductAdminRecord(model, quantity, price, manufacturerID, sku, productSEOURLs,
-// 	// 	points, rewards, imageURL, isShippable, weight, length, width, height, minimumQuantity,
-// 	// 	relatedProducts, productDescription, productCategories)
+	mockProductAdminRepo.On("Insert", mock.Anything).Return(true, nil)
+	productService.CreateDynamoProductAdminRecord(model, quantity, price, manufacturerID, sku, productSEOURLs,
+		points, rewards, imageURL, isShippable, weight, length, width, height, minimumQuantity,
+		relatedProducts, productDescription, productCategories)
 
-// 	mockProductAdminRepo.AssertNumberOfCalls(t, "InsertProduct", 1)
-// }
+	mockProductAdminRepo.AssertNumberOfCalls(t, "Insert", 1)
+}
 
-// // func TestShouldDeleteOrderByOrderId(t *testing.T) {
-// // 	orderId := "10293194182"
-// // 	mockOrderRepo.On("DeleteOrderById", orderId).Return(true, nil)
-// // 	res, err := orderService.DeleteOrderById(orderId)
-// // 	assert.Nil(t, err)
-// // 	assert.Equal(t, res, true)
-// // }
+func TestShouldDeleteProductByProductId(t *testing.T) {
+	productId := "10293194182"
+	mockProductAdminRepo.On("DeleteByID", productId).Return(true, nil)
+	res, err := productService.DeleteProductById(productId)
+	assert.Nil(t, err)
+	assert.Equal(t, res, true)
+}
 
-// // func TestShouldGetOrderByOrderId(t *testing.T) {
-// // 	orderId := "128132121"
-// // 	userid := "12321322"
-// // 	status := "pending"
-// // 	prodquant := map[string]int{
-// // 		"Origin of life":  1,
-// // 		"Reynolds trimax": 10,
-// // 	}
-// // 	prodcost := map[string]int{
-// // 		"Origin of life":  999,
-// // 		"Reynolds trimax": 60,
-// // 	}
-// // 	totalcost := 1700
+func TestShouldGetProductByProductId(t *testing.T) {
+	productId := "1203712"
+	model := "boat bassheads 100"
+	quantity := int64(100)
+	price := float64(299)
+	manufacturerID := "boat_company_id"
+	sku := "ZG011AQA"
+	productSEOURLs := []domain.ProductSEOURL{}
+	points := int64(15)
+	rewards := int64(20)
+	imageURL := "http://usnews.com/vivamus/metus/arcu/adipiscing.json?luctus=placerat&ultricies=praesent"
+	isShippable := true
+	weight := 120.25
+	length := 0.0
+	width := 0.0
+	height := 30.5
+	minimumQuantity := int64(2)
+	relatedProducts := []string{"boat bassheads 102", "boat bassheads 152"}
+	productDescription := []domain.ProductDescription{}
+	productCategories := []string{}
 
-// // 	newOrder := domain.NewOrder(userid, status, prodquant, prodcost, totalcost)
+	newProduct := domain.NewProductObject(model, quantity, price, manufacturerID, sku, productSEOURLs, points, rewards,
+		imageURL, isShippable, weight, length, width, height, minimumQuantity, relatedProducts, productDescription,
+		productCategories)
 
-// // 	mockOrderRepo.On("FindOrderById", orderId).Return(newOrder, nil)
-// // 	resOrder, _ := orderService.GetOrderById(orderId)
+	mockProductAdminRepo.On("FindByID", productId).Return(*newProduct, nil)
+	resProduct, _ := productService.GetProductById(productId)
+	mockProductAdminRepo.AssertNumberOfCalls(t, "FindByID", 1)
 
-// // 	assert.Equal(t, userid, resOrder.UserID)
-// // 	assert.Equal(t, status, resOrder.Status)
-// // 	assert.Equal(t, prodquant, resOrder.ProductsQuantity)
-// // 	assert.Equal(t, prodcost, resOrder.ProductsCost)
-// // 	assert.Equal(t, totalcost, resOrder.TotalCost)
-// // }
+	assert.Equal(t, model, resProduct.Model)
+	assert.Equal(t, quantity, resProduct.Quantity)
+	assert.Equal(t, price, resProduct.Price)
+	assert.Equal(t, manufacturerID, resProduct.ManufacturerID)
+	assert.Equal(t, sku, resProduct.SKU)
+	assert.Equal(t, productSEOURLs, resProduct.ProductSEOURLs)
+	assert.Equal(t, points, resProduct.Points)
+	assert.Equal(t, rewards, resProduct.Reward)
+	assert.Equal(t, imageURL, resProduct.ImageURL)
+	assert.Equal(t, isShippable, resProduct.IsShippable)
+	assert.Equal(t, weight, resProduct.Weight)
+	assert.Equal(t, height, resProduct.Height)
+	assert.Equal(t, minimumQuantity, resProduct.MinimumQuantity)
+	assert.Equal(t, relatedProducts, resProduct.RelatedProducts)
+	assert.Equal(t, productDescription, resProduct.ProductDescriptions)
+	assert.Equal(t, productCategories, resProduct.ProductCategories)
+}
 
-// // func TestShouldNotDeleteOrderByOrderIdUponInvalidOrderId(t *testing.T) {
-// // 	orderId := "-99"
-// // 	errMessage := "some error"
-// // 	mockOrderRepo.On("DeleteOrderById", orderId).Return(false, errs.NewUnexpectedError(errMessage))
+func TestShouldNotDeleteProductByProductIdUponInvalidProductId(t *testing.T) {
+	productId := "-99"
+	errMessage := "some error"
+	mockProductAdminRepo.On("DeleteByID", productId).Return(false, errors.New(errMessage))
 
-// // 	res, err := orderService.DeleteOrderById(orderId)
-// // 	assert.Equal(t, res, false)
-// // 	assert.Error(t, err.Error(), errMessage)
-// // }
+	res, err := productService.DeleteProductById(productId)
+	assert.Equal(t, res, false)
+	assert.Error(t, err, errMessage)
+}
 
-// // func TestShouldUpdateOrder(t *testing.T) {
-// // 	orderid := "31490934"
-// // 	userid := "12321324"
-// // 	status := "confirmed"
-// // 	prodquant := map[string]int{
-// // 		"Origin of life":  1,
-// // 		"Reynolds trimax": 10,
-// // 	}
-// // 	prodcost := map[string]int{
-// // 		"Origin of life":  1021,
-// // 		"Reynolds trimax": 60,
-// // 	}
-// // 	totalcost := 1800
+func TestShouldUpdateProductDetails(t *testing.T) {
+	model := "boat bassheads 100"
+	quantity := int64(100)
+	price := float64(299)
+	manufacturerID := "boat_company_id"
+	sku := "ZG011AQA"
+	productSEOURLs := []domain.ProductSEOURL{}
+	points := int64(15)
+	rewards := int64(20)
+	imageURL := "http://usnews.com/vivamus/metus/arcu/adipiscing.json?luctus=placerat&ultricies=praesent"
+	isShippable := true
+	weight := 120.25
+	length := 0.0
+	width := 0.0
+	height := 30.5
+	minimumQuantity := int64(2)
+	relatedProducts := []string{"boat bassheads 102", "boat bassheads 152"}
+	productDescription := []domain.ProductDescription{}
+	productCategories := []string{}
 
-// // 	_ = domain.NewOrder(userid, status, prodquant, prodcost, totalcost)
-// // 	mockOrderRepo.On("UpdateOrderStatus", orderid, status).Return(true, nil)
-// // 	res, err := orderService.UpdateOrderStatus(orderid, status)
+	newProduct := domain.NewProductObject(model, quantity, price, manufacturerID, sku, productSEOURLs, points, rewards,
+		imageURL, isShippable, weight, length, width, height, minimumQuantity, relatedProducts, productDescription,
+		productCategories)
 
-// // 	assert.Nil(t, err)
-// // 	assert.Equal(t, res, true)
-// // }
+	mockProductAdminRepo.On("UpdateItem", newProduct.Id, int64(5)).Return(true, nil)
+	res, err := productService.UpdateProduct(newProduct.Id, int64(5))
 
-// // func TestShouldGetAllOrders(t *testing.T) {
-// // 	userId := "12321324"
-// // 	status := "pending"
-// // 	prodquant := map[string]int{
-// // 		"Origin of life":  1,
-// // 		"Reynolds trimax": 10,
-// // 	}
-// // 	prodcost := map[string]int{
-// // 		"Origin of life":  999,
-// // 		"Reynolds trimax": 60,
-// // 	}
-// // 	totalcost := 1700
+	assert.Nil(t, err)
+	assert.Equal(t, res, true)
+}
 
-// // 	newOrder := domain.NewOrder(userId, status, prodquant, prodcost, totalcost)
+func TestShouldGetAllPeoducts(t *testing.T) {
+	model := "boat bassheads 100"
+	quantity := int64(100)
+	price := float64(299)
+	manufacturerID := "boat_company_id"
+	sku := "ZG011AQA"
+	productSEOURLs := []domain.ProductSEOURL{}
+	points := int64(15)
+	rewards := int64(20)
+	imageURL := "http://usnews.com/vivamus/metus/arcu/adipiscing.json?luctus=placerat&ultricies=praesent"
+	isShippable := true
+	weight := 120.25
+	length := 0.0
+	width := 0.0
+	height := 30.5
+	minimumQuantity := int64(2)
+	relatedProducts := []string{"boat bassheads 102", "boat bassheads 152"}
+	productDescription := []domain.ProductDescription{}
+	productCategories := []string{}
 
-// // 	mockOrderRepo.On("FindAllOrders").Return([]domain.Order{*newOrder}, nil)
-// // 	resOrders, _ := orderService.GetAllOrders()
+	newProduct := domain.NewProductObject(model, quantity, price, manufacturerID, sku, productSEOURLs, points, rewards,
+		imageURL, isShippable, weight, length, width, height, minimumQuantity, relatedProducts, productDescription,
+		productCategories)
 
-// // 	assert.Equal(t, userId, resOrders[0].UserID)
-// // 	assert.Equal(t, status, resOrders[0].Status)
-// // 	assert.Equal(t, prodquant, resOrders[0].ProductsQuantity)
-// // 	assert.Equal(t, prodcost, resOrders[0].ProductsCost)
-// // 	assert.Equal(t, totalcost, resOrders[0].TotalCost)
-// // }
+	mockProductAdminRepo.On("Find").Return([]domain.Product{*newProduct}, nil)
+	resProducts, _ := productService.GetProduct()
+
+	assert.Equal(t, model, resProducts[0].Model)
+	assert.Equal(t, quantity, resProducts[0].Quantity)
+	assert.Equal(t, price, resProducts[0].Price)
+	assert.Equal(t, manufacturerID, resProducts[0].ManufacturerID)
+	assert.Equal(t, sku, resProducts[0].SKU)
+	assert.Equal(t, productSEOURLs, resProducts[0].ProductSEOURLs)
+	assert.Equal(t, points, resProducts[0].Points)
+	assert.Equal(t, rewards, resProducts[0].Reward)
+	assert.Equal(t, imageURL, resProducts[0].ImageURL)
+	assert.Equal(t, isShippable, resProducts[0].IsShippable)
+	assert.Equal(t, weight, resProducts[0].Weight)
+	assert.Equal(t, height, resProducts[0].Height)
+	assert.Equal(t, minimumQuantity, resProducts[0].MinimumQuantity)
+	assert.Equal(t, relatedProducts, resProducts[0].RelatedProducts)
+	assert.Equal(t, productDescription, resProducts[0].ProductDescriptions)
+	assert.Equal(t, productCategories, resProducts[0].ProductCategories)
+}
