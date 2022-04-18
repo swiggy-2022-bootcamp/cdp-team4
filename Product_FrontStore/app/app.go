@@ -1,21 +1,23 @@
 package app
 
 import (
-	"log"
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 
 	"github.com/joho/godotenv"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/Product_FrontStore/docs"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/Product_FrontStore/domain"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/Product_FrontStore/infra"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/Product_FrontStore/infra/logger"
 
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
 )
 
 var productFrontStoreHandler ProductFrontStoreHandler
+var log logrus.Logger = *logger.GetLogger()
 
 func setupRouter() *gin.Engine {
 	router := gin.Default()
@@ -26,7 +28,7 @@ func setupRouter() *gin.Engine {
 	return router
 }
 
-func configureSwaggerDoc() {
+func ConfigureSwaggerDoc() {
 	docs.SwaggerInfo.Title = "Swagger Product Front Store API"
 }
 
@@ -40,9 +42,10 @@ func Start() {
 		return
 	}
 
-	configureSwaggerDoc()
+	ConfigureSwaggerDoc()
 
 	PORT := os.Getenv("PORT")
 	router := setupRouter()
 	router.Run(":" + PORT)
+	log.WithFields(logrus.Fields{"PORT": PORT}).Info("Running on PORT")
 }

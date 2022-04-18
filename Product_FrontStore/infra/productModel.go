@@ -16,10 +16,6 @@ type ProductDescriptionModel struct {
 	Tag             string `json:"tag"`
 }
 
-type ProductCategoryModel struct {
-	CategoryID string
-}
-
 type ProductModel struct {
 	Id                  string                    `json:"id"`
 	Model               string                    `json:"model"`
@@ -39,5 +35,10 @@ type ProductModel struct {
 	MinimumQuantity     int64                     `json:"minimum_quantity"`
 	RelatedProducts     []string                  `json:"related_products"`
 	ProductDescriptions []ProductDescriptionModel `json:"product_description"`
-	ProductCategories   []ProductCategoryModel    `json:"product_categories"`
+	ProductCategories   []string                  `json:"product_categories"`
+}
+
+type ProductCategoryRelation struct {
+	CategoryID string `json:"category_id"`
+	ProductID  string `json:"product_id"`
 }

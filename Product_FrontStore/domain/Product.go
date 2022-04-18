@@ -17,10 +17,6 @@ type ProductDescription struct {
 	Tag             string
 }
 
-type ProductCategory struct {
-	CategoryID string
-}
-
 type Product struct {
 	Id                  string
 	Model               string
@@ -40,7 +36,7 @@ type Product struct {
 	MinimumQuantity     int64
 	RelatedProducts     []string
 	ProductDescriptions []ProductDescription
-	ProductCategories   []ProductCategory
+	ProductCategories   []string
 }
 
 type ProductFrontStoreDynamoRepository interface {
@@ -52,7 +48,7 @@ type ProductFrontStoreDynamoRepository interface {
 func NewProductObject(model string, quantity int64, price float64, manufacturerID string, sku string,
 	productSEOURLs []ProductSEOURL, points int64, reward int64, imageURL string, isShippable bool,
 	weight float64, length float64, width float64, height float64, minimumQuantity int64,
-	relatedProducts []string, productDescription []ProductDescription, productCategories []ProductCategory) *Product {
+	relatedProducts []string, productDescription []ProductDescription, productCategories []string) *Product {
 	return &Product{
 		Id:                  _generateUniqueId(),
 		Model:               model,
