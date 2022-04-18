@@ -1,4 +1,71 @@
 basePath: /
+definitions:
+  app.PaymentMethodDTO:
+    properties:
+      agree:
+        type: string
+      comment:
+        type: string
+      id:
+        type: string
+      method:
+        type: string
+    type: object
+  app.PaymentRecordDTO:
+    properties:
+      amount:
+        type: integer
+      currency:
+        type: string
+      description:
+        type: string
+      method:
+        type: string
+      notes:
+        items:
+          type: string
+        type: array
+      orderID:
+        type: string
+      status:
+        type: string
+      userID:
+        type: string
+      vpa:
+        type: string
+    type: object
+  app.UpdatePayStatusDTO:
+    properties:
+      id:
+        type: string
+      status:
+        type: string
+    type: object
+  domain.Payment:
+    properties:
+      amount:
+        type: integer
+      currency:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      method:
+        type: string
+      notes:
+        items:
+          type: string
+        type: array
+      orderID:
+        type: string
+      status:
+        type: string
+      userID:
+        type: string
+      vpa:
+        type: string
+    type: object
 info:
   contact:
     email: support@swagger.io
@@ -30,6 +97,152 @@ paths:
       summary: Health of payment service
       tags:
       - Health
-schemes:
-- http
+  /pay/:
+    get:
+      consumes:
+      - application/json
+      description: Get payment record by Id
+      parameters:
+      - description: Payment id
+        in: query
+        name: req
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Payment'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: get payment record by Id
+      tags:
+      - Payment
+    post:
+      consumes:
+      - application/json
+      description: Returns razorpay payment link with other details to the user
+      parameters:
+      - description: Payment details
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/app.PaymentRecordDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Initiate the payment process
+      tags:
+      - Payment
+    put:
+      consumes:
+      - application/json
+      description: update payment status
+      parameters:
+      - description: Payment status
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/app.UpdatePayStatusDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: update payment status
+      tags:
+      - Payment
+  /pay/paymentMethods:
+    post:
+      consumes:
+      - application/json
+      description: add new payment method
+      parameters:
+      - description: Payment method details
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/app.PaymentMethodDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: add payment method
+      tags:
+      - PaymentMethod
+  /pay/paymentMethods/:id:
+    get:
+      consumes:
+      - application/json
+      description: Get supported payment methods for user
+      parameters:
+      - description: User Id
+        in: query
+        name: req
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get supported payment methods for user
+      tags:
+      - PaymentMethod
 swagger: "2.0"

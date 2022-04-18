@@ -34,6 +34,11 @@ type PaymentMethodDTO struct {
 	Comment string
 }
 
+type UpdatePayStatusDTO struct {
+	Id     string
+	Status string
+}
+
 func simulatePaymentDone(data interface{}) {
 	time.Sleep(10 * time.Second)
 	ok, err := gokafka.WriteMsgToKafka("payment", data)
@@ -45,6 +50,18 @@ func simulatePaymentDone(data interface{}) {
 	log.Debug("write message to kafka")
 }
 
+// Handle pay
+// @Summary Initiate the payment process
+// @Description Returns razorpay payment link with other details to the user
+// @Tags Payment
+// @Schemes
+// @Accept json
+// @Produce json
+// @Param   req  body PaymentRecordDTO true "Payment details"
+// @Success	200  string		Payment record added successfully
+// @Failure 400  string   	Bad request
+// @Failure 500  string		Internal Server Error
+// @Router /pay/ [POST]
 func (ph PayHandler) HandlePay() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var paymentDto PaymentRecordDTO
@@ -88,6 +105,18 @@ func (ph PayHandler) HandlePay() gin.HandlerFunc {
 	}
 }
 
+// Get payment record by Id
+// @Summary get payment record by Id
+// @Description Get payment record by Id
+// @Tags Payment
+// @Schemes
+// @Accept json
+// @Produce json
+// @Param   req  query int true "Payment id"
+// @Success	200  {object}		domain.Payment
+// @Failure 400  string   	Bad request
+// @Failure 500  string		Internal Server Error
+// @Router /pay/ [GET]
 func (ph PayHandler) HandleGetPayRecordByID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("id")
@@ -118,20 +147,30 @@ func (ph PayHandler) handleGetPayRecordsByUserID() gin.HandlerFunc {
 	}
 }
 
+// Update payment status
+// @Summary update payment status
+// @Description update payment status
+// @Tags Payment
+// @Schemes
+// @Accept json
+// @Produce json
+// @Param   req  body UpdatePayStatusDTO true "Payment status"
+// @Success	200  string		Payment status update successfully
+// @Failure 400  string   	Bad request
+// @Failure 500  string		Internal Server Error
+// @Router /pay/ [PUT]
 func (ph PayHandler) handleUpdatePayStatus() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var requestDTO struct {
-			Id     string
-			Status string
-		}
-		if err := ctx.BindJSON(&requestDTO); err != nil {
+		var updatePayStatusDTO UpdatePayStatusDTO
+
+		if err := ctx.BindJSON(&updatePayStatusDTO); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
 				Error("unable to json bind")
 			return
 		}
 
-		ok, err := ph.PaymentService.UpdatePaymentStatus(requestDTO.Id, requestDTO.Status)
+		ok, err := ph.PaymentService.UpdatePaymentStatus(updatePayStatusDTO.Id, updatePayStatusDTO.Status)
 		if !ok {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
@@ -144,6 +183,18 @@ func (ph PayHandler) handleUpdatePayStatus() gin.HandlerFunc {
 	}
 }
 
+// Add payment method
+// @Summary add payment method
+// @Description add new payment method
+// @Tags PaymentMethod
+// @Schemes
+// @Accept json
+// @Produce json
+// @Param   req  body PaymentMethodDTO true "Payment method details"
+// @Success	200  string		Payment method added successfully
+// @Failure 400  string   	Bad request
+// @Failure 500  string		Internal Server Error
+// @Router /pay/paymentMethods [POST]
 func (ph PayHandler) handleAddPaymentMethods() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var paymentMethodDTO PaymentMethodDTO
@@ -179,6 +230,18 @@ func (ph PayHandler) handleAddPaymentMethods() gin.HandlerFunc {
 	}
 }
 
+// Handle get payment methods
+// @Summary Get supported payment methods for user
+// @Description Get supported payment methods for user
+// @Tags PaymentMethod
+// @Schemes
+// @Accept json
+// @Produce json
+// @Param   req  query 		int true "User Id"
+// @Success	200  {object}	[]string
+// @Failure 400  string   	Bad request
+// @Failure 500  string		Internal Server Error
+// @Router /pay/paymentMethods/:id [GET]
 func (ph PayHandler) handleGetPaymentMethods() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("id")
