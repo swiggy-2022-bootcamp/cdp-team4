@@ -3,6 +3,7 @@ package gokafka
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"math/rand"
 	"time"
 
@@ -15,11 +16,12 @@ import (
 var brokers = []string{
 	"localhost:9091",
 }
+
 var log logrus.Logger = *logger.GetLogger()
 
 func getRandomKey() []byte {
 	var src = rand.NewSource(time.Now().UnixNano())
-	return []byte(string(src.Int63()))
+	return []byte(fmt.Sprint(src.Int63()))
 }
 
 func getProducer(ctx context.Context, topic string, brokers []string) *kafka.Writer {
