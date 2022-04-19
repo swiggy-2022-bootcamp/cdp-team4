@@ -136,11 +136,11 @@ func (odr OrderDynamoRepository) FindOrderByUserId(userId string) ([]domain.Orde
 		record := OrderModel{}
 		err := dynamodbattribute.UnmarshalMap(item, &record)
 		if err != nil {
-			errstring := fmt.Sprintf("expression new builder - %s", err.Error())
-			return nil, &errs.AppError{Message: errstring}
+			fmt.Println("Stray records inside db")
+		} else {
+			recordm := toModelfromDynamodbEntity(record)
+			orderRecords = append(orderRecords, *recordm)
 		}
-		recordm := toModelfromDynamodbEntity(record)
-		orderRecords = append(orderRecords, *recordm)
 	}
 
 	return orderRecords, nil
@@ -176,13 +176,14 @@ func (odr OrderDynamoRepository) FindOrderByStatus(status string) ([]domain.Orde
 
 	for _, item := range result.Items {
 		record := OrderModel{}
+		fmt.Print("single item", item)
 		err := dynamodbattribute.UnmarshalMap(item, &record)
 		if err != nil {
-			errstring := fmt.Sprintf("expression new builder - %s", err.Error())
-			return nil, &errs.AppError{Message: errstring}
+			fmt.Println("Stray records inside db")
+		} else {
+			recordm := toModelfromDynamodbEntity(record)
+			orderRecords = append(orderRecords, *recordm)
 		}
-		recordm := toModelfromDynamodbEntity(record)
-		orderRecords = append(orderRecords, *recordm)
 	}
 
 	return orderRecords, nil
@@ -195,8 +196,6 @@ func (odr OrderDynamoRepository) UpdateOrderStatus(id, attributeValue string) (b
 		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
 			":s": {
 				S: aws.String(attributeValue),
-			}, ":s1": {
-				S: aws.String(time.Now().String()),
 			},
 		},
 		Key: map[string]*dynamodb.AttributeValue{
@@ -205,7 +204,7 @@ func (odr OrderDynamoRepository) UpdateOrderStatus(id, attributeValue string) (b
 			},
 		},
 		ReturnValues:     aws.String("UPDATED_NEW"),
-		UpdateExpression: aws.String("set order_status = :s,updated_at = :s1"),
+		UpdateExpression: aws.String("set order_status = :s"),
 		TableName:        aws.String("Order"),
 	}
 
@@ -238,28 +237,30 @@ func (odr OrderDynamoRepository) DeleteOrderById(id string) (bool, *errs.AppErro
 }
 
 func (odr OrderDynamoRepository) FindAllOrders() ([]domain.Order, *errs.AppError) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
+	//ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	//defer cancel()
 	input := &dynamodb.ScanInput{
 		TableName: aws.String("Order"),
 	}
-	out, err := odr.Session.ScanWithContext(ctx, input)
 
+	result, err := odr.Session.Scan(input)
 	if err != nil {
-		return nil, &errs.AppError{Message: err.Error()}
+		errstring := fmt.Sprintf("scan with filter - %s", err.Error())
+		return nil, &errs.AppError{Message: errstring}
 	}
 
 	orderRecords := make([]domain.Order, 0)
-
-	for _, item := range out.Items {
+	//fmt.Print("items", result)
+	for _, item := range result.Items {
 		record := OrderModel{}
+		//fmt.Print("single item", item)
 		err := dynamodbattribute.UnmarshalMap(item, &record)
 		if err != nil {
-			errstring := fmt.Sprintf("expression new builder - %s", err.Error())
-			return nil, &errs.AppError{Message: errstring}
+			fmt.Println("Stray records inside db")
+		} else {
+			recordm := toModelfromDynamodbEntity(record)
+			orderRecords = append(orderRecords, *recordm)
 		}
-		recordm := toModelfromDynamodbEntity(record)
-		orderRecords = append(orderRecords, *recordm)
 	}
 
 	return orderRecords, nil
