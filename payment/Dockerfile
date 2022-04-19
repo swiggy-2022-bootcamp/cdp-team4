@@ -14,4 +14,4 @@ RUN go build -o /paymentService
 
 EXPOSE 8081
 
-CMD [ "/PaymentService" ]
+CMD [ "/paymentService" ]
