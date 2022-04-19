@@ -44,9 +44,9 @@ func (sdr ShippingAddressDynamoRepository) InsertShippingAddress(p domain.Shippi
 	if err != nil {
 		return "", &errs.AppError{Message: fmt.Sprintf("unable to marshal - %s", err.Error())}
 	}
-	fmt.Println(p)
-	fmt.Println(ShippingAddressRecord)
-	fmt.Println(av)
+	// fmt.Println(p)
+	// fmt.Println(ShippingAddressRecord)
+	// fmt.Println(av)
 	input := &dynamodb.PutItemInput{
 		Item:      av,
 		TableName: aws.String("ShippingAddress"),
@@ -112,8 +112,6 @@ func (sdr ShippingAddressDynamoRepository) UpdateShippingAddressById(id string, 
 				N: aws.String(strconv.Itoa(sh.CountryID)),
 			}, ":s6": {
 				N: aws.String(strconv.Itoa(sh.PostCode)),
-			}, ":s7": {
-				S: aws.String(time.Now().String()),
 			},
 		},
 		Key: map[string]*dynamodb.AttributeValue{
@@ -122,7 +120,7 @@ func (sdr ShippingAddressDynamoRepository) UpdateShippingAddressById(id string, 
 			},
 		},
 		ReturnValues:     aws.String("UPDATED_NEW"),
-		UpdateExpression: aws.String("set firstname =:s, lastname = :s1, city = :s2, address_1 = :s3, address_2 = :s4, country_id = :s5, postcode =:s6, updated_at =:s7"),
+		UpdateExpression: aws.String("set firstname =:s, lastname = :s1, city = :s2, address_1 = :s3, address_2 = :s4, country_id = :s5, postcode =:s6"),
 		TableName:        aws.String("ShippingAddress"),
 	}
 

@@ -6,17 +6,13 @@ import (
 	pb "github.com/swiggy-2022-bootcamp/cdp-team4/shipping/app/protobuf"
 )
 
-// type GrpcCostServer struct {
-// 	pb.UnimplementedShippingCostServer
-// }
+type GrpcServer struct {
+	pb.UnimplementedShippingServer
+}
 
-// func NewShippingGrpcCostServer() *GrpcCostServer {
-// 	return &GrpcCostServer{}
-// }
+func (S *GrpcServer) mustEmbedUnimplementedShippingServer() {}
 
-func (S *GrpcAddressServer) mustEmbedUnimplementedShippingCostServer() {}
-
-func (S *GrpcAddressServer) GetShippingCost(ctx context.Context, in *pb.ShippingCostRequest) (out *pb.ShippingCostResponse, err1 error) {
+func (S *GrpcServer) GetShippingCost(ctx context.Context, in *pb.ShippingCostRequest) (out *pb.ShippingCostResponse, err1 error) {
 	city := in.City
 	res, err := shippingHandler.ShippingCostService.GetShippingCostByCity(city)
 	if err != nil {
@@ -28,17 +24,11 @@ func (S *GrpcAddressServer) GetShippingCost(ctx context.Context, in *pb.Shipping
 	}, nil
 }
 
-type GrpcAddressServer struct {
-	pb.UnimplementedShippingServer
+func NewShippingGrpcServer() *GrpcServer {
+	return &GrpcServer{}
 }
 
-func NewShippingGrpcAddressServer() *GrpcAddressServer {
-	return &GrpcAddressServer{}
-}
-
-func (S1 *GrpcAddressServer) mustEmbedUnimplementedShippingAddressServer() {}
-
-func (S1 *GrpcAddressServer) GetShippingAddress(ctx context.Context, in *pb.ShippingAddressRequest) (out *pb.ShippingAddressResponse, err1 error) {
+func (S *GrpcServer) GetShippingAddress(ctx context.Context, in *pb.ShippingAddressRequest) (out *pb.ShippingAddressResponse, err1 error) {
 	id := in.ShippingAddressID
 	res, err := shippingHandler.ShippingAddressService.GetShippingAddressById(id)
 	if err != nil {
@@ -53,4 +43,22 @@ func (S1 *GrpcAddressServer) GetShippingAddress(ctx context.Context, in *pb.Ship
 		Countryid: uint32(res.CountryID),
 		Postcode:  uint32(res.PostCode),
 	}, nil
+}
+
+func (S *GrpcServer) AddShippingAddress(ctx context.Context, in *pb.ShippingAddressAddRequest) (out *pb.ShippingAddressAddResponse, err1 error) {
+	res, err := shippingHandler.ShippingAddressService.CreateShippingAddress(in.Firstname, in.Lastname, in.City, in.Address1, in.Address2, int(in.Countryid), int(in.Postcode))
+	if err != nil {
+		return &pb.ShippingAddressAddResponse{}, err.AsMessage().Error()
+	}
+	return &pb.ShippingAddressAddResponse{
+		ShippingAddressID: res,
+	}, nil
+}
+
+func (S *GrpcServer) DeleteShippingAddress(ctx context.Context, in *pb.ShippingAddressRequest) (out *pb.ShippingAddressDeleteResponse, err1 error) {
+	res, err := shippingHandler.ShippingAddressService.DeleteShippingAddressById(in.ShippingAddressID)
+	if err != nil {
+		return &pb.ShippingAddressDeleteResponse{Confirm: false}, err.AsMessage().Error()
+	}
+	return &pb.ShippingAddressDeleteResponse{Confirm: res}, nil
 }

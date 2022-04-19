@@ -31,6 +31,28 @@ func TestGrpcAddressClient(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, resp.Firstname, "Naveen")
 	assert.Equal(t, resp.City, "Banglore")
+
+	// resp1, err := c.AddShippingAddress(context.Background(),
+	// 	&pb.ShippingAddressAddRequest{
+	// 		Firstname: "Praveen",
+	// 		Lastname:  "Kumar",
+	// 		City:      "Noida",
+	// 		Address1:  "Address1",
+	// 		Address2:  "Address2",
+	// 		Countryid: 90,
+	// 		Postcode:  560001,
+	// 	},
+	// )
+	// assert.Nil(t, err)
+	// assert.NotNil(t, resp1)
+
+	resp2, err := c.DeleteShippingAddress(context.Background(),
+		&pb.ShippingAddressRequest{
+			ShippingAddressID: "8c87aaa5-81b0-43a7-88e8-31b2026ea3b3",
+		},
+	)
+	assert.Nil(t, err)
+	assert.Equal(t, resp2.Confirm, true)
 }
 
 func TestGrpcCostClient(t *testing.T) {

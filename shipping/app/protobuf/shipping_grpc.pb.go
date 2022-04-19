@@ -18,7 +18,9 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ShippingClient interface {
+	AddShippingAddress(ctx context.Context, in *ShippingAddressAddRequest, opts ...grpc.CallOption) (*ShippingAddressAddResponse, error)
 	GetShippingAddress(ctx context.Context, in *ShippingAddressRequest, opts ...grpc.CallOption) (*ShippingAddressResponse, error)
+	DeleteShippingAddress(ctx context.Context, in *ShippingAddressRequest, opts ...grpc.CallOption) (*ShippingAddressDeleteResponse, error)
 	GetShippingCost(ctx context.Context, in *ShippingCostRequest, opts ...grpc.CallOption) (*ShippingCostResponse, error)
 }
 
@@ -30,9 +32,27 @@ func NewShippingClient(cc grpc.ClientConnInterface) ShippingClient {
 	return &shippingClient{cc}
 }
 
+func (c *shippingClient) AddShippingAddress(ctx context.Context, in *ShippingAddressAddRequest, opts ...grpc.CallOption) (*ShippingAddressAddResponse, error) {
+	out := new(ShippingAddressAddResponse)
+	err := c.cc.Invoke(ctx, "/Shipping/AddShippingAddress", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *shippingClient) GetShippingAddress(ctx context.Context, in *ShippingAddressRequest, opts ...grpc.CallOption) (*ShippingAddressResponse, error) {
 	out := new(ShippingAddressResponse)
-	err := c.cc.Invoke(ctx, "/protobuf.Shipping/GetShippingAddress", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/Shipping/GetShippingAddress", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *shippingClient) DeleteShippingAddress(ctx context.Context, in *ShippingAddressRequest, opts ...grpc.CallOption) (*ShippingAddressDeleteResponse, error) {
+	out := new(ShippingAddressDeleteResponse)
+	err := c.cc.Invoke(ctx, "/Shipping/DeleteShippingAddress", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +61,7 @@ func (c *shippingClient) GetShippingAddress(ctx context.Context, in *ShippingAdd
 
 func (c *shippingClient) GetShippingCost(ctx context.Context, in *ShippingCostRequest, opts ...grpc.CallOption) (*ShippingCostResponse, error) {
 	out := new(ShippingCostResponse)
-	err := c.cc.Invoke(ctx, "/protobuf.Shipping/GetShippingCost", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/Shipping/GetShippingCost", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +72,9 @@ func (c *shippingClient) GetShippingCost(ctx context.Context, in *ShippingCostRe
 // All implementations must embed UnimplementedShippingServer
 // for forward compatibility
 type ShippingServer interface {
+	AddShippingAddress(context.Context, *ShippingAddressAddRequest) (*ShippingAddressAddResponse, error)
 	GetShippingAddress(context.Context, *ShippingAddressRequest) (*ShippingAddressResponse, error)
+	DeleteShippingAddress(context.Context, *ShippingAddressRequest) (*ShippingAddressDeleteResponse, error)
 	GetShippingCost(context.Context, *ShippingCostRequest) (*ShippingCostResponse, error)
 	mustEmbedUnimplementedShippingServer()
 }
@@ -61,8 +83,14 @@ type ShippingServer interface {
 type UnimplementedShippingServer struct {
 }
 
+func (UnimplementedShippingServer) AddShippingAddress(context.Context, *ShippingAddressAddRequest) (*ShippingAddressAddResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddShippingAddress not implemented")
+}
 func (UnimplementedShippingServer) GetShippingAddress(context.Context, *ShippingAddressRequest) (*ShippingAddressResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetShippingAddress not implemented")
+}
+func (UnimplementedShippingServer) DeleteShippingAddress(context.Context, *ShippingAddressRequest) (*ShippingAddressDeleteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteShippingAddress not implemented")
 }
 func (UnimplementedShippingServer) GetShippingCost(context.Context, *ShippingCostRequest) (*ShippingCostResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetShippingCost not implemented")
@@ -80,6 +108,24 @@ func RegisterShippingServer(s grpc.ServiceRegistrar, srv ShippingServer) {
 	s.RegisterService(&Shipping_ServiceDesc, srv)
 }
 
+func _Shipping_AddShippingAddress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ShippingAddressAddRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ShippingServer).AddShippingAddress(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Shipping/AddShippingAddress",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ShippingServer).AddShippingAddress(ctx, req.(*ShippingAddressAddRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Shipping_GetShippingAddress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ShippingAddressRequest)
 	if err := dec(in); err != nil {
@@ -90,10 +136,28 @@ func _Shipping_GetShippingAddress_Handler(srv interface{}, ctx context.Context, 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/protobuf.Shipping/GetShippingAddress",
+		FullMethod: "/Shipping/GetShippingAddress",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ShippingServer).GetShippingAddress(ctx, req.(*ShippingAddressRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Shipping_DeleteShippingAddress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ShippingAddressRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ShippingServer).DeleteShippingAddress(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Shipping/DeleteShippingAddress",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ShippingServer).DeleteShippingAddress(ctx, req.(*ShippingAddressRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -108,7 +172,7 @@ func _Shipping_GetShippingCost_Handler(srv interface{}, ctx context.Context, dec
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/protobuf.Shipping/GetShippingCost",
+		FullMethod: "/Shipping/GetShippingCost",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ShippingServer).GetShippingCost(ctx, req.(*ShippingCostRequest))
@@ -120,12 +184,20 @@ func _Shipping_GetShippingCost_Handler(srv interface{}, ctx context.Context, dec
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Shipping_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "protobuf.Shipping",
+	ServiceName: "Shipping",
 	HandlerType: (*ShippingServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
+			MethodName: "AddShippingAddress",
+			Handler:    _Shipping_AddShippingAddress_Handler,
+		},
+		{
 			MethodName: "GetShippingAddress",
 			Handler:    _Shipping_GetShippingAddress_Handler,
+		},
+		{
+			MethodName: "DeleteShippingAddress",
+			Handler:    _Shipping_DeleteShippingAddress_Handler,
 		},
 		{
 			MethodName: "GetShippingCost",

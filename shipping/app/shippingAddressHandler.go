@@ -1,10 +1,10 @@
 package app
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/shipping/domain"
 )
 
@@ -51,6 +51,8 @@ func (sh ShippingHandler) handleShippingAddress() gin.HandlerFunc {
 		)
 
 		if err != nil {
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+				Error("create Shipping Address Record")
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			return
 		}
@@ -69,10 +71,12 @@ func (sh ShippingHandler) handleShippingAddress() gin.HandlerFunc {
 func (sh ShippingHandler) HandleGetShippingAddrssByID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("id")
-		fmt.Println(id)
+		//fmt.Println(id)
 		res, err := sh.ShippingAddressService.GetShippingAddressById(id)
 
 		if err != nil {
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+				Error("Get Shipping Address Record")
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Record not found"})
 			return
 		}
@@ -100,6 +104,8 @@ func (sh ShippingHandler) HandleUpdateShippingAddressByID() gin.HandlerFunc {
 
 		ok, err := sh.ShippingAddressService.UpdateShippingAddressById(id, newshipAddr)
 		if !ok {
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+				Error("Update Shipping Address Record")
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			return
 		}
@@ -118,10 +124,12 @@ func (sh ShippingHandler) HandleUpdateShippingAddressByID() gin.HandlerFunc {
 func (sh ShippingHandler) HandleDeleteShippingAddressById() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("id")
-		fmt.Println(id)
+		//fmt.Println(id)
 		_, err := sh.ShippingAddressService.DeleteShippingAddressById(id)
 
 		if err != nil {
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+				Error("Delete Shipping Address Record")
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			return
 		}

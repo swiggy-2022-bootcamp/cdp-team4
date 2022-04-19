@@ -3,20 +3,24 @@ package app
 import (
 	"fmt"
 	"net"
+	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/sirupsen/logrus"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	pb "github.com/swiggy-2022-bootcamp/cdp-team4/shipping/app/protobuf"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/shipping/docs"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/shipping/domain"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/shipping/infra"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/shipping/infra/logger"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
 
+var log logrus.Logger = *logger.GetLogger()
 var shippingHandler ShippingHandler
 
 func setupRouter() *gin.Engine {
@@ -39,6 +43,7 @@ func Start() {
 		ShippingAddressService: domain.NewShippingAddressService(dynamoRepository),
 		ShippingCostService:    domain.NewShippingCostService(dynamoRepository1),
 	}
+	log.WithFields(logrus.Fields{"message": "message", "status": http.StatusBadRequest}).Error("Error Check")
 	go startGrpcCostServer(shippingHandler)
 	err := godotenv.Load(".env")
 	if err != nil {
@@ -54,7 +59,7 @@ func Start() {
 
 func startGrpcCostServer(sh ShippingHandler) {
 	gs := grpc.NewServer()
-	ss := NewShippingGrpcAddressServer()
+	ss := NewShippingGrpcServer()
 	pb.RegisterShippingServer(gs, ss)
 	reflection.Register(gs)
 	err := godotenv.Load(".env")
