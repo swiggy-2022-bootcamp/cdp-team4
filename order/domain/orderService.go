@@ -16,7 +16,7 @@ type service struct {
 	orderRepository OrderRepository
 }
 
-var order_status []string = []string{"confirmed", "declined", "cancelled", "pending","delivered"}
+var order_status []string = []string{"confirmed", "declined", "cancelled", "pending", "delivered"}
 
 func (s service) CreateOrder(userId string, status string, products_quantity map[string]int, products_cost map[string]int, totalcost int) (string, *errs.AppError) {
 	order := NewOrder(userId, status, products_quantity, products_cost, totalcost)
@@ -71,7 +71,7 @@ func (s service) DeleteOrderById(orderId string) (bool, *errs.AppError) {
 
 func (s service) UpdateOrderStatus(id string, status string) (bool, *errs.AppError) {
 	if !stringInSlice(status, order_status) {
-		return nil, errs.NewNotFoundError("Not a valid status")
+		return false, errs.NewNotFoundError("Not a valid status")
 	}
 	_, err := s.orderRepository.UpdateOrderStatus(id, status)
 	if err != nil {

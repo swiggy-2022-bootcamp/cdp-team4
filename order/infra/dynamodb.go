@@ -176,7 +176,6 @@ func (odr OrderDynamoRepository) FindOrderByStatus(status string) ([]domain.Orde
 
 	for _, item := range result.Items {
 		record := OrderModel{}
-		fmt.Print("single item", item)
 		err := dynamodbattribute.UnmarshalMap(item, &record)
 		if err != nil {
 			fmt.Println("Stray records inside db")
