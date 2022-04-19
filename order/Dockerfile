@@ -12,6 +12,6 @@ RUN go get ./...
 # build
 RUN go build -o /orderService
 
-EXPOSE 7000
+EXPOSE 7774
 
 CMD [ "/orderService" ] 
