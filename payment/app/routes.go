@@ -8,7 +8,7 @@ func HealthCheckRouter(gin *gin.Engine) {
 	gin.GET("/", HealthCheck())
 }
 
-func PayRouter(gin *gin.Engine) {
+func PayRouter(gin *gin.Engine, paymentHandler PayHandler) {
 	p := gin.Group("/pay")
 	{
 		p.POST("/", paymentHandler.HandlePay())

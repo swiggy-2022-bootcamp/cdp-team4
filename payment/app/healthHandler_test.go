@@ -1,4 +1,4 @@
-package app
+package app_test
 
 import (
 	"net/http"
@@ -6,10 +6,12 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/payment/app"
 )
 
 func TestHeathCheck(t *testing.T) {
-	router := setupRouter()
+
+	router := app.SetupRouter(paymentHandler)
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/", nil)

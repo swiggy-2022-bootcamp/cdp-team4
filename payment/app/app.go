@@ -17,14 +17,13 @@ import (
 )
 
 var log logrus.Logger = *logger.GetLogger()
-var paymentHandler PayHandler
 
-func setupRouter() *gin.Engine {
+func SetupRouter(paymentHandler PayHandler) *gin.Engine {
 	router := gin.Default()
 	// health check route
 	HealthCheckRouter(router)
 	// payment router
-	PayRouter(router)
+	PayRouter(router, paymentHandler)
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	return router
@@ -36,10 +35,13 @@ func ConfigureSwaggerDoc() {
 
 func Start(testMode bool) {
 	dynamoRepository := infra.NewDynamoRepository()
-	paymentHandler = PayHandler{PaymentService: domain.NewPaymentService(dynamoRepository)}
+	paymentService := domain.NewPaymentService(dynamoRepository)
+	paymentHandler := NewPaymentHandler(paymentService)
+
+	// PayHandler{PaymentService: domain.NewPaymentService(dynamoRepository)}
 
 	ConfigureSwaggerDoc()
-	router := setupRouter()
+	router := SetupRouter(paymentHandler)
 
 	err := godotenv.Load("../.env")
 	if err != nil {

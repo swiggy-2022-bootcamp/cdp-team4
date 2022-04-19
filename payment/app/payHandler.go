@@ -258,3 +258,9 @@ func (ph PayHandler) handleGetPaymentMethods() gin.HandlerFunc {
 			Info("fetch payment methods")
 	}
 }
+
+func NewPaymentHandler(paymentService domain.PaymentService) PayHandler {
+	return PayHandler{
+		PaymentService: paymentService,
+	}
+}
