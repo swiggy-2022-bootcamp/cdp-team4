@@ -3,14 +3,13 @@ package domain
 import (
 	"golang.org/x/crypto/bcrypt"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"fmt"
 )
 
 type UserService interface {
-	CreateUserInDynamodb(string, string, string, string, string, string, Role) (User, error)
+	CreateUserInDynamodb(string, string, string, string, string, string, Role, string, string) (User, error)
 	GetUserById(string) (*User, error)
 	GetAllUsers() ([]User, error)
-	UpdateUserById(user_id, firstName, lastName, username, phone, email, password string, role Role) (bool, error)
+	UpdateUserById(user_id, firstName, lastName, username, phone, email, password string, role Role, addressId, fax string) (bool, error)
 	DeleteUserById(string) (bool, error)
 }
 
@@ -25,13 +24,13 @@ func NewUserService(userDynamodbRepository UserDynamoDBRepository) UserService {
 }
 
 
-func (s service) CreateUserInDynamodb(firstName, lastName, username, phone, email, password string, role Role) (User, error) {
+func (s service) CreateUserInDynamodb(firstName, lastName, username, phone, email, password string, role Role, addressId, fax string) (User, error) {
 	id := _generateUniqueId()
 	hashedPassword, err := HashPassword(password)
 	if err != nil {
 		return User{}, err
 	}
-	user := NewUser(id, firstName, lastName, username, phone, email, hashedPassword, role)
+	user := NewUser(id, firstName, lastName, username, phone, email, hashedPassword, role, addressId, fax)
 	persistedUser, err1 := s.userDynamodbRepository.Save(*user)
 	if err1 != nil {
 		return User{}, err1
@@ -58,11 +57,8 @@ func (s service) GetAllUsers() ([]User, error) {
 }
 
 
-func (s service) UpdateUserById(user_id, firstName, lastName, username, phone, email, password string, role Role) (bool, error) {
-	fmt.Println(user_id, firstName, lastName, username, phone, email, password, role)
-	
-	
-	user := NewUser(user_id, firstName, lastName, username, phone, email, password, role)
+func (s service) UpdateUserById(user_id, firstName, lastName, username, phone, email, password string, role Role, addressId, fax string) (bool, error) {
+	user := NewUser(user_id, firstName, lastName, username, phone, email, password, role, addressId, fax)
 	_, err := s.userDynamodbRepository.UpdateById(*user)
 	if err != nil {
 		return false, err

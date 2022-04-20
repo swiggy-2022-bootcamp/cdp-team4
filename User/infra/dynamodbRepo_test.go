@@ -21,8 +21,10 @@ func TestShouldCreateNewUserinDynamoDB(t *testing.T) {
 	username := "swastik153"
 	password, _ := domain.HashPassword("Pass!23")
 	role := domain.Admin
+	addressID := "addressid"
+	fax := "18-1918-10101"
 
-	user := domain.NewUser(userID, firstName, lastName, username, phone, email, password, role)
+	user := domain.NewUser(userID, firstName, lastName, username, phone, email, password, role, addressID, fax)
 	res, err := testUserService.Save(*user)
 	t.Logf("Inserted user is %s\n", res)
 	assert.NotNil(t, res)
@@ -39,12 +41,14 @@ func TestShouldGetUserByUserIdDynamoDB(t *testing.T) {
 	username := "swastik153"
 	password, _ := domain.HashPassword("Pass!23")
 	role := domain.Admin
+	addressID := "addressid"
+	fax := "18-1918-10101"
 
 	t.Logf("Inserted User Id is %s Reading\n", userID)
 	res, err := testUserService.FindByID(userID)
 	t.Logf("Read %v", res)
 
-	user := domain.NewUser(userID, firstName, lastName, username, phone, email, password, role)
+	user := domain.NewUser(userID, firstName, lastName, username, phone, email, password, role, addressID, fax)
 
 	assert.NotNil(t, res)
 	assert.Nil(t, err)
@@ -66,8 +70,11 @@ func TestShouldUpdateUserByIdDynamoDB(t *testing.T) {
 	username := "swastik153U"
 	password, _ := domain.HashPassword("Pass!23U")
 	role := domain.Admin
+	addressID := "addressid"
+	fax := "18-1918-10101"
 
-	user := domain.NewUser(userID, firstName, lastName, username, phone, email, password, role)
+
+	user := domain.NewUser(userID, firstName, lastName, username, phone, email, password, role, addressID, fax)
 
 	t.Logf("Inserted User Id is %s Reading\n", userID)
 	res, err := testUserService.UpdateById(*user)
@@ -88,8 +95,10 @@ func TestShouldUpdateUserByIdDynamoDB2(t *testing.T) {
 	username := ""
 	password := ""
 	role := domain.Admin
+	addressID := "addressid"
+	fax := "18-1918-10101"
 
-	user := domain.NewUser(userID, firstName, lastName, username, phone, email, password, role)
+	user := domain.NewUser(userID, firstName, lastName, username, phone, email, password, role, addressID, fax)
 
 	t.Logf("Inserted User Id is %s Reading\n", userID)
 	res, err := testUserService.UpdateById(*user)

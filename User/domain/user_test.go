@@ -55,14 +55,18 @@ func TestShouldReturnNewUser(t *testing.T) {
 	username := "swastik153"
 	password := "secret"
 	role := Admin
+	addressID := "addressid"
+	fax := "18-1918-10101"
 
-	user := NewUser(id, firstName, lastName, username, phone, email, password, role)
+	user := NewUser(id, firstName, lastName, username, phone, email, password, role, addressID, fax)
 	assert.Equal(t, firstName, user.FirstName)
 	assert.Equal(t, lastName, user.LastName)
 	assert.Equal(t, username, user.Username)
 	assert.Equal(t, phone, user.Phone)
 	assert.Equal(t, email, user.Email) 
 	assert.Equal(t, password, user.Password)
+	assert.Equal(t, addressID, user.AddressID)
+	assert.Equal(t, fax, user.Fax)
 }
 
 func TestShouldUpdateEmail(t *testing.T) {
@@ -74,9 +78,11 @@ func TestShouldUpdateEmail(t *testing.T) {
 	username := "swastik153"
 	password := "secret"
 	role := Admin
+	addressID := "addressid"
+	fax := "18-1918-10101"
 
 	newEmail := "msadriwala.1198@gmail.com"
-	user := NewUser(id, firstName, lastName, username, phone, email, password, role)
+	user := NewUser(id, firstName, lastName, username, phone, email, password, role, addressID, fax)
 
 	user.Email = newEmail
 
@@ -92,9 +98,11 @@ func TestShouldUpdatePhone(t *testing.T) {
 	username := "swastik153"
 	password := "secret"
 	role := Admin
+	addressID := "addressid"
+	fax := "18-1918-10101"
 
 	newPhone := "9999955555"
-	user := NewUser(id, firstName, lastName, username, phone, email, password, role)
+	user := NewUser(id, firstName, lastName, username, phone, email, password, role, addressID, fax)
 
 	user.Phone = newPhone
 
@@ -110,9 +118,11 @@ func TestShouldUpdateUsername(t *testing.T) {
 	username := "swastik153"
 	password := "secret"
 	role := Admin
+	addressID := "addressid"
+	fax := "18-1918-10101"
 
 	newUsername := "newUsername"
-	user := NewUser(id, firstName, lastName, username, phone, email, password, role)
+	user := NewUser(id, firstName, lastName, username, phone, email, password, role, addressID, fax)
 
 	user.Username = newUsername
 
@@ -128,9 +138,11 @@ func TestShouldUpdatePassword(t *testing.T) {
 	username := "swastik153"
 	password := "secret"
 	role := Admin
+	addressID := "addressid"
+	fax := "18-1918-10101"
 
 	newPassword := "newPass"
-	user := NewUser(id, firstName, lastName, username, phone, email, password, role)
+	user := NewUser(id, firstName, lastName, username, phone, email, password, role, addressID, fax)
 
 	user.Password = newPassword
 
@@ -146,9 +158,11 @@ func TestShouldUpdateFirstName(t *testing.T) {
 	username := "swastik153"
 	password := "secret"
 	role := Admin
+	addressID := "addressid"
+	fax := "18-1918-10101"
 
 	newFirstName := "SwastikNew"
-	user := NewUser(id, firstName, lastName, username, phone, email, password, role)
+	user := NewUser(id, firstName, lastName, username, phone, email, password, role, addressID, fax)
 
 	user.FirstName = newFirstName
 
@@ -164,9 +178,11 @@ func TestShouldUpdateLastName(t *testing.T) {
 	username := "swastik153"
 	password := "secret"
 	role := Admin
+	addressID := "addressid"
+	fax := "18-1918-10101"
 
 	newLastName := "newLastName"
-	user := NewUser(id, firstName, lastName, username, phone, email, password, role)
+	user := NewUser(id, firstName, lastName, username, phone, email, password, role, addressID, fax)
 
 	user.LastName = newLastName
 
@@ -182,9 +198,11 @@ func TestShouldUpdateRole(t *testing.T) {
 	username := "swastik153"
 	password := "secret"
 	role := Admin
+	addressID := "addressid"
+	fax := "18-1918-10101"
 
 	newRole := Customer
-	user := NewUser(id, firstName, lastName, username, phone, email, password, role)
+	user := NewUser(id, firstName, lastName, username, phone, email, password, role, addressID, fax)
 
 	user.Role = newRole
 
@@ -200,11 +218,12 @@ func TestShouldMarshallJson(t *testing.T) {
 	username := "murtaza896"
 	password := "Pass!23"
 	role := Admin
+	addressID := "addressid"
+	fax := "18-1918-10101"
 
-	user := NewUser(id, firstName, lastName, username, phone, email, password, role)
+	user := NewUser(id, firstName, lastName, username, phone, email, password, role, addressID, fax)
 
-	expectedJson := "{\"email\":\"murtaza896@gmail.com\",\"firstName\":\"Murtaza\",\"lastName\":\"Sadriwala\",\"password\":\"Pass!23\",\"phone\":\"9900887766\",\"role\":0,\"user_id\":\"absbs\",\"username\":\"murtaza896\"}"
-
+	expectedJson := "{\"address_id\":\"addressid\",\"email\":\"murtaza896@gmail.com\",\"fax\":\"18-1918-10101\",\"firstName\":\"Murtaza\",\"lastName\":\"Sadriwala\",\"password\":\"Pass!23\",\"phone\":\"9900887766\",\"role\":0,\"user_id\":\"absbs\",\"username\":\"murtaza896\"}"
 	actualJson, _ := user.MarshalJSON()
 
 	assert.Equal(t, expectedJson, string(actualJson))

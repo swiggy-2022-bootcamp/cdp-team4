@@ -40,6 +40,8 @@ type User struct {
 	Phone           string             `json:"phone"`
 	Email           string             `json:"email"`
 	Role            Role               `json:"role"`
+	AddressID		string			   `json:"address_id"`
+	Fax				string			   `json:"fax"`
 }
 
 func (u User) MarshalJSON() ([]byte, error) {
@@ -52,10 +54,12 @@ func (u User) MarshalJSON() ([]byte, error) {
 		"username":         u.Username,
 		"phone":            u.Phone,
 		"role":             u.Role,
+		"address_id":		u.AddressID,
+		"fax":				u.Fax,
 	})
 }
 
-func NewUser(userId, firstName, lastName, username, phone, email, password string, role Role) *User {
+func NewUser(userId, firstName, lastName, username, phone, email, password string, role Role, addressId, fax string) *User {
 	return &User{
 		UserID:			 userId,
 		FirstName:       firstName,
@@ -65,6 +69,8 @@ func NewUser(userId, firstName, lastName, username, phone, email, password strin
 		Email:           email,
 		Password:        password,
 		Role:            role,
+		AddressID: 		 addressId,
+		Fax:			 fax,
 	}
 }
 

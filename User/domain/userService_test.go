@@ -28,10 +28,13 @@ func TestShouldCreateNewUser(t *testing.T) {
 	username := "swastik153"
 	password, _ := domain.HashPassword("Pass!23")
 	role := domain.Admin
+	addressID := "addressid"
+	fax := "18-1918-10101"
 
-	user := domain.NewUser(userID, firstName, lastName, username, phone, email, password, role)
+
+	user := domain.NewUser(userID, firstName, lastName, username, phone, email, password, role, addressID, fax)
 	mockUserRepo.On("Save", mock.Anything).Return(*user, nil)
-	userService.CreateUserInDynamodb(firstName, lastName, username, phone, email, password, role)
+	userService.CreateUserInDynamodb(firstName, lastName, username, phone, email, password, role, addressID, fax)
 	mockUserRepo.AssertNumberOfCalls(t, "Save", 1)
 }
 
@@ -44,7 +47,11 @@ func TestShouldGetUserByUserId(t *testing.T) {
 	username := "swastik153"
 	password, _ := domain.HashPassword("Pass!23")
 	role := domain.Admin
-	user := domain.NewUser(userID, firstName, lastName, username, phone, email, password, role)
+	addressID := "addressid"
+	fax := "18-1918-10101"
+
+
+	user := domain.NewUser(userID, firstName, lastName, username, phone, email, password, role, addressID, fax)
 	mockUserRepo.On("FindByID", userID).Return(user, nil)
 	var _, _ = userService.GetUserById(userID)
 	mockUserRepo.AssertNumberOfCalls(t, "FindByID", 1)
@@ -59,7 +66,11 @@ func TestShouldGetAllUsers(t *testing.T) {
 	username := "swastik153"
 	password, _ := domain.HashPassword("Pass!23")
 	role := domain.Admin
-	user := domain.NewUser(userID, firstName, lastName, username, phone, email, password, role)
+	addressID := "addressid"
+	fax := "18-1918-10101"
+
+
+	user := domain.NewUser(userID, firstName, lastName, username, phone, email, password, role, addressID, fax)
 	userArr := []domain.User{*user}
 	mockUserRepo.On("FindAll").Return(userArr, nil)
 	var _, _ = userService.GetAllUsers()
@@ -76,9 +87,12 @@ func TestShouldUpdateUserByUserId(t *testing.T) {
 	username := "swastik153"
 	password, _ := domain.HashPassword("Pass!23")
 	role := domain.Admin
+	addressID := "addressid"
+	fax := "18-1918-10101"
+
 	mockUserRepo.On("UpdateById", mock.Anything).Return(true, nil)
 
-	var _, err = userService.UpdateUserById(userID, firstName, lastName, username, phone, email, password, role)
+	var _, err = userService.UpdateUserById(userID, firstName, lastName, username, phone, email, password, role, addressID, fax)
 	assert.Nil(t, err)
 }
 

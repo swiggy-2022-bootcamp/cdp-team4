@@ -15,6 +15,8 @@ type UserModel struct {
 	Phone           string             `json:"phone"`
 	Email           string             `json:"email"`
 	Role            domain.Role        `json:"role"`
+	AddressID		string			   `json:"address_id"`
+	Fax				string			   `json:"fax"`
 	CreatedAt       time.Time          `json:"created_at"`
 	UpdatedAt       time.Time          `json:"updated_at"`
 }

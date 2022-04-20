@@ -234,6 +234,8 @@ func toPersistedDynamodbEntity(u domain.User) *UserModel {
 		Username:        u.Username,
 		Password:        u.Password,
 		Role:            u.Role,
+		AddressID:		 u.AddressID,
+		Fax:			 u.Fax,
 		CreatedAt:       time.Now(),
 		UpdatedAt:       time.Now(),
 	}

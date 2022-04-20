@@ -4,20 +4,36 @@ import (
 	"net/http"
 	"github.com/gin-gonic/gin"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/user/domain"
+	pb "github.com/swiggy-2022-bootcamp/cdp-team4/user/app/protobuf"
+	"fmt"
+	"google.golang.org/grpc"
+	"context"
 )
 
 type UserHandler struct {
 	userService domain.UserService
 }
 
+type shippingAddressDTO struct {
+	FirstName string    `json:"firstname"`
+	LastName  string    `json:"lastname"`
+	City      string    `json:"city"`
+	Address1  string    `json:"address_1"`
+	Address2  string    `json:"address_2"`
+	CountryID uint32    `json:"country_id"`
+	PostCode  uint32    `json:"postcode"`
+}
+
 type userDTO struct {
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Username  string `json:"username"`
-	Password  string `json:"password"`
-	Phone     string `json:"phone"`
-	Email     string `json:"email"`
-	Role      int    `json:"role"`
+	FirstName string 				`json:"first_name"`
+	LastName  string 				`json:"last_name"`
+	Username  string 				`json:"username"`
+	Password  string 				`json:"password"`
+	Phone     string 				`json:"phone"`
+	Email     string 				`json:"email"`
+	Role      int    				`json:"role"`
+	Address   shippingAddressDTO 	`json:"address"`
+	Fax		  string 				`json:"fax"`
 }
 
 // @Summary Create User
@@ -45,6 +61,8 @@ func (h UserHandler) HandleUserCreation() gin.HandlerFunc {
 			return
 		}
 
+		shippingAddressId := getShippingAddressId(newUser.Address)
+
 		user, err1 := h.userService.CreateUserInDynamodb(
 			newUser.FirstName, 
 			newUser.LastName, 
@@ -53,6 +71,8 @@ func (h UserHandler) HandleUserCreation() gin.HandlerFunc {
 			newUser.Email, 
 			newUser.Password, 
 			role,
+			shippingAddressId,
+			newUser.Fax,
 		)
 		
 		if err1 != nil {
@@ -147,6 +167,8 @@ func (h UserHandler) HandleUpdateUserByID() gin.HandlerFunc {
 			newUpdatedUser.Email, 
 			newUpdatedUser.Password, 
 			role,
+			"",
+			"",
 		)
 		
 		if err1 != nil {
@@ -179,4 +201,37 @@ func (h UserHandler) HandleDeleteUserByID() gin.HandlerFunc {
 		}
 		ctx.JSON(http.StatusAccepted, gin.H{"message": "user deleted"})
 	}
+}
+
+
+func getShippingAddressId(address shippingAddressDTO) (string){
+	// Set up connection with the grpc server
+
+	conn, err := grpc.Dial("localhost:7776", grpc.WithInsecure())
+	if err != nil {
+		fmt.Printf("Error while making connection, %v\n", err)
+	}
+
+	// Create a client instance
+	c := pb.NewShippingClient(conn)
+
+	// Lets invoke the remote function from client on the server
+	resp, err1 := c.AddShippingAddress(
+		context.Background(),
+		&pb.ShippingAddressAddRequest{
+			Firstname: address.FirstName,
+			Lastname:  address.LastName,
+			City:      address.City,
+			Address1:  address.Address1,
+			Address2:  address.Address2,
+			Countryid: address.CountryID,
+			Postcode:  address.PostCode,
+		},
+	)
+	
+	if err1 != nil {
+		fmt.Printf("Error while inserting address, %v\n", err1)
+	}
+
+	return resp.ShippingAddressID
 }
