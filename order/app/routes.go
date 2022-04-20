@@ -8,7 +8,7 @@ func HealthCheckRouter(gin *gin.Engine) {
 	gin.GET("/", HealthCheck())
 }
 
-func OrderRouter(router *gin.Engine) {
+func OrderRouter(router *gin.Engine, orderHandler OrderHandler) {
 
 	router.POST("/order", orderHandler.handleOrder())
 	router.GET("/orders", orderHandler.HandleGetAllRecords())

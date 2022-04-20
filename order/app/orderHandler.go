@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -58,7 +57,7 @@ func (oh OrderHandler) handleOrder() gin.HandlerFunc {
 			return
 		}
 
-		product_quantity, product_cost := convertProductsDTOtoMaps(orderDto.Products)
+		product_quantity, product_cost := ConvertProductsDTOtoMaps(orderDto.Products)
 
 		res, err := oh.OrderService.CreateOrder(
 			orderDto.UserID,
@@ -70,7 +69,7 @@ func (oh OrderHandler) handleOrder() gin.HandlerFunc {
 		if err != nil {
 			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
 				Error("Error while creating order")
-			ctx.JSON(http.StatusBadGateway, gin.H{"message": err.Error()})
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			return
 		}
 		ctx.JSON(http.StatusAccepted, gin.H{"message": "Order Record Added", "order id": res})
@@ -94,7 +93,6 @@ func (oh OrderHandler) HandleGetOrderRecordByID() gin.HandlerFunc {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Invalid ID"})
 			return
 		}
-		fmt.Println(id)
 		res, err := oh.OrderService.GetOrderById(id)
 
 		if err != nil {
@@ -125,7 +123,6 @@ func (oh OrderHandler) HandleGetOrderRecordsByUserID() gin.HandlerFunc {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Invalid ID"})
 			return
 		}
-		fmt.Println(id)
 		record, err := oh.OrderService.GetOrderByUserId(id)
 
 		if err != nil {
@@ -260,7 +257,6 @@ func (oh OrderHandler) HandleDeleteOrderById() gin.HandlerFunc {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Invalid ID"})
 			return
 		}
-		fmt.Println(id)
 		_, err := oh.OrderService.DeleteOrderById(id)
 
 		if err != nil {
@@ -310,7 +306,7 @@ func (oh OrderHandler) HandleAddOrderFromCart() gin.HandlerFunc {
 				Cost:     int16(prod.Price),
 			})
 		}
-		product_quantity, product_cost := convertProductsDTOtoMaps(newpdto)
+		product_quantity, product_cost := ConvertProductsDTOtoMaps(newpdto)
 		res, result := oh.OrderService.CreateOrder(
 			resp.UserID,
 			"Pending",
@@ -335,7 +331,7 @@ func (oh OrderHandler) HandleAddOrderFromCart() gin.HandlerFunc {
 	}
 }
 
-func convertProductsDTOtoMaps(products []ProductRecordDTO) (map[string]int, map[string]int) {
+func ConvertProductsDTOtoMaps(products []ProductRecordDTO) (map[string]int, map[string]int) {
 	var product_quantity map[string]int = make(map[string]int)
 	var product_cost map[string]int = make(map[string]int)
 	for _, product := range products {
@@ -356,5 +352,10 @@ func convertOrderModeltoOrderDTO(order domain.Order) OrderRecordDTO {
 		Products:  prodcts,
 		OrderID:   order.ID,
 		TotalCost: int16(order.TotalCost),
+	}
+}
+func NewOrderHandler(orderService domain.OrderService) OrderHandler {
+	return OrderHandler{
+		OrderService: orderService,
 	}
 }

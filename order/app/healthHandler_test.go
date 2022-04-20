@@ -1,4 +1,4 @@
-package app
+package app_test
 
 import (
 	"net/http"
@@ -6,10 +6,16 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/order/app"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/order/domain"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/order/infra"
 )
 
 func TestHeathCheck(t *testing.T) {
-	router := setupRouter()
+	dynamoRepo := infra.NewDynamoRepository()
+	service := domain.NewOrderService(dynamoRepo)
+	orderHandler := app.NewOrderHandler(service)
+	router := app.SetupRouter(orderHandler)
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/", nil)
