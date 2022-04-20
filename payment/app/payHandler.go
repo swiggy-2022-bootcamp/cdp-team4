@@ -9,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/payment/domain"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/payment/infra/gokafka"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type PayHandler struct {
@@ -39,6 +40,10 @@ type UpdatePayStatusDTO struct {
 	Status string
 }
 
+func GenerateUniqueId() string {
+	return primitive.NewObjectID().Hex()
+}
+
 func simulatePaymentDone(data interface{}) {
 	time.Sleep(10 * time.Second)
 	ok, err := gokafka.WriteMsgToKafka("payment", data)
@@ -46,8 +51,6 @@ func simulatePaymentDone(data interface{}) {
 		log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
 			Error("unable to write message to kafka")
 	}
-
-	log.Debug("write message to kafka")
 }
 
 // Handle pay
@@ -72,8 +75,10 @@ func (ph PayHandler) HandlePay() gin.HandlerFunc {
 				Error("bind json")
 			return
 		}
+		id := GenerateUniqueId()
 
 		data, err := ph.PaymentService.CreateDynamoPaymentRecord(
+			id,
 			paymentDto.Amount,
 			paymentDto.Currency,
 			paymentDto.Status,
@@ -92,7 +97,7 @@ func (ph PayHandler) HandlePay() gin.HandlerFunc {
 		}
 		if data == nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": "unable to create payment link"})
-			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+			log.WithFields(logrus.Fields{"message": err, "status": http.StatusBadRequest}).
 				Error("unable create payment link")
 			return
 		}
@@ -159,7 +164,7 @@ func (ph PayHandler) handleGetPayRecordsByUserID() gin.HandlerFunc {
 // @Failure 400  string   	Bad request
 // @Failure 500  string		Internal Server Error
 // @Router /pay/ [PUT]
-func (ph PayHandler) handleUpdatePayStatus() gin.HandlerFunc {
+func (ph PayHandler) HandleUpdatePayStatus() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var updatePayStatusDTO UpdatePayStatusDTO
 
@@ -170,7 +175,10 @@ func (ph PayHandler) handleUpdatePayStatus() gin.HandlerFunc {
 			return
 		}
 
-		ok, err := ph.PaymentService.UpdatePaymentStatus(updatePayStatusDTO.Id, updatePayStatusDTO.Status)
+		ok, err := ph.PaymentService.UpdatePaymentStatus(
+			updatePayStatusDTO.Id,
+			updatePayStatusDTO.Status,
+		)
 		if !ok {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
@@ -195,7 +203,7 @@ func (ph PayHandler) handleUpdatePayStatus() gin.HandlerFunc {
 // @Failure 400  string   	Bad request
 // @Failure 500  string		Internal Server Error
 // @Router /pay/paymentMethods [POST]
-func (ph PayHandler) handleAddPaymentMethods() gin.HandlerFunc {
+func (ph PayHandler) HandleAddPaymentMethods() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var paymentMethodDTO PaymentMethodDTO
 		if err := ctx.BindJSON(&paymentMethodDTO); err != nil {
@@ -242,7 +250,7 @@ func (ph PayHandler) handleAddPaymentMethods() gin.HandlerFunc {
 // @Failure 400  string   	Bad request
 // @Failure 500  string		Internal Server Error
 // @Router /pay/paymentMethods/:id [GET]
-func (ph PayHandler) handleGetPaymentMethods() gin.HandlerFunc {
+func (ph PayHandler) HandleGetPaymentMethods() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("id")
 		methods, err := ph.PaymentService.GetPaymentMethods(id)
@@ -253,7 +261,7 @@ func (ph PayHandler) handleGetPaymentMethods() gin.HandlerFunc {
 				Error("unable to fetch payment methods")
 			return
 		}
-		ctx.JSON(http.StatusAccepted, gin.H{"methods": methods})
+		ctx.JSON(http.StatusOK, gin.H{"methods": methods})
 		log.WithFields(logrus.Fields{"methods": methods, "status": http.StatusOK}).
 			Info("fetch payment methods")
 	}

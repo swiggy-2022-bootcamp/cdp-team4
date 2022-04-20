@@ -12,12 +12,12 @@ func PayRouter(gin *gin.Engine, paymentHandler PayHandler) {
 	p := gin.Group("/pay")
 	{
 		p.POST("/", paymentHandler.HandlePay())
-		p.PUT("/", paymentHandler.handleUpdatePayStatus())
+		p.PUT("/", paymentHandler.HandleUpdatePayStatus())
 
 		p.GET("/user/:user_id", paymentHandler.handleGetPayRecordsByUserID())
 		p.GET("/:id", paymentHandler.HandleGetPayRecordByID())
 
-		p.POST("/paymentMethods", paymentHandler.handleAddPaymentMethods())
-		p.GET("/paymentMethods/:id", paymentHandler.handleGetPaymentMethods())
+		p.POST("/paymentMethods", paymentHandler.HandleAddPaymentMethods())
+		p.GET("/paymentMethods/:id", paymentHandler.HandleGetPaymentMethods())
 	}
 }
