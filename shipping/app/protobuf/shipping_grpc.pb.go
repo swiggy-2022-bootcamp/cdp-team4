@@ -21,6 +21,7 @@ type ShippingClient interface {
 	AddShippingAddress(ctx context.Context, in *ShippingAddressAddRequest, opts ...grpc.CallOption) (*ShippingAddressAddResponse, error)
 	GetShippingAddress(ctx context.Context, in *ShippingAddressRequest, opts ...grpc.CallOption) (*ShippingAddressResponse, error)
 	DeleteShippingAddress(ctx context.Context, in *ShippingAddressRequest, opts ...grpc.CallOption) (*ShippingAddressDeleteResponse, error)
+	UpdateShippingAddress(ctx context.Context, in *ShippingAddressUpdateRequest, opts ...grpc.CallOption) (*ShippingAddressUpdateResponse, error)
 	GetShippingCost(ctx context.Context, in *ShippingCostRequest, opts ...grpc.CallOption) (*ShippingCostResponse, error)
 }
 
@@ -59,6 +60,15 @@ func (c *shippingClient) DeleteShippingAddress(ctx context.Context, in *Shipping
 	return out, nil
 }
 
+func (c *shippingClient) UpdateShippingAddress(ctx context.Context, in *ShippingAddressUpdateRequest, opts ...grpc.CallOption) (*ShippingAddressUpdateResponse, error) {
+	out := new(ShippingAddressUpdateResponse)
+	err := c.cc.Invoke(ctx, "/Shipping/UpdateShippingAddress", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *shippingClient) GetShippingCost(ctx context.Context, in *ShippingCostRequest, opts ...grpc.CallOption) (*ShippingCostResponse, error) {
 	out := new(ShippingCostResponse)
 	err := c.cc.Invoke(ctx, "/Shipping/GetShippingCost", in, out, opts...)
@@ -75,6 +85,7 @@ type ShippingServer interface {
 	AddShippingAddress(context.Context, *ShippingAddressAddRequest) (*ShippingAddressAddResponse, error)
 	GetShippingAddress(context.Context, *ShippingAddressRequest) (*ShippingAddressResponse, error)
 	DeleteShippingAddress(context.Context, *ShippingAddressRequest) (*ShippingAddressDeleteResponse, error)
+	UpdateShippingAddress(context.Context, *ShippingAddressUpdateRequest) (*ShippingAddressUpdateResponse, error)
 	GetShippingCost(context.Context, *ShippingCostRequest) (*ShippingCostResponse, error)
 	mustEmbedUnimplementedShippingServer()
 }
@@ -91,6 +102,9 @@ func (UnimplementedShippingServer) GetShippingAddress(context.Context, *Shipping
 }
 func (UnimplementedShippingServer) DeleteShippingAddress(context.Context, *ShippingAddressRequest) (*ShippingAddressDeleteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteShippingAddress not implemented")
+}
+func (UnimplementedShippingServer) UpdateShippingAddress(context.Context, *ShippingAddressUpdateRequest) (*ShippingAddressUpdateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateShippingAddress not implemented")
 }
 func (UnimplementedShippingServer) GetShippingCost(context.Context, *ShippingCostRequest) (*ShippingCostResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetShippingCost not implemented")
@@ -162,6 +176,24 @@ func _Shipping_DeleteShippingAddress_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Shipping_UpdateShippingAddress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ShippingAddressUpdateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ShippingServer).UpdateShippingAddress(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Shipping/UpdateShippingAddress",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ShippingServer).UpdateShippingAddress(ctx, req.(*ShippingAddressUpdateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Shipping_GetShippingCost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ShippingCostRequest)
 	if err := dec(in); err != nil {
@@ -198,6 +230,10 @@ var Shipping_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteShippingAddress",
 			Handler:    _Shipping_DeleteShippingAddress_Handler,
+		},
+		{
+			MethodName: "UpdateShippingAddress",
+			Handler:    _Shipping_UpdateShippingAddress_Handler,
 		},
 		{
 			MethodName: "GetShippingCost",

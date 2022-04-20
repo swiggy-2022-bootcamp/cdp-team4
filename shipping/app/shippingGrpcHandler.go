@@ -4,6 +4,7 @@ import (
 	"context"
 
 	pb "github.com/swiggy-2022-bootcamp/cdp-team4/shipping/app/protobuf"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/shipping/domain"
 )
 
 type GrpcServer struct {
@@ -61,4 +62,21 @@ func (S *GrpcServer) DeleteShippingAddress(ctx context.Context, in *pb.ShippingA
 		return &pb.ShippingAddressDeleteResponse{Confirm: false}, err.AsMessage().Error()
 	}
 	return &pb.ShippingAddressDeleteResponse{Confirm: res}, nil
+}
+
+func (S *GrpcServer) UpdateShippingAddress(ctx context.Context, in *pb.ShippingAddressUpdateRequest) (out *pb.ShippingAddressUpdateResponse, err2 error) {
+	newDaModel := domain.ShippingAddress{
+		FirstName: in.Firstname,
+		LastName:  in.Lastname,
+		City:      in.City,
+		Address1:  in.Address1,
+		Address2:  in.Address2,
+		PostCode:  int(in.Postcode),
+		CountryID: int(in.Countryid),
+	}
+	res, err := shippingHandler.ShippingAddressService.UpdateShippingAddressById(in.ShippingAddressID, newDaModel)
+	if err != nil {
+		return &pb.ShippingAddressUpdateResponse{Confirm: false}, err.AsMessage().Error()
+	}
+	return &pb.ShippingAddressUpdateResponse{Confirm: res}, nil
 }
