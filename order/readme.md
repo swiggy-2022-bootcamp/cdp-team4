@@ -2,4 +2,4 @@
 2022-Capability Dev Program - Team4
 
 # Order Service
-Created Health check route
+Created Health check route.
