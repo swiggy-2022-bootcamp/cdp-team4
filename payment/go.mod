@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/aws/aws-sdk-go v1.43.38
 	github.com/gin-gonic/gin v1.7.7
+	github.com/golang/mock v1.6.0
 	github.com/joho/godotenv v1.4.0
 	github.com/razorpay/razorpay-go v0.0.0-20220125080828-980e9c2fc0e4
 	github.com/segmentio/kafka-go v0.4.31

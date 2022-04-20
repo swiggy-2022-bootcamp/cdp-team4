@@ -4,14 +4,11 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/payment/domain"
-	mocks "github.com/swiggy-2022-bootcamp/cdp-team4/payment/mocks/domain"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/payment/mocks"
 )
-
-var mockDynamoRepo = mocks.PaymentDynamoRepository{}
-var service = domain.NewPaymentService(&mockDynamoRepo)
 
 func TestGenerateUniqueId(t *testing.T) {
 	var id interface{} = domain.GenerateUniqueId()
@@ -21,7 +18,12 @@ func TestGenerateUniqueId(t *testing.T) {
 }
 
 func TestGetRazorpayPaymentLink(t *testing.T) {
-	response, err := domain.GetRazorpayPaymentLink(domain.Payment{
+	mockCtrl := gomock.NewController(t)
+	mockDynamoRepo := mocks.NewMockPaymentDynamoRepository(mockCtrl)
+
+	service := domain.NewPaymentService(mockDynamoRepo)
+
+	response, err := service.GetRazorpayPaymentLink(domain.Payment{
 		Amount:   45,
 		Currency: "INR",
 		UserID:   "adf",
@@ -40,6 +42,7 @@ func TestShouldReturnNewUserService(t *testing.T) {
 
 func TestCreateDynamoPaymentRecord(t *testing.T) {
 	payment := domain.Payment{
+		Id:          domain.GenerateUniqueId(),
 		Amount:      54,
 		Currency:    "INR",
 		Status:      "pending",
@@ -51,19 +54,59 @@ func TestCreateDynamoPaymentRecord(t *testing.T) {
 		Notes:       []string{""},
 	}
 
-	mockDynamoRepo.On("InsertPaymentRecord", mock.Anything).Return(true, nil)
-	service.CreateDynamoPaymentRecord(
-		payment.Amount,
-		payment.Currency,
-		payment.Status,
-		payment.OrderID,
-		payment.UserID,
-		payment.Method,
-		payment.Description,
-		payment.VPA,
-		payment.Notes,
-	)
-	mockDynamoRepo.AssertNumberOfCalls(t, "InsertPaymentRecord", 1)
+	testcases := []struct {
+		name       string
+		createStub func(mocks.MockPaymentDynamoRepository)
+		assertTest func(*testing.T, map[string]interface{}, error)
+	}{
+		{
+			name: "FailCreateDynamoPaymentRecord",
+			createStub: func(mpdr mocks.MockPaymentDynamoRepository) {
+				mpdr.EXPECT().InsertPaymentRecord(payment).Return(false, fmt.Errorf("unable to insert record"))
+			},
+			assertTest: func(t *testing.T, m map[string]interface{}, err error) {
+				assert.Nil(t, m)
+				assert.NotNil(t, err)
+			},
+		},
+		{
+			name: "FailCreateDynamoPaymentRecordGenerateLink",
+			createStub: func(mpdr mocks.MockPaymentDynamoRepository) {
+				mpdr.EXPECT().InsertPaymentRecord(payment).Return(true, nil)
+			},
+			assertTest: func(t *testing.T, m map[string]interface{}, err error) {
+				assert.Nil(t, m)
+				assert.NotNil(t, err)
+			},
+		},
+	}
+
+	for _, testcase := range testcases {
+		t.Run(testcase.name, func(t *testing.T) {
+			mockCtrl := gomock.NewController(t)
+			mockDynamoRepo := mocks.NewMockPaymentDynamoRepository(mockCtrl)
+			testcase.createStub(*mockDynamoRepo)
+
+			service := domain.NewPaymentService(mockDynamoRepo)
+
+			// mockDynamoRepo.On("InsertPaymentRecord", mock.Anything).Return(true, nil)
+			data, err := service.CreateDynamoPaymentRecord(
+				payment.Id,
+				payment.Amount,
+				payment.Currency,
+				payment.Status,
+				payment.OrderID,
+				payment.UserID,
+				payment.Method,
+				payment.Description,
+				payment.VPA,
+				payment.Notes,
+			)
+
+			testcase.assertTest(t, data, err)
+		})
+	}
+
 }
 
 func TestGetPaymentRecordById(t *testing.T) {
@@ -78,55 +121,178 @@ func TestGetPaymentRecordById(t *testing.T) {
 		OrderID:     "isf",
 		Notes:       []string{""},
 	}
-	mockDynamoRepo.On("FindPaymentRecordById", "abc").Return(&payment, nil)
-	service.GetPaymentRecordById("abc")
 
-	mockDynamoRepo.AssertNumberOfCalls(t, "FindPaymentRecordById", 1)
-}
+	testcases := []struct {
+		name       string
+		createStub func(mocks.MockPaymentDynamoRepository)
+		assertTest func(*testing.T, *domain.Payment, error)
+	}{
+		{
+			name: "SuccessGetPaymentRecordById",
+			createStub: func(mpdr mocks.MockPaymentDynamoRepository) {
+				mpdr.EXPECT().FindPaymentRecordById("xyx").Return(&payment, nil)
+			},
+			assertTest: func(t *testing.T, m *domain.Payment, err error) {
+				assert.NotNil(t, m)
+				assert.Nil(t, err)
+			},
+		},
+		{
+			name: "FailGetPaymentRecordById",
+			createStub: func(mpdr mocks.MockPaymentDynamoRepository) {
+				mpdr.EXPECT().FindPaymentRecordById("xyx").Return(nil, fmt.Errorf("unable to find record"))
+			},
+			assertTest: func(t *testing.T, m *domain.Payment, err error) {
+				assert.Nil(t, m)
+				assert.NotNil(t, err)
+			},
+		},
+	}
 
-func TestFailGetPaymentRecordById(t *testing.T) {
-	mockDynamoRepo.On("FindPaymentRecordById", "abcd").
-		Return(nil, fmt.Errorf("element id not found"))
-	service.GetPaymentRecordById("abcd")
+	for _, testcase := range testcases {
+		t.Run(testcase.name, func(t *testing.T) {
+			mockCtrl := gomock.NewController(t)
+			mockDynamoRepo := mocks.NewMockPaymentDynamoRepository(mockCtrl)
+			testcase.createStub(*mockDynamoRepo)
 
-	mockDynamoRepo.AssertNumberOfCalls(t, "FindPaymentRecordById", 2)
+			service := domain.NewPaymentService(mockDynamoRepo)
+
+			data, err := service.GetPaymentRecordById("xyx")
+
+			testcase.assertTest(t, data, err)
+		})
+	}
+
 }
 
 func TestGetPaymentMethods(t *testing.T) {
-	methodList := []string{"upi"}
-	mockDynamoRepo.On("GetPaymentMethods", "abd").Return(methodList, nil)
-	service.GetPaymentMethods("abd")
 
-	mockDynamoRepo.AssertNumberOfCalls(t, "GetPaymentMethods", 1)
-}
+	testcases := []struct {
+		name       string
+		createStub func(mocks.MockPaymentDynamoRepository)
+		assertTest func(*testing.T, []string, error)
+	}{
+		{
+			name: "SuccessGetPaymentMethods",
+			createStub: func(mpdr mocks.MockPaymentDynamoRepository) {
+				mpdr.EXPECT().GetPaymentMethods("xyx").Return([]string{""}, nil)
+			},
+			assertTest: func(t *testing.T, m []string, err error) {
+				assert.NotNil(t, m)
+				assert.Nil(t, err)
+			},
+		},
+		{
+			name: "FailGetPaymentMethods",
+			createStub: func(mpdr mocks.MockPaymentDynamoRepository) {
+				mpdr.EXPECT().GetPaymentMethods("xyx").Return(nil, fmt.Errorf("unable to find record"))
+			},
+			assertTest: func(t *testing.T, m []string, err error) {
+				assert.Nil(t, m)
+				assert.NotNil(t, err)
+			},
+		},
+	}
 
-func TestFailGetPaymentMethods(t *testing.T) {
-	mockDynamoRepo.On("GetPaymentMethods", "abdc").Return(nil, fmt.Errorf("element id not found"))
-	service.GetPaymentMethods("abdc")
+	for _, testcase := range testcases {
+		t.Run(testcase.name, func(t *testing.T) {
+			mockCtrl := gomock.NewController(t)
+			mockDynamoRepo := mocks.NewMockPaymentDynamoRepository(mockCtrl)
+			testcase.createStub(*mockDynamoRepo)
 
-	mockDynamoRepo.AssertNumberOfCalls(t, "GetPaymentMethods", 2)
+			service := domain.NewPaymentService(mockDynamoRepo)
+
+			data, err := service.GetPaymentMethods("xyx")
+
+			testcase.assertTest(t, data, err)
+		})
+	}
+
 }
 
 func TestUpdatePaymentStatus(t *testing.T) {
-	ok, _ := service.UpdatePaymentStatus("abc", "pending")
-	assert.Equal(t, true, ok)
+	t.Run("updatePaymentStatus", func(t *testing.T) {
+		mockCtrl := gomock.NewController(t)
+		mockDynamoRepo := mocks.NewMockPaymentDynamoRepository(mockCtrl)
+
+		service := domain.NewPaymentService(mockDynamoRepo)
+		ok, err := service.UpdatePaymentStatus("xyx", "confirmed")
+
+		assert.Equal(t, true, ok)
+		assert.Nil(t, err)
+	})
 }
 
 func TestAddPaymentMethod(t *testing.T) {
-	mockDynamoRepo.On("GetPaymentMethods", "abc").Return(nil, fmt.Errorf("element id not found"))
-	mockDynamoRepo.On("InsertPaymentMethod", mock.Anything).Return(true, nil)
-	mockDynamoRepo.On("UpdatePaymentMethods", "abc", "upi").Return(true, nil)
+	var paymentRecord = domain.PaymentMethod{
+		Id:      "id",
+		Agree:   "agree",
+		Comment: "comment",
+		Method:  []string{"method"},
+	}
 
-	service.AddPaymentMethod("abc", "upi", "1", "none")
-	// mockDynamoRepo.AssertNumberOfCalls(t, "UpdatePaymentMethods", 1)
-	mockDynamoRepo.AssertNumberOfCalls(t, "InsertPaymentMethod", 1)
-}
+	testcases := []struct {
+		name       string
+		createStub func(mocks.MockPaymentDynamoRepository)
+		assertTest func(*testing.T, bool, error)
+	}{
+		{
+			name: "SuccessAddPaymentMethodUpdateState",
+			createStub: func(mpdr mocks.MockPaymentDynamoRepository) {
+				mpdr.EXPECT().GetPaymentMethods("id").Return([]string{""}, nil)
+				mpdr.EXPECT().UpdatePaymentMethods("id", "method").Return(true, nil)
+			},
+			assertTest: func(t *testing.T, m bool, err error) {
+				assert.Equal(t, true, m)
+				assert.Nil(t, err)
+			},
+		},
+		{
+			name: "FailAddPaymentMethodUpdateState",
+			createStub: func(mpdr mocks.MockPaymentDynamoRepository) {
+				mpdr.EXPECT().GetPaymentMethods("id").Return([]string{""}, nil)
+				mpdr.EXPECT().UpdatePaymentMethods("id", "method").Return(false, fmt.Errorf("unable to update methods"))
+			},
+			assertTest: func(t *testing.T, m bool, err error) {
+				assert.Equal(t, false, m)
+				assert.NotNil(t, err)
+			},
+		},
+		{
+			name: "SuccessAddPaymentMethodInsertState",
+			createStub: func(mpdr mocks.MockPaymentDynamoRepository) {
+				mpdr.EXPECT().GetPaymentMethods("id").Return([]string{""}, fmt.Errorf("method not found"))
+				mpdr.EXPECT().InsertPaymentMethod(paymentRecord).Return(true, nil)
+			},
+			assertTest: func(t *testing.T, m bool, err error) {
+				assert.Equal(t, true, m)
+				assert.Nil(t, err)
+			},
+		},
+		{
+			name: "FailAddPaymentMethodInsertState",
+			createStub: func(mpdr mocks.MockPaymentDynamoRepository) {
+				mpdr.EXPECT().GetPaymentMethods("id").Return([]string{""}, fmt.Errorf("method not found"))
+				mpdr.EXPECT().InsertPaymentMethod(paymentRecord).Return(false, fmt.Errorf("unable to insert"))
+			},
+			assertTest: func(t *testing.T, m bool, err error) {
+				assert.Equal(t, false, m)
+				assert.NotNil(t, err)
+			},
+		},
+	}
 
-func TestAddNextPaymentMethod(t *testing.T) {
-	mockDynamoRepo.On("GetPaymentMethods", "xyz").Return(nil, nil)
-	mockDynamoRepo.On("InsertPaymentMethod", mock.Anything).Return(true, nil)
-	mockDynamoRepo.On("UpdatePaymentMethods", "xyz", "upi").Return(true, nil)
+	for _, testcase := range testcases {
+		t.Run(testcase.name, func(t *testing.T) {
+			mockCtrl := gomock.NewController(t)
+			mockDynamoRepo := mocks.NewMockPaymentDynamoRepository(mockCtrl)
+			testcase.createStub(*mockDynamoRepo)
 
-	service.AddPaymentMethod("xyz", "upi", "1", "none")
-	mockDynamoRepo.AssertNumberOfCalls(t, "UpdatePaymentMethods", 1)
+			service := domain.NewPaymentService(mockDynamoRepo)
+
+			data, err := service.AddPaymentMethod("id", "method", "agree", "comment")
+
+			testcase.assertTest(t, data, err)
+		})
+	}
 }

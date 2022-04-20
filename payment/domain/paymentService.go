@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"fmt"
 	"os"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -13,6 +12,7 @@ import (
 
 type PaymentService interface {
 	CreateDynamoPaymentRecord(
+		string,
 		int16,
 		string,
 		string,
@@ -29,6 +29,7 @@ type PaymentService interface {
 	// UpdatePaymentMethod(string, string) (bool, error)
 	GetPaymentMethods(string) ([]string, error)
 	AddPaymentMethod(string, string, string, string) (bool, error)
+	GetRazorpayPaymentLink(Payment) (map[string]interface{}, error)
 }
 
 type paymentService struct {
@@ -39,7 +40,7 @@ func GenerateUniqueId() string {
 	return primitive.NewObjectID().Hex()
 }
 
-func GetRazorpayPaymentLink(p Payment) (map[string]interface{}, error) {
+func (service paymentService) GetRazorpayPaymentLink(p Payment) (map[string]interface{}, error) {
 	err := godotenv.Load("../.env")
 	if err != nil {
 		return nil, err
@@ -47,9 +48,8 @@ func GetRazorpayPaymentLink(p Payment) (map[string]interface{}, error) {
 
 	key_id := os.Getenv("RAZORPAY_KEY_ID")
 	key_secret := os.Getenv("RAZORPAY_KEY_SECRET")
-	fmt.Print("secret done")
 	client := razorpay.NewClient(key_id, key_secret)
-	fmt.Print("razorpay client done")
+
 	data := gin.H{
 		"amount":       p.Amount,
 		"currency":     p.Currency,
@@ -63,11 +63,8 @@ func GetRazorpayPaymentLink(p Payment) (map[string]interface{}, error) {
 		// },
 		// "notes": p.Notes,
 	}
-	fmt.Print("razorpay data done")
-
 	body, err := client.PaymentLink.Create(data, nil)
-	fmt.Printf("\n%+v \n", body)
-	fmt.Printf("%+v", err)
+
 	if err != nil {
 		return nil, err
 	}
@@ -75,11 +72,11 @@ func GetRazorpayPaymentLink(p Payment) (map[string]interface{}, error) {
 }
 
 func (service paymentService) CreateDynamoPaymentRecord(
+	id string,
 	amount int16,
 	currency, status, order_id, user_id, method, description, vpa string,
 	notes []string,
 ) (map[string]interface{}, error) {
-	id := GenerateUniqueId()
 	paymentRecord := Payment{
 		Id:          id,
 		Amount:      amount,
@@ -97,7 +94,8 @@ func (service paymentService) CreateDynamoPaymentRecord(
 	if !ok {
 		return nil, err
 	}
-	data, err := GetRazorpayPaymentLink(paymentRecord)
+
+	data, err := service.GetRazorpayPaymentLink(paymentRecord)
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +143,6 @@ func (service paymentService) AddPaymentMethod(id, method, agree, comment string
 	}
 	_, err := service.PaymentDynamoRepository.GetPaymentMethods(id)
 
-	fmt.Print(err)
 	if err != nil {
 		ok, err := service.PaymentDynamoRepository.InsertPaymentMethod(paymentRecord)
 		if !ok {
