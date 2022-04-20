@@ -4,7 +4,7 @@
 // - protoc             v3.6.1
 // source: checkout.proto
 
-package domain
+package protos
 
 import (
 	context "context"

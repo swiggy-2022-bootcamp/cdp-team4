@@ -12,6 +12,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/checkout/domain"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/checkout/infra/logger"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/checkout/protos"
 	// gin-swagger middleware
 )
 
@@ -21,7 +22,7 @@ func setupServer() *grpc.Server {
 	gs := grpc.NewServer()
 	cs := domain.NewCheckout()
 
-	domain.RegisterCheckoutServer(gs, cs)
+	protos.RegisterCheckoutServer(gs, cs)
 	log.Debug("gRPC server registered!")
 
 	reflection.Register(gs)
