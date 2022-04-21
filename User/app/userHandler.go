@@ -3,11 +3,13 @@ package app
 import (
 	"net/http"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/user/domain"
 	pb "github.com/swiggy-2022-bootcamp/cdp-team4/user/app/protobuf"
 	"fmt"
 	"google.golang.org/grpc"
 	"context"
+
 )
 
 type UserHandler struct {
@@ -42,7 +44,7 @@ type userDTO struct {
 // @Schemes
 // @Accept json
 // @Produce json
-// @Param        user	body	domain.User  true  "User structure"
+// @Param        user	body	userDTO  true  "User structure"
 // @Success	201  {string} 	http.StatusCreated
 // @Failure	400  {number} 	http.http.StatusBadRequest
 // @Router /user [POST]
@@ -52,12 +54,16 @@ func (h UserHandler) HandleUserCreation() gin.HandlerFunc {
 
 		if err := ctx.BindJSON(&newUser); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+				Error("bind json")
 			return
 		}
 
 		role, err := domain.GetEnumByIndex(newUser.Role) 
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
+				Error("unable to get role")
 			return
 		}
 
@@ -77,8 +83,12 @@ func (h UserHandler) HandleUserCreation() gin.HandlerFunc {
 		
 		if err1 != nil {
 			ctx.JSON(http.StatusInternalServerError, err1)
+			log.WithFields(logrus.Fields{"message": err1.Error(), "status": http.StatusInternalServerError}).
+				Error("unable to create user")
 		} else {
 			data, _ := user.MarshalJSON()
+			log.WithFields(logrus.Fields{"data": data, "status": http.StatusCreated}).
+				Info("User Added")
 			ctx.Data(http.StatusCreated, "application/json", data)
 		}
 	}
@@ -102,9 +112,13 @@ func (h UserHandler) HandleGetUserByID() gin.HandlerFunc {
 
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+				Error("unable to get user by id")
 			return
 		}
 		ctx.JSON(http.StatusAccepted, gin.H{"record": record})
+		log.WithFields(logrus.Fields{"data": record, "status": http.StatusAccepted}).
+				Info("User fetched")
 	}
 }
 
@@ -124,9 +138,13 @@ func (h UserHandler) HandleGetAllUsers() gin.HandlerFunc {
 
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+				Error("unable to get users")
 			return
 		}
 		ctx.JSON(http.StatusAccepted, gin.H{"records": records})
+		log.WithFields(logrus.Fields{"data": records, "status": http.StatusAccepted}).
+				Info("Fetched users")
 	}
 }
 
@@ -149,16 +167,20 @@ func (h UserHandler) HandleUpdateUserByID() gin.HandlerFunc {
 
 		if err := ctx.BindJSON(&newUpdatedUser); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+				Error("unable to get user by id")
 			return
 		}
 
 		role, err := domain.GetEnumByIndex(newUpdatedUser.Role) 
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
+				Error("unable to get role")
 			return
 		}
 
-		_, err1 := h.userService.UpdateUserById(
+		ok, err1 := h.userService.UpdateUserById(
 			userId,
 			newUpdatedUser.FirstName, 
 			newUpdatedUser.LastName, 
@@ -173,8 +195,12 @@ func (h UserHandler) HandleUpdateUserByID() gin.HandlerFunc {
 		
 		if err1 != nil {
 			ctx.JSON(http.StatusInternalServerError, err1)
+			log.WithFields(logrus.Fields{"message": err1.Error(), "status": http.StatusInternalServerError}).
+				Error("unable to update user")
 		} else {
 			ctx.JSON(http.StatusAccepted, gin.H{"message": "user updated"})
+			log.WithFields(logrus.Fields{"is_updated": ok, "status": http.StatusAccepted}).
+				Info("User updated")
 		}
 	}
 }
@@ -197,9 +223,13 @@ func (h UserHandler) HandleDeleteUserByID() gin.HandlerFunc {
 
 		if !ok {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
+				Error("unable to delete user")
 			return
 		}
 		ctx.JSON(http.StatusAccepted, gin.H{"message": "user deleted"})
+		log.WithFields(logrus.Fields{"is_deleted": ok, "status": http.StatusAccepted}).
+				Info("User deleted")
 	}
 }
 
@@ -231,6 +261,8 @@ func getShippingAddressId(address shippingAddressDTO) (string){
 	
 	if err1 != nil {
 		fmt.Printf("Error while inserting address, %v\n", err1)
+		log.WithFields(logrus.Fields{"message": err1.Error(), "status": http.StatusInternalServerError}).
+				Error("unable to add address")
 	}
 
 	return resp.ShippingAddressID

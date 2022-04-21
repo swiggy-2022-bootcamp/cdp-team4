@@ -1,13 +1,16 @@
 package app
 
 import (
-	"log"
 	"os"
+	// "fmt"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 
 	"github.com/joho/godotenv"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/user/docs"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/user/infra/logger"
 
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
@@ -15,6 +18,8 @@ import (
 	"github.com/swiggy-2022-bootcamp/cdp-team4/user/infra"	
 	"github.com/swiggy-2022-bootcamp/cdp-team4/user/domain"		
 )
+
+var log logrus.Logger = *logger.GetLogger()
 
 type Routes struct {
 	router *gin.Engine
@@ -39,12 +44,14 @@ func configureSwaggerDoc() {
 }
 
 func Start() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal(err)
+	err1 := godotenv.Load(".env")
+	if err1 != nil {
+		logrus.Fatal(err1)
 		return
 	}
 	PORT := os.Getenv("PORT")
+
+	log.WithFields(logrus.Fields{"message": "message", "status": http.StatusBadRequest}).Error("Error Check")
 
 	userDynamodbRepository := infra.NewDynamoRepository()
 

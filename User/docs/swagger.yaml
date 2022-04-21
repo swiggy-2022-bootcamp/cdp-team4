@@ -1,8 +1,50 @@
 basePath: /
 definitions:
+  app.shippingAddressDTO:
+    properties:
+      address_1:
+        type: string
+      address_2:
+        type: string
+      city:
+        type: string
+      country_id:
+        type: integer
+      firstname:
+        type: string
+      lastname:
+        type: string
+      postcode:
+        type: integer
+    type: object
+  app.userDTO:
+    properties:
+      address:
+        $ref: '#/definitions/app.shippingAddressDTO'
+      email:
+        type: string
+      fax:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      role:
+        type: integer
+      username:
+        type: string
+    type: object
   domain.User:
     properties:
+      address_id:
+        type: string
       email:
+        type: string
+      fax:
         type: string
       first_name:
         type: string
@@ -61,7 +103,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/domain.User'
+          $ref: '#/definitions/app.userDTO'
       produces:
       - application/json
       responses:
