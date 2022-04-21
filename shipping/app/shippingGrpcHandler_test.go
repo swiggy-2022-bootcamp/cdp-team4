@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -13,7 +14,7 @@ import (
 func TestGrpcAddressClient(t *testing.T) {
 	// Set up connection with the grpc server
 
-	conn, err := grpc.Dial("localhost:7776", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:"+os.Getenv("GRPC_SHIPPING_PORT"), grpc.WithInsecure())
 	if err != nil {
 		fmt.Printf("Error while making connection, %v\n", err)
 	}
@@ -31,20 +32,6 @@ func TestGrpcAddressClient(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, resp.Firstname, "Naveen")
 	assert.Equal(t, resp.City, "Banglore")
-
-	// resp1, err := c.AddShippingAddress(context.Background(),
-	// 	&pb.ShippingAddressAddRequest{
-	// 		Firstname: "Praveen",
-	// 		Lastname:  "Kumar",
-	// 		City:      "Noida",
-	// 		Address1:  "Address1",
-	// 		Address2:  "Address2",
-	// 		Countryid: 90,
-	// 		Postcode:  560001,
-	// 	},
-	// )
-	// assert.Nil(t, err)
-	// assert.NotNil(t, resp1)
 
 	resp2, err := c.DeleteShippingAddress(context.Background(),
 		&pb.ShippingAddressRequest{

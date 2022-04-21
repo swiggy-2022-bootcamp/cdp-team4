@@ -150,3 +150,10 @@ func convertShippingAddressDTOtoShippingAddressModel(saDto ShippingAddressRecord
 		CountryID: saDto.CountryID,
 	}
 }
+
+func NewShippingHandler(shippingAddressService domain.ShippingAddressService, shippingCostService domain.ShippingCostService) ShippingHandler {
+	return ShippingHandler{
+		ShippingAddressService: shippingAddressService,
+		ShippingCostService:    shippingCostService,
+	}
+}

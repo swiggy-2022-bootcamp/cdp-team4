@@ -1,26 +1,26 @@
-POST http://localhost:7002/shippingaddress
+POST http://localhost:7775/shippingaddress
 Content-Type: application/json
 
 {
- "firstname": "Naveen",
+ "firstname": "Vineet",
  "lastname": "Kumar",
  "city": "Bengaluru",
  "address_1": "Demo",
  "address_2": "Demo",
- "country_id": 81,
- "postcode": 560068
+ "country_id": 86,
+ "postcode": 590068
 }
 
 
 ###
 
-GET http://localhost:7002/shippingaddress/2ae72080-59f8-43b9-b514-af0ea970c242
+GET http://localhost:7775/shippingaddress/e661bee1-a682-4f8e-a37f-d44f0f4b897d
 ###
 
-PUT http://localhost:7002/shippingaddress/2ae72080-59f8-43b9-b514-af0ea970c242
+PUT http://localhost:7775/shippingaddress/e661bee1-a682-4f8e-a37f-d44f0f4b897d
 
 {
- "firstname": "Naveen",
+ "firstname": "Vineet",
  "lastname": "Kumar",
  "city": "Bengaluru",
  "address_1": "Demo",
@@ -31,12 +31,12 @@ PUT http://localhost:7002/shippingaddress/2ae72080-59f8-43b9-b514-af0ea970c242
 
 ###
 
-DELETE http://localhost:7002/shippingaddress/2ae72080-59f8-43b9-b514-af0ea970c242
+DELETE http://localhost:7775/shippingaddress/2ae72080-59f8-43b9-b514-af0ea970c242
 
 
 ###
 
-POST http://localhost:7002/shippingcost
+POST http://localhost:7775/shippingcost
 Content-Type: application/json
 
 {
@@ -45,10 +45,10 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:7002/shippingcost/Mumbai
+GET http://localhost:7775/shippingcost/Mumbai
 
 ###
-PUT http://localhost:7002/shippingcost
+PUT http://localhost:7775/shippingcost
 Content-Type: application/json
 
 {
@@ -57,4 +57,4 @@ Content-Type: application/json
 }
 
 ###
-DELETE  http://localhost:7002/shippingcost/Mumbai
+DELETE  http://localhost:7775/shippingcost/Mumbai

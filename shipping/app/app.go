@@ -23,11 +23,11 @@ import (
 var log logrus.Logger = *logger.GetLogger()
 var shippingHandler ShippingHandler
 
-func setupRouter() *gin.Engine {
+func SetupRouter(shippingHandler ShippingHandler) *gin.Engine {
 	router := gin.Default()
 	// health check route
 	HealthCheckRouter(router)
-	ShippingRouter(router)
+	ShippingRouter(router, shippingHandler)
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	return router
 }
@@ -39,10 +39,9 @@ func configureSwaggerDoc() {
 func Start() {
 	dynamoRepository := infra.NewDynamoShippingAddressRepository()
 	dynamoRepository1 := infra.NewShippingCostDynamoRepository()
-	shippingHandler = ShippingHandler{
-		ShippingAddressService: domain.NewShippingAddressService(dynamoRepository),
-		ShippingCostService:    domain.NewShippingCostService(dynamoRepository1),
-	}
+	shippingAddressSerivce := domain.NewShippingAddressService(dynamoRepository)
+	shippingCostSerivce := domain.NewShippingCostService(dynamoRepository1)
+	shippingHandler = NewShippingHandler(shippingAddressSerivce, shippingCostSerivce)
 	log.WithFields(logrus.Fields{"message": "message", "status": http.StatusBadRequest}).Error("Error Check")
 	go startGrpcCostServer(shippingHandler)
 	err := godotenv.Load(".env")
@@ -51,7 +50,7 @@ func Start() {
 		return
 	}
 	PORT := os.Getenv("SHIPPING_SERVICE_PORT")
-	router := setupRouter()
+	router := SetupRouter(shippingHandler)
 	configureSwaggerDoc()
 
 	router.Run(":" + PORT)
@@ -67,7 +66,7 @@ func startGrpcCostServer(sh ShippingHandler) {
 		fmt.Print(err)
 		return
 	}
-	GRPC_COST_PORT := os.Getenv("GRPC_PORT")
+	GRPC_COST_PORT := os.Getenv("GRPC_SHIPPING_PORT")
 	l, err := net.Listen("tcp", ":"+GRPC_COST_PORT)
 	if err != nil {
 		fmt.Print(err)
