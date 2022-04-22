@@ -8,6 +8,8 @@ func HealthCheckRouter(gin *gin.Engine) {
 	gin.GET("/", HealthCheck())
 }
 
+// function that is used to register all the routes and their
+// respective handler methods
 func PayRouter(gin *gin.Engine, paymentHandler PayHandler) {
 	p := gin.Group("/pay")
 	{

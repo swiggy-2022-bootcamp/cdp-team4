@@ -8,7 +8,7 @@ import (
 
 // Health Check
 // @Summary      Health of payment service
-// @Description  use tocheck whether payment service is up and running or not
+// @Description  route use to check whether payment service is up and running or not
 // @Tags         Health
 // @Produce      json
 // @Success      200  {object}  map[string]interface{}

@@ -16,8 +16,6 @@ import (
 )
 
 func TestHandlePay(t *testing.T) {
-	// router := gin.Default()
-
 	requestData := app.PaymentRecordDTO{
 		Amount:      45,
 		Currency:    "INR",
@@ -41,7 +39,17 @@ func TestHandlePay(t *testing.T) {
 				response := map[string]interface{}{"name": "dummy_name"}
 
 				mps.EXPECT().
-					CreateDynamoPaymentRecord(gomock.Any(), requestData.Amount, requestData.Currency, requestData.Status, requestData.OrderID, requestData.UserID, requestData.Method, requestData.Description, requestData.VPA, requestData.Notes).
+					CreateDynamoPaymentRecord(
+						gomock.Any(),
+						requestData.Amount,
+						requestData.Currency,
+						requestData.Status,
+						requestData.OrderID,
+						requestData.UserID,
+						requestData.Method,
+						requestData.Description,
+						requestData.VPA,
+						requestData.Notes).
 					Return(response, nil)
 			},
 			expected: 200,
@@ -50,7 +58,17 @@ func TestHandlePay(t *testing.T) {
 			name: "ErrorCreateDynamoPaymentRecord",
 			createStub: func(mps *mocks.MockPaymentService) {
 				mps.EXPECT().
-					CreateDynamoPaymentRecord(gomock.Any(), requestData.Amount, requestData.Currency, requestData.Status, requestData.OrderID, requestData.UserID, requestData.Method, requestData.Description, requestData.VPA, requestData.Notes).
+					CreateDynamoPaymentRecord(
+						gomock.Any(),
+						requestData.Amount,
+						requestData.Currency,
+						requestData.Status,
+						requestData.OrderID,
+						requestData.UserID,
+						requestData.Method,
+						requestData.Description,
+						requestData.VPA,
+						requestData.Notes).
 					Return(nil, fmt.Errorf("unable to insert record"))
 			},
 			expected: 400,
@@ -59,7 +77,17 @@ func TestHandlePay(t *testing.T) {
 			name: "ErrorNothingReturnFromCreateDynamoPaymentRecord",
 			createStub: func(mps *mocks.MockPaymentService) {
 				mps.EXPECT().
-					CreateDynamoPaymentRecord(gomock.Any(), requestData.Amount, requestData.Currency, requestData.Status, requestData.OrderID, requestData.UserID, requestData.Method, requestData.Description, requestData.VPA, requestData.Notes).
+					CreateDynamoPaymentRecord(
+						gomock.Any(),
+						requestData.Amount,
+						requestData.Currency,
+						requestData.Status,
+						requestData.OrderID,
+						requestData.UserID,
+						requestData.Method,
+						requestData.Description,
+						requestData.VPA,
+						requestData.Notes).
 					Return(nil, nil)
 			},
 			expected: 400,
@@ -117,14 +145,18 @@ func TestHandleGetPayRecordByID(t *testing.T) {
 		{
 			name: "SuccessGetPayRecordByID",
 			createStub: func(mps *mocks.MockPaymentService) {
-				mps.EXPECT().GetPaymentRecordById("xyx" /* id */).Return(&domain.Payment{}, nil)
+				mps.EXPECT().
+					GetPaymentRecordById("xyx" /* id */).
+					Return(&domain.Payment{}, nil)
 			},
 			expected: 200,
 		},
 		{
 			name: "FailGetPayRecordByID",
 			createStub: func(mps *mocks.MockPaymentService) {
-				mps.EXPECT().GetPaymentRecordById("xyx" /* id */).Return(nil, fmt.Errorf("record not found"))
+				mps.EXPECT().
+					GetPaymentRecordById("xyx" /* id */).
+					Return(nil, fmt.Errorf("record not found"))
 			},
 			expected: 400,
 		},
@@ -160,14 +192,18 @@ func TestHandleUpdatePayStatus(t *testing.T) {
 		{
 			name: "SuccesshandleUpdatePayStatus",
 			createStub: func(mps mocks.MockPaymentService) {
-				mps.EXPECT().UpdatePaymentStatus("xyx" /* id */, "confirmed" /* status */).Return(true, nil)
+				mps.EXPECT().
+					UpdatePaymentStatus("xyx" /* id */, "confirmed" /* status */).
+					Return(true, nil)
 			},
 			expected: 200,
 		},
 		{
 			name: "FailurehandleUpdatePayStatus",
 			createStub: func(mps mocks.MockPaymentService) {
-				mps.EXPECT().UpdatePaymentStatus("xyx" /* id */, "confirmed" /* status */).Return(false, fmt.Errorf("unable to update the status"))
+				mps.EXPECT().
+					UpdatePaymentStatus("xyx" /* id */, "confirmed" /* status */).
+					Return(false, fmt.Errorf("unable to update the status"))
 			},
 			expected: 400,
 		},
@@ -185,10 +221,16 @@ func TestHandleUpdatePayStatus(t *testing.T) {
 				PaymentService: mockService,
 			})
 
-			requestData, _ := json.Marshal(app.UpdatePayStatusDTO{Id: "xyx", Status: "confirmed"})
+			requestData, _ := json.Marshal(
+				app.UpdatePayStatusDTO{Id: "xyx", Status: "confirmed"},
+			)
 
 			recorder := httptest.NewRecorder()
-			req := httptest.NewRequest(http.MethodPut, "/pay/", bytes.NewReader(requestData))
+			req := httptest.NewRequest(
+				http.MethodPut,
+				"/pay/",
+				bytes.NewReader(requestData),
+			)
 			router.ServeHTTP(recorder, req)
 
 			assert.Equal(t, testcase.expected, recorder.Code)
@@ -221,14 +263,18 @@ func TestHandleAddPaymentMethods(t *testing.T) {
 		{
 			name: "SuccessHandleAddPaymentMethods",
 			createStub: func(mps mocks.MockPaymentService) {
-				mps.EXPECT().AddPaymentMethod("xyx", "credit-card", "1", "none").Return(true, nil)
+				mps.EXPECT().
+					AddPaymentMethod("xyx", "credit-card", "1", "none").
+					Return(true, nil)
 			},
 			expected: 200,
 		},
 		{
 			name: "SuccessHandleAddPaymentMethods",
 			createStub: func(mps mocks.MockPaymentService) {
-				mps.EXPECT().AddPaymentMethod("xyx", "credit-card", "1", "none").Return(false, fmt.Errorf("unable to add"))
+				mps.EXPECT().
+					AddPaymentMethod("xyx", "credit-card", "1", "none").
+					Return(false, fmt.Errorf("unable to add"))
 
 			},
 			expected: 400,
@@ -236,7 +282,11 @@ func TestHandleAddPaymentMethods(t *testing.T) {
 		{
 			name: "SuccessHandleAddPaymentMethods",
 			createStub: func(mps mocks.MockPaymentService) {
-				mps.EXPECT().AddPaymentMethod("xyx", "credit-card", "1", "none").Return(false, fmt.Errorf("ConditionalCheckFailedException: unable to add"))
+				mps.EXPECT().
+					AddPaymentMethod("xyx", "credit-card", "1", "none").
+					Return(
+						false,
+						fmt.Errorf("ConditionalCheckFailedException: unable to add"))
 
 			},
 			expected: 400,
@@ -264,7 +314,11 @@ func TestHandleAddPaymentMethods(t *testing.T) {
 			})
 
 			recorder := httptest.NewRecorder()
-			req := httptest.NewRequest(http.MethodPost, "/pay/paymentMethods", bytes.NewReader(requestData))
+			req := httptest.NewRequest(
+				http.MethodPost,
+				"/pay/paymentMethods",
+				bytes.NewReader(requestData),
+			)
 			router.ServeHTTP(recorder, req)
 
 			assert.Equal(t, testcase.expected, recorder.Code)
@@ -305,7 +359,9 @@ func TestHandleGetPaymentMethods(t *testing.T) {
 		{
 			name: "SuccessHandleAddPaymentMethods",
 			createStub: func(mps mocks.MockPaymentService) {
-				mps.EXPECT().GetPaymentMethods("xyx").Return(nil, fmt.Errorf("unable to get methods"))
+				mps.EXPECT().
+					GetPaymentMethods("xyx").
+					Return(nil, fmt.Errorf("unable to get methods"))
 			},
 			expected: 400,
 		},

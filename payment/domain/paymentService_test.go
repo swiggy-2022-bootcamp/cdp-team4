@@ -62,7 +62,9 @@ func TestCreateDynamoPaymentRecord(t *testing.T) {
 		{
 			name: "FailCreateDynamoPaymentRecord",
 			createStub: func(mpdr mocks.MockPaymentDynamoRepository) {
-				mpdr.EXPECT().InsertPaymentRecord(payment).Return(false, fmt.Errorf("unable to insert record"))
+				mpdr.EXPECT().
+					InsertPaymentRecord(payment).
+					Return(false, fmt.Errorf("unable to insert record"))
 			},
 			assertTest: func(t *testing.T, m map[string]interface{}, err error) {
 				assert.Nil(t, m)
@@ -140,7 +142,9 @@ func TestGetPaymentRecordById(t *testing.T) {
 		{
 			name: "FailGetPaymentRecordById",
 			createStub: func(mpdr mocks.MockPaymentDynamoRepository) {
-				mpdr.EXPECT().FindPaymentRecordById("xyx").Return(nil, fmt.Errorf("unable to find record"))
+				mpdr.EXPECT().
+					FindPaymentRecordById("xyx").
+					Return(nil, fmt.Errorf("unable to find record"))
 			},
 			assertTest: func(t *testing.T, m *domain.Payment, err error) {
 				assert.Nil(t, m)
@@ -185,7 +189,9 @@ func TestGetPaymentMethods(t *testing.T) {
 		{
 			name: "FailGetPaymentMethods",
 			createStub: func(mpdr mocks.MockPaymentDynamoRepository) {
-				mpdr.EXPECT().GetPaymentMethods("xyx").Return(nil, fmt.Errorf("unable to find record"))
+				mpdr.EXPECT().
+					GetPaymentMethods("xyx").
+					Return(nil, fmt.Errorf("unable to find record"))
 			},
 			assertTest: func(t *testing.T, m []string, err error) {
 				assert.Nil(t, m)
@@ -251,7 +257,9 @@ func TestAddPaymentMethod(t *testing.T) {
 			name: "FailAddPaymentMethodUpdateState",
 			createStub: func(mpdr mocks.MockPaymentDynamoRepository) {
 				mpdr.EXPECT().GetPaymentMethods("id").Return([]string{""}, nil)
-				mpdr.EXPECT().UpdatePaymentMethods("id", "method").Return(false, fmt.Errorf("unable to update methods"))
+				mpdr.EXPECT().
+					UpdatePaymentMethods("id", "method").
+					Return(false, fmt.Errorf("unable to update methods"))
 			},
 			assertTest: func(t *testing.T, m bool, err error) {
 				assert.Equal(t, false, m)
@@ -261,7 +269,9 @@ func TestAddPaymentMethod(t *testing.T) {
 		{
 			name: "SuccessAddPaymentMethodInsertState",
 			createStub: func(mpdr mocks.MockPaymentDynamoRepository) {
-				mpdr.EXPECT().GetPaymentMethods("id").Return([]string{""}, fmt.Errorf("method not found"))
+				mpdr.EXPECT().
+					GetPaymentMethods("id").
+					Return([]string{""}, fmt.Errorf("method not found"))
 				mpdr.EXPECT().InsertPaymentMethod(paymentRecord).Return(true, nil)
 			},
 			assertTest: func(t *testing.T, m bool, err error) {
@@ -272,8 +282,12 @@ func TestAddPaymentMethod(t *testing.T) {
 		{
 			name: "FailAddPaymentMethodInsertState",
 			createStub: func(mpdr mocks.MockPaymentDynamoRepository) {
-				mpdr.EXPECT().GetPaymentMethods("id").Return([]string{""}, fmt.Errorf("method not found"))
-				mpdr.EXPECT().InsertPaymentMethod(paymentRecord).Return(false, fmt.Errorf("unable to insert"))
+				mpdr.EXPECT().
+					GetPaymentMethods("id").
+					Return([]string{""}, fmt.Errorf("method not found"))
+				mpdr.EXPECT().
+					InsertPaymentMethod(paymentRecord).
+					Return(false, fmt.Errorf("unable to insert"))
 			},
 			assertTest: func(t *testing.T, m bool, err error) {
 				assert.Equal(t, false, m)

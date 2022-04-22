@@ -12,10 +12,15 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// payHandler wraps up the paymentServices along with all
+// the handler methods of respective routes
 type PayHandler struct {
 	PaymentService domain.PaymentService
 }
 
+// data model of Payment record  used to parse the body of the http request
+// and pass on the data to service layer that is going to redirect to
+// infra layer and save it to database
 type PaymentRecordDTO struct {
 	Amount      int16
 	Currency    string
@@ -28,6 +33,7 @@ type PaymentRecordDTO struct {
 	Notes       []string
 }
 
+// data model of Payment method  used to parse the body of the http request
 type PaymentMethodDTO struct {
 	Id      string
 	Method  string
@@ -35,15 +41,23 @@ type PaymentMethodDTO struct {
 	Comment string
 }
 
+// data model used to parse the body of the http request when handler has to
+// update the status of payment that is confirmed, cancel or pending.
 type UpdatePayStatusDTO struct {
 	Id     string
 	Status string
 }
 
+// function to generate unique id which internally uses the primitive's Object id
+// that is used in MongoDb to automatically create an ID.
 func GenerateUniqueId() string {
 	return primitive.NewObjectID().Hex()
 }
 
+// as per the current scope of project, the payment is not going to happen by the user
+// so to simulate the successful payment process,
+// this function is going to update the
+// payment status for that particular user after 10 secs of delay/
 func simulatePaymentDone(data interface{}) {
 	time.Sleep(10 * time.Second)
 	ok, err := gokafka.WriteMsgToKafka("payment", data)
@@ -96,7 +110,10 @@ func (ph PayHandler) HandlePay() gin.HandlerFunc {
 			return
 		}
 		if data == nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": "unable to create payment link"})
+			ctx.JSON(
+				http.StatusBadRequest,
+				gin.H{"message": "unable to create payment link"},
+			)
 			log.WithFields(logrus.Fields{"message": err, "status": http.StatusBadRequest}).
 				Error("unable create payment link")
 			return
@@ -141,14 +158,6 @@ func (ph PayHandler) HandleGetPayRecordByID() gin.HandlerFunc {
 
 func (ph PayHandler) handleGetPayRecordsByUserID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		// id := ctx.Param("user_id")
-		// record, err := ph.PaymentService.GetPaymentAllRecordsByUserId(id)
-
-		// if err != nil {
-		// 	ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-		// 	return
-		// }
-		// ctx.JSON(http.StatusAccepted, gin.H{"record": record})
 	}
 }
 

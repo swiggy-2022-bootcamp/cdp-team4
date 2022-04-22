@@ -40,7 +40,9 @@ func GenerateUniqueId() string {
 	return primitive.NewObjectID().Hex()
 }
 
-func (service paymentService) GetRazorpayPaymentLink(p Payment) (map[string]interface{}, error) {
+func (service paymentService) GetRazorpayPaymentLink(
+	p Payment,
+) (map[string]interface{}, error) {
 	err := godotenv.Load("../.env")
 	if err != nil {
 		return nil, err
@@ -134,7 +136,9 @@ func (service paymentService) UpdatePaymentStatus(
 	return true, nil
 }
 
-func (service paymentService) AddPaymentMethod(id, method, agree, comment string) (bool, error) {
+func (service paymentService) AddPaymentMethod(
+	id, method, agree, comment string,
+) (bool, error) {
 	var paymentRecord = PaymentMethod{
 		Id:      id,
 		Agree:   agree,

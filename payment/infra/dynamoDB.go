@@ -126,7 +126,9 @@ func (pdr PaymentDynamoRepository) FindPaymentRecordByUserID(
 	return paymentRecords, nil
 }
 
-func (pdr PaymentDynamoRepository) UpdatePaymentRecord(id, attributeValue string) (bool, error) {
+func (pdr PaymentDynamoRepository) UpdatePaymentRecord(
+	id, attributeValue string,
+) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	input := &dynamodb.UpdateItemInput{
@@ -171,7 +173,9 @@ func (pdr PaymentDynamoRepository) DeletePaymentRecordByID(id string) (bool, err
 	return true, nil
 }
 
-func (pdr PaymentDynamoRepository) InsertPaymentMethod(pm domain.PaymentMethod) (bool, error) {
+func (pdr PaymentDynamoRepository) InsertPaymentMethod(
+	pm domain.PaymentMethod,
+) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	payMethodModel := _toDynamoPayMethodModel(&pm)
@@ -224,7 +228,10 @@ func (pdr PaymentDynamoRepository) GetPaymentMethods(id string) ([]string, error
 
 	return payMethodModel.Methods, nil
 }
-func (pdr PaymentDynamoRepository) UpdatePaymentMethods(id, paymentMethod string) (bool, error) {
+
+func (pdr PaymentDynamoRepository) UpdatePaymentMethods(
+	id, paymentMethod string,
+) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
