@@ -12,8 +12,17 @@ type OrderService interface {
 	UpdateOrderStatus(string, string) (bool, *errs.AppError)
 }
 
+type OrderOverviewService interface {
+	CreateOrderOverview(OrderOverview) (bool, *errs.AppError)
+	GetOrderOverviewByOrderID(string) (*OrderOverview, *errs.AppError)
+}
+
 type service struct {
 	orderRepository OrderRepository
+}
+
+type service1 struct {
+	orderOverviewrepo OrderOverviewRepository
 }
 
 var order_status []string = []string{"confirmed", "declined", "cancelled", "pending", "delivered"}
@@ -80,9 +89,31 @@ func (s service) UpdateOrderStatus(id string, status string) (bool, *errs.AppErr
 	return true, nil
 }
 
+func (s service1) CreateOrderOverview(ov OrderOverview) (bool, *errs.AppError) {
+	_, err := s.orderOverviewrepo.InsertOrderOverview(ov)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func (s service1) GetOrderOverviewByOrderID(orderid string) (*OrderOverview, *errs.AppError) {
+	result, err := s.orderOverviewrepo.GetOrderOverview(orderid)
+	if err != nil {
+		return &OrderOverview{}, err
+	}
+	return result, nil
+}
+
 func NewOrderService(orderRepository OrderRepository) OrderService {
 	return &service{
 		orderRepository: orderRepository,
+	}
+}
+
+func NewOrderOverviewService(orderOverviewrepo OrderOverviewRepository) OrderOverviewService {
+	return &service1{
+		orderOverviewrepo: orderOverviewrepo,
 	}
 }
 

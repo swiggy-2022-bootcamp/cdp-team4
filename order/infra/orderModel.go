@@ -15,3 +15,8 @@ type OrderModel struct {
 	CreatedAt        time.Time      `json:"created_at"`
 	UpdatedAt        time.Time      `json:"updated_at"`
 }
+
+type OrderOverview struct {
+	OrderID            string         `json:"order_id"`
+	ProductsIdQuantity map[string]int `json:"products"`
+}

@@ -13,8 +13,10 @@ import (
 
 func TestHeathCheck(t *testing.T) {
 	dynamoRepo := infra.NewDynamoRepository()
+	dynamoRepo1 := infra.NewDynomoOrderOverviewRepository()
 	service := domain.NewOrderService(dynamoRepo)
-	orderHandler := app.NewOrderHandler(service)
+	service1 := domain.NewOrderOverviewService(dynamoRepo1)
+	orderHandler := app.NewOrderHandler(service, service1)
 	router := app.SetupRouter(orderHandler)
 
 	w := httptest.NewRecorder()

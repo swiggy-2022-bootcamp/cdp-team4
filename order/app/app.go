@@ -33,8 +33,9 @@ func configureSwaggerDoc() {
 
 func Start() {
 	dynamoRepository := infra.NewDynamoRepository()
-	orderHandler := OrderHandler{OrderService: domain.NewOrderService(dynamoRepository)}
-	startKafkaConsumer(dynamoRepository)
+	dynamoRepositoryOrderOverview := infra.NewDynomoOrderOverviewRepository()
+	orderHandler := NewOrderHandler(domain.NewOrderService(dynamoRepository), domain.NewOrderOverviewService(dynamoRepositoryOrderOverview))
+	startKafkaConsumer(dynamoRepository, dynamoRepositoryOrderOverview)
 	// grpcserver for testing
 	//go testGrpcServer()
 	err := godotenv.Load(".env")
@@ -49,9 +50,9 @@ func Start() {
 	router.Run(":" + PORT)
 }
 
-func startKafkaConsumer(repo infra.OrderDynamoRepository) {
+func startKafkaConsumer(repo infra.OrderDynamoRepository, repo1 infra.OrderDynamoRepository) {
 	ctx := context.Background()
-	go gokafka.StatusConsumer(ctx, "payment", repo)
+	go gokafka.StatusConsumer(ctx, "payment", repo, repo1)
 }
 
 // func testGrpcServer() {

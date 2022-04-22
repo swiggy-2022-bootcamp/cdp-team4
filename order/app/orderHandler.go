@@ -3,8 +3,10 @@ package app
 import (
 	"context"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	pb "github.com/swiggy-2022-bootcamp/cdp-team4/order/app/protobuf"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/order/domain"
@@ -12,7 +14,8 @@ import (
 )
 
 type OrderHandler struct {
-	OrderService domain.OrderService
+	OrderService         domain.OrderService
+	OrderOverviewService domain.OrderOverviewService
 }
 
 type ProductRecordDTO struct {
@@ -38,12 +41,23 @@ type OrderConfirmResponseDTO struct {
 	RewardspointsConsumed int16  `json:"reward_points"`
 }
 
+type OrderOverviewRecordDTO struct {
+	OrderID string `json:"order_id"`
+	CartID  string `json:"cart_id"`
+}
+
+type RequestDTO struct {
+	Id     string `json:"id"`
+	Status string `json:"status"`
+}
+
 // Create Order
 // @Summary      Create Order
 // @Description  This Handle allows admin to create new Order
 // @Tags         Order
 // @Produce      json
-// @Success      200  {object}  map[string]interface{}
+// @Param 		 order body OrderRecordDTO true "Create order"
+// @Success      200  {object}  OrderConfirmResponseDTO
 // @Failure      400  {number} 	http.StatusBadRequest
 // @Router       /order    [post]
 func (oh OrderHandler) handleOrder() gin.HandlerFunc {
@@ -81,7 +95,8 @@ func (oh OrderHandler) handleOrder() gin.HandlerFunc {
 // @Description  This Handle returns Order given order id
 // @Tags         Order
 // @Produce      json
-// @Success      200  {object}  map[string]interface{}
+// @Param        id   path      int  true  "order id"
+// @Success      200  {object}  OrderRecordDTO
 // @Failure      400  {number} 	http.StatusBadRequest
 // @Router       /order/:id    [get]
 func (oh OrderHandler) HandleGetOrderRecordByID() gin.HandlerFunc {
@@ -111,7 +126,8 @@ func (oh OrderHandler) HandleGetOrderRecordByID() gin.HandlerFunc {
 // @Description  This Handle returns Order given user id
 // @Tags         Order
 // @Produce      json
-// @Success      200  {object}  map[string]interface{}
+// @Param        user_id   path      int  true  "user id"
+// @Success      200  {object}  []OrderRecordDTO
 // @Failure      400  {number} 	http.StatusBadRequest
 // @Router       /order/user/:userid    [get]
 func (oh OrderHandler) HandleGetOrderRecordsByUserID() gin.HandlerFunc {
@@ -148,7 +164,8 @@ func (oh OrderHandler) HandleGetOrderRecordsByUserID() gin.HandlerFunc {
 // @Description  This Handle returns Order given status
 // @Tags         Order
 // @Produce      json
-// @Success      200  {object}  map[string]interface{}
+// @Param        id   status    int  true  "status"
+// @Success      200  {object}  []OrderRecordDTO
 // @Failure      400  {number} 	http.StatusBadRequest
 // @Router       /order/status/:status    [get]
 func (oh OrderHandler) HandleGetOrderRecordsByStatus() gin.HandlerFunc {
@@ -185,7 +202,8 @@ func (oh OrderHandler) HandleGetOrderRecordsByStatus() gin.HandlerFunc {
 // @Description  This Handle returns all of the orders
 // @Tags         Order
 // @Produce      json
-// @Success      200  {object}  map[string]interface{}
+// @Param        id   path      int  true  "order id"
+// @Success      200  {object}  []OrderRecordDTO
 // @Failure      400  {number} 	http.StatusBadRequest
 // @Router       /orders    [get]
 func (oh OrderHandler) HandleGetAllRecords() gin.HandlerFunc {
@@ -213,15 +231,13 @@ func (oh OrderHandler) HandleGetAllRecords() gin.HandlerFunc {
 // @Description  This Handle Update order status given order id
 // @Tags         Order
 // @Produce      json
-// @Success      200  {object}  map[string]interface{}
+// @Param 		 order body RequestDTO true "Update order"
+// @Success      200  {number}  http.StatusAccepted
 // @Failure      400  {number} 	http.StatusBadRequest
 // @Router       /order/status    [put]
 func (oh OrderHandler) handleUpdateOrderStatus() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var requestDTO struct {
-			Id     string `json:"id"`
-			Status string `json:"status"`
-		}
+		var requestDTO RequestDTO
 		if err := ctx.BindJSON(&requestDTO); err != nil {
 			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
 				Error(err.Error())
@@ -245,7 +261,8 @@ func (oh OrderHandler) handleUpdateOrderStatus() gin.HandlerFunc {
 // @Description  This Handle deletes order given order id
 // @Tags         Order
 // @Produce      json
-// @Success      200  {object}  map[string]interface{}
+// @Param        id   path      int  true  "order id"
+// @Success      200  {number}  http.StatusAccepted
 // @Failure      400  {number} 	http.StatusBadRequest
 // @Router       /order/:id   [delete]
 func (oh OrderHandler) HandleDeleteOrderById() gin.HandlerFunc {
@@ -270,7 +287,16 @@ func (oh OrderHandler) HandleDeleteOrderById() gin.HandlerFunc {
 	}
 }
 
-func (oh OrderHandler) HandleAddOrderFromCart() gin.HandlerFunc {
+// Confirm Order
+// @Summary      Confirm Order
+// @Description  This Handle adds order from checkout
+// @Tags         Order
+// @Produce      json
+// @Success      200  {object}  OrderConfirmResponseDTO
+// @Failure      400  {number} 	http.StatusBadRequest
+// @Router       /confirm/:userid   [post]
+
+func (oh OrderHandler) HandleAddOrderFromCheckout() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("user_id")
 		if id == "" {
@@ -279,7 +305,14 @@ func (oh OrderHandler) HandleAddOrderFromCart() gin.HandlerFunc {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Invalid ID"})
 			return
 		}
-		conn, err := grpc.Dial("localhost:7899", grpc.WithInsecure())
+
+		err := godotenv.Load(".env")
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+		PORT := os.Getenv("CHECKOUT_SERVICE_PORT")
+		conn, err := grpc.Dial("localhost:"+PORT, grpc.WithInsecure())
 		if err != nil {
 			log.WithFields(logrus.Fields{"message": "Error while making connection", "status": http.StatusBadGateway}).
 				Error("Error while making connection")
@@ -320,6 +353,26 @@ func (oh OrderHandler) HandleAddOrderFromCart() gin.HandlerFunc {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error while creating order"})
 			return
 		}
+
+		prod_id_quantity := make(map[string]int)
+
+		for _, item := range resp.Item {
+			prod_id_quantity[item.Id] = int(item.Qty)
+		}
+
+		neworder := domain.OrderOverview{
+			OrderID:            res,
+			ProductsIdQuantity: prod_id_quantity,
+		}
+
+		_, err1 := oh.OrderOverviewService.CreateOrderOverview(neworder)
+		if err1 != nil {
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadGateway}).
+				Error("Error while creating order")
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error while creating order"})
+			return
+		}
+
 		ctx.JSON(http.StatusAccepted, gin.H{"record": OrderConfirmResponseDTO{
 			UserID:                resp.UserID,
 			OrderID:               res,
@@ -354,8 +407,9 @@ func convertOrderModeltoOrderDTO(order domain.Order) OrderRecordDTO {
 		TotalCost: int16(order.TotalCost),
 	}
 }
-func NewOrderHandler(orderService domain.OrderService) OrderHandler {
+func NewOrderHandler(orderService domain.OrderService, orderOverviewService domain.OrderOverviewService) OrderHandler {
 	return OrderHandler{
-		OrderService: orderService,
+		OrderService:         orderService,
+		OrderOverviewService: orderOverviewService,
 	}
 }

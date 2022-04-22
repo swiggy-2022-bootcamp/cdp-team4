@@ -61,12 +61,22 @@ const docTemplate = `{
                     "Order"
                 ],
                 "summary": "Create Order",
+                "parameters": [
+                    {
+                        "description": "Create order",
+                        "name": "order",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/app.OrderRecordDTO"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/app.OrderConfirmResponseDTO"
                         }
                     },
                     "400": {
@@ -92,8 +102,68 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/app.OrderRecordDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "This Handle deletes order given order id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Order"
+                ],
+                "summary": "Delete order",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                }
+            }
+        },
+        "/order/status": {
+            "put": {
+                "description": "This Handle Update order status given order id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Order"
+                ],
+                "summary": "Update order status",
+                "parameters": [
+                    {
+                        "description": "Update order",
+                        "name": "order",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/app.RequestDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "number"
                         }
                     },
                     "400": {
@@ -119,8 +189,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/app.OrderRecordDTO"
+                            }
                         }
                     },
                     "400": {
@@ -146,8 +218,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/app.OrderRecordDTO"
+                            }
                         }
                     },
                     "400": {
@@ -173,8 +247,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/app.OrderRecordDTO"
+                            }
                         }
                     },
                     "400": {
@@ -184,55 +260,78 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "put": {
-                "description": "This Handle Update order status given order id",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Order"
-                ],
-                "summary": "Update order status",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "number"
-                        }
-                    }
+            }
+        }
+    },
+    "definitions": {
+        "app.OrderConfirmResponseDTO": {
+            "type": "object",
+            "properties": {
+                "order_id": {
+                    "type": "string"
+                },
+                "reward_points": {
+                    "type": "integer"
+                },
+                "shipping_price": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "total_cost": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "string"
                 }
-            },
-            "delete": {
-                "description": "This Handle deletes order given order id",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Order"
-                ],
-                "summary": "Delete order",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "number"
-                        }
+            }
+        },
+        "app.OrderRecordDTO": {
+            "type": "object",
+            "properties": {
+                "order_id": {
+                    "type": "string"
+                },
+                "products": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.ProductRecordDTO"
                     }
+                },
+                "status": {
+                    "type": "string"
+                },
+                "total_cost": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.ProductRecordDTO": {
+            "type": "object",
+            "properties": {
+                "cost": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "integer"
+                }
+            }
+        },
+        "app.RequestDTO": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
                 }
             }
         }

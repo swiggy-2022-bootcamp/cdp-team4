@@ -33,7 +33,7 @@ type PaymentRecord struct {
 	Notes    []string
 }
 
-func StatusConsumer(ctx context.Context, topic string, db infra.OrderDynamoRepository) {
+func StatusConsumer(ctx context.Context, topic string, db infra.OrderDynamoRepository, db1 infra.OrderDynamoRepository) {
 
 	reader := getKafkaReader(ctx, topic, "id", []string{"localhost:9092"})
 	for {
@@ -50,6 +50,7 @@ func StatusConsumer(ctx context.Context, topic string, db infra.OrderDynamoRepos
 			orderid := statusMsg.OrderID
 			status := statusMsg.Status
 			go db.UpdateOrderStatus(orderid, status)
+			go UpdateProductService("product", orderid, db1)
 		}
 	}
 }

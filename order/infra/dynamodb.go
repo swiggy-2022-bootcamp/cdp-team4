@@ -15,6 +15,9 @@ import (
 	"github.com/swiggy-2022-bootcamp/cdp-team4/order/utils/errs"
 )
 
+var OrderTableName string = "order"
+var OrderOverviewTableName string = "order-overview"
+
 type OrderDynamoRepository struct {
 	Session   *dynamodb.DynamoDB
 	Tablename string
@@ -58,7 +61,7 @@ func (odr OrderDynamoRepository) InsertOrder(p domain.Order) (string, *errs.AppE
 
 	input := &dynamodb.PutItemInput{
 		Item:      av,
-		TableName: aws.String("Order"),
+		TableName: aws.String(OrderTableName),
 	}
 
 	_, err = odr.Session.PutItemWithContext(ctx, input)
@@ -76,7 +79,7 @@ func (odr OrderDynamoRepository) FindOrderById(orderID string) (*domain.Order, *
 	defer cancel()
 
 	input := &dynamodb.GetItemInput{
-		TableName: aws.String("Order"),
+		TableName: aws.String(OrderTableName),
 		Key: map[string]*dynamodb.AttributeValue{
 			"id": {
 				S: aws.String(orderID),
@@ -121,7 +124,7 @@ func (odr OrderDynamoRepository) FindOrderByUserId(userId string) ([]domain.Orde
 		ExpressionAttributeNames:  expr.Names(),
 		FilterExpression:          expr.Filter(),
 		ExpressionAttributeValues: expr.Values(),
-		TableName:                 aws.String("Order"),
+		TableName:                 aws.String(OrderTableName),
 	}
 
 	result, err := odr.Session.ScanWithContext(ctx, input)
@@ -163,7 +166,7 @@ func (odr OrderDynamoRepository) FindOrderByStatus(status string) ([]domain.Orde
 		ExpressionAttributeNames:  expr.Names(),
 		FilterExpression:          expr.Filter(),
 		ExpressionAttributeValues: expr.Values(),
-		TableName:                 aws.String("Order"),
+		TableName:                 aws.String(OrderTableName),
 	}
 
 	result, err := odr.Session.ScanWithContext(ctx, input)
@@ -204,7 +207,7 @@ func (odr OrderDynamoRepository) UpdateOrderStatus(id, attributeValue string) (b
 		},
 		ReturnValues:     aws.String("UPDATED_NEW"),
 		UpdateExpression: aws.String("set order_status = :s"),
-		TableName:        aws.String("Order"),
+		TableName:        aws.String(OrderTableName),
 	}
 
 	_, err := odr.Session.UpdateItemWithContext(ctx, input)
@@ -224,7 +227,7 @@ func (odr OrderDynamoRepository) DeleteOrderById(id string) (bool, *errs.AppErro
 				S: aws.String(id),
 			},
 		},
-		TableName: aws.String("Order"),
+		TableName: aws.String(OrderTableName),
 	}
 
 	_, err := odr.Session.DeleteItemWithContext(ctx, input)
@@ -239,7 +242,7 @@ func (odr OrderDynamoRepository) FindAllOrders() ([]domain.Order, *errs.AppError
 	//ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	//defer cancel()
 	input := &dynamodb.ScanInput{
-		TableName: aws.String("Order"),
+		TableName: aws.String(OrderTableName),
 	}
 
 	result, err := odr.Session.Scan(input)
@@ -263,6 +266,68 @@ func (odr OrderDynamoRepository) FindAllOrders() ([]domain.Order, *errs.AppError
 	}
 
 	return orderRecords, nil
+}
+
+func (odr OrderDynamoRepository) InsertOrderOverview(ov domain.OrderOverview) (bool, *errs.AppError) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	av, err := dynamodbattribute.MarshalMap(ov)
+	if err != nil {
+		errstring := fmt.Sprintf("unable to marshal - %s", err.Error())
+		return false, &errs.AppError{Message: errstring}
+	}
+
+	input := &dynamodb.PutItemInput{
+		Item:      av,
+		TableName: aws.String(OrderOverviewTableName),
+	}
+
+	_, err = odr.Session.PutItemWithContext(ctx, input)
+
+	if err != nil {
+		errstring := fmt.Sprintf("unable to put item - %s", err.Error())
+		return false, &errs.AppError{Message: errstring}
+	}
+
+	return true, nil
+
+}
+
+func (odr OrderDynamoRepository) GetOrderOverview(orderid string) (*domain.OrderOverview, *errs.AppError) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	input := &dynamodb.GetItemInput{
+		TableName: aws.String(OrderTableName),
+		Key: map[string]*dynamodb.AttributeValue{
+			"order_id": {
+				S: aws.String(orderid),
+			},
+		},
+	}
+
+	result, err := odr.Session.GetItemWithContext(ctx, input)
+	if err != nil {
+		return &domain.OrderOverview{}, &errs.AppError{Message: "Failed to read"}
+	}
+
+	if result.Item == nil {
+		return &domain.OrderOverview{}, &errs.AppError{Message: "Item not found"}
+	}
+
+	ovModel := OrderOverview{}
+	err = dynamodbattribute.UnmarshalMap(result.Item, &ovModel)
+
+	if err != nil {
+		errstring := fmt.Sprintf("unmarshal map - %s", err.Error())
+		return &domain.OrderOverview{}, &errs.AppError{Message: errstring}
+	}
+	return &domain.OrderOverview{
+		OrderID:            ovModel.OrderID,
+		ProductsIdQuantity: ovModel.ProductsIdQuantity,
+	}, nil
 }
 
 // func NewDynamoRepository() OrderDynamoRepository {
@@ -298,36 +363,10 @@ func toModelfromDynamodbEntity(o OrderModel) *domain.Order {
 
 func NewDynamoRepository() OrderDynamoRepository {
 	svc := connect()
-	return OrderDynamoRepository{Session: svc, Tablename: "Order"}
+	return OrderDynamoRepository{Session: svc, Tablename: OrderTableName}
 }
 
-// func (dyr OrderDynamoRepository) ListTables() ([]string, *errs.AppError) {
-// 	input := &dynamodb.ListTablesInput{}
-
-// 	// if docker container of dynamoDB is not running then code
-// 	// should be blocked indefinitely, that's why using context with time out.
-// 	context, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-// 	defer cancel()
-
-// 	var tableNames []string
-
-// 	result, err := dyr.Session.ListTablesWithContext(context, input)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 		return tableNames, err
-// 	}
-
-// 	for _, n := range result.TableNames {
-// 		tableNames = append(tableNames, *n)
-// 	}
-
-// 	return tableNames, nil
-// }
-
-// func (dyr OrderDynamoRepository) CreateTable(tableName string) bool {
-// 	// input := &dynamodb.CreateTableInput{}
-
-// 	// context, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-// 	// defer cancel()
-// 	return true
-// }
+func NewDynomoOrderOverviewRepository() OrderDynamoRepository {
+	svc := connect()
+	return OrderDynamoRepository{Session: svc, Tablename: OrderOverviewTableName}
+}

@@ -16,6 +16,11 @@ type Order struct {
 	TotalCost        int            `json:"total_cost"`
 }
 
+type OrderOverview struct {
+	OrderID            string         `json:"order_id"`
+	ProductsIdQuantity map[string]int `json:"products"`
+}
+
 type OrderRepository interface {
 	InsertOrder(Order) (string, *errs.AppError)
 	FindOrderById(string) (*Order, *errs.AppError)
@@ -24,6 +29,11 @@ type OrderRepository interface {
 	FindAllOrders() ([]Order, *errs.AppError)
 	DeleteOrderById(string) (bool, *errs.AppError)
 	UpdateOrderStatus(string, string) (bool, *errs.AppError)
+}
+
+type OrderOverviewRepository interface {
+	InsertOrderOverview(OrderOverview) (bool, *errs.AppError)
+	GetOrderOverview(string) (*OrderOverview, *errs.AppError)
 }
 
 func NewOrder(userId string, status string, products_quantity map[string]int, products_cost map[string]int, total_cost int) *Order {
