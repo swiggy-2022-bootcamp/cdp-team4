@@ -37,3 +37,8 @@ type ProductModel struct {
 	ProductDescriptions []ProductDescriptionModel `json:"product_description"`
 	ProductCategories   []string                  `json:"product_categories"`
 }
+
+type ProductCategory struct {
+	CategoryId string `json:"category_id"`
+	ProductId  string `json:"product_id"`
+}

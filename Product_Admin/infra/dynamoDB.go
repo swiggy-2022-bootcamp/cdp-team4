@@ -4,12 +4,14 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"github.com/aws/aws-sdk-go/service/dynamodb/expression"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/Product_Admin/domain"
 )
 
@@ -24,23 +26,7 @@ func connect() *dynamodb.DynamoDB {
 
 	// create dynamo client
 	svc := dynamodb.New(sess)
-
 	return svc
-	// sess, err := session.NewSession(&aws.Config{
-	// 	Region:   aws.String("us-east-1"),
-	// 	Endpoint: aws.String("http://localhost:8000"),
-	// })
-	// if err != nil {
-	// 	panic(err.Error())
-	// }
-	// // create dynamo client
-	// svc := dynamodb.New(sess)
-	// return svc
-}
-
-type ProductCategory struct {
-	CategoryId string `json:"category_id"`
-	ProductId  string `json:"product_id"`
 }
 
 func (padr ProductAdminDynamoRepository) Insert(product domain.Product) (bool, error) {
@@ -134,7 +120,6 @@ func (padr ProductAdminDynamoRepository) FindByID(productID string) (domain.Prod
 		return domain.Product{}, fmt.Errorf("unmarshal map - %s", err.Error())
 	}
 	return productModel, nil
-
 }
 
 func (padr ProductAdminDynamoRepository) UpdateItem(productID string, quantiyReduction int64) (bool, error) {
@@ -187,6 +172,135 @@ func (padr ProductAdminDynamoRepository) DeleteByID(productID string) (bool, err
 		return false, fmt.Errorf("unable to delete - %s", err.Error())
 	}
 	return true, nil
+}
+
+func (padr ProductAdminDynamoRepository) GetProductAvailability(productId string, QuantityNeeded int64) (bool, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	input := &dynamodb.GetItemInput{
+		TableName: aws.String("Product"),
+		Key: map[string]*dynamodb.AttributeValue{
+			"id": {
+				S: aws.String(productId),
+			},
+		},
+	}
+
+	result, err := padr.Session.GetItemWithContext(ctx, input)
+	if err != nil {
+		return false, fmt.Errorf("unable to get the item - %s", err.Error())
+	}
+
+	if result.Item == nil {
+		return false, fmt.Errorf("item not found")
+	}
+
+	productModel := domain.Product{}
+	err = dynamodbattribute.UnmarshalMap(result.Item, &productModel)
+	if err != nil {
+		return false, fmt.Errorf("unmarshal map - %s", err.Error())
+	}
+	if productModel.Quantity < QuantityNeeded {
+		return false, fmt.Errorf("product quantity is not enough for this order")
+	}
+	return true, nil
+}
+
+func (padr ProductAdminDynamoRepository) FindByCategoryID(categoryId string) ([]domain.Product, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+	defer cancel()
+
+	filter := expression.Name("category_id").Equal(expression.Value(categoryId))
+	expr, err := expression.NewBuilder().WithFilter(filter).Build()
+	if err != nil {
+		return nil, fmt.Errorf("expression new builder - %s", err.Error())
+	}
+	fmt.Println("categoryid", categoryId)
+	input := &dynamodb.ScanInput{
+		ExpressionAttributeNames:  expr.Names(),
+		FilterExpression:          expr.Filter(),
+		ExpressionAttributeValues: expr.Values(),
+		TableName:                 aws.String("ProductCategoryRelation"),
+	}
+	result, err := padr.Session.ScanWithContext(ctx, input)
+	if err != nil {
+		return nil, fmt.Errorf("scan with filter - %s", err.Error())
+	}
+
+	var products = []domain.Product{}
+	for _, item := range result.Items {
+		record := ProductCategory{}
+		err := dynamodbattribute.UnmarshalMap(item, &record)
+		if err != nil {
+			return nil, fmt.Errorf("expression new builder - %s", err.Error())
+		}
+		product, err := padr.FindByID(record.ProductId)
+		if err != nil {
+			return nil, fmt.Errorf("error in fetching product details -%s", err.Error())
+		}
+		products = append(products, product)
+	}
+	return products, nil
+}
+
+func (padr ProductAdminDynamoRepository) FindByManufacturerID(manufacturerId string) ([]domain.Product, error) {
+	filter := expression.Name("manufacturer_id").Equal(expression.Value(manufacturerId))
+
+	// Build condition from above filter
+	condition, err := expression.NewBuilder().WithFilter(filter).Build()
+	if err != nil {
+		return []domain.Product{}, err
+	}
+	_products, err2 := padr.GetProductsByCondition(condition)
+	if err2 != nil {
+		return []domain.Product{}, err2
+	}
+	return _products, nil
+}
+
+func (padr ProductAdminDynamoRepository) FindByKeyword(keyword string) ([]domain.Product, error) {
+	// Define the filter expression for searching product by keyword
+	filter1 := expression.Contains(expression.Name("model"), keyword)
+	filter2 := expression.Contains(expression.Name("model"), strings.ToUpper(keyword))
+	filter3 := expression.Contains(expression.Name("sku"), keyword)
+	filter4 := expression.Contains(expression.Name("sku"), strings.ToUpper(keyword))
+	filter := filter1.Or(filter2).Or(filter3).Or(filter4)
+	condition, err := expression.NewBuilder().WithFilter(filter).Build()
+	if err != nil {
+		return []domain.Product{}, err
+	}
+	_products, err2 := padr.GetProductsByCondition(condition)
+	if err2 != nil {
+		return []domain.Product{}, err2
+	}
+	return _products, nil
+}
+
+func (padr ProductAdminDynamoRepository) GetProductsByCondition(condition expression.Expression) ([]domain.Product, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+	defer cancel()
+	input := &dynamodb.ScanInput{
+		ExpressionAttributeNames:  condition.Names(),
+		ExpressionAttributeValues: condition.Values(),
+		FilterExpression:          condition.Filter(),
+		ProjectionExpression:      condition.Projection(),
+		TableName:                 aws.String("Product"),
+	}
+	response, err := padr.Session.ScanWithContext(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+	// Unmarshal dynamodb map to domain.Product
+	products := []domain.Product{}
+	for _, _dbProduct := range response.Items {
+		var _product domain.Product
+		err = dynamodbattribute.UnmarshalMap(_dbProduct, &_product)
+		if err != nil {
+			return nil, err
+		}
+		products = append(products, _product)
+	}
+	return products, nil
 }
 
 func NewDynamoRepository() ProductAdminDynamoRepository {

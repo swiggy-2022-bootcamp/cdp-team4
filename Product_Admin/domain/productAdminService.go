@@ -1,8 +1,6 @@
 package domain
 
 import (
-	"fmt"
-
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -14,6 +12,10 @@ type ProductAdminService interface {
 	GetProductById(string) (Product, error)
 	UpdateProduct(string, int64) (bool, error)
 	DeleteProductById(string) (bool, error)
+	GetProductAvailability(string, int64) (bool, error)
+	GetProductByCategoryId(string) ([]Product, error)
+	GetProductByManufacturerId(string) ([]Product, error)
+	GetProductByKeyword(string) ([]Product, error)
 }
 
 type productAdminService struct {
@@ -60,7 +62,6 @@ func (service productAdminService) CreateDynamoProductAdminRecord(model string, 
 
 func (service productAdminService) GetProduct() ([]Product, error) {
 	productRecords, err := service.ProductAdminDynamoRepository.Find()
-	fmt.Println("getproduct ", productRecords, err)
 	if err != nil {
 		return nil, err
 	}
@@ -89,6 +90,36 @@ func (service productAdminService) DeleteProductById(productId string) (bool, er
 		return false, err
 	}
 	return true, nil
+}
+
+func (service productAdminService) GetProductAvailability(productId string, quantityNeeded int64) (bool, error) {
+	res, err := service.ProductAdminDynamoRepository.GetProductAvailability(productId, quantityNeeded)
+	if err != nil {
+		return false, err
+	}
+	return res, nil
+}
+
+func (service productAdminService) GetProductByCategoryId(categoryId string) ([]Product, error) {
+	productRecord, err := service.ProductAdminDynamoRepository.FindByCategoryID(categoryId)
+	if err != nil {
+		return []Product{}, err
+	}
+	return productRecord, nil
+}
+func (service productAdminService) GetProductByManufacturerId(manufacturerId string) ([]Product, error) {
+	productRecord, err := service.ProductAdminDynamoRepository.FindByManufacturerID(manufacturerId)
+	if err != nil {
+		return []Product{}, err
+	}
+	return productRecord, nil
+}
+func (service productAdminService) GetProductByKeyword(keyword string) ([]Product, error) {
+	productRecord, err := service.ProductAdminDynamoRepository.FindByKeyword(keyword)
+	if err != nil {
+		return []Product{}, err
+	}
+	return productRecord, nil
 }
 
 func NewProductAdminService(productAdminDynamoRepository ProductAdminDynamoRepository) ProductAdminService {

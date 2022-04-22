@@ -49,6 +49,10 @@ type ProductAdminDynamoRepository interface {
 	FindByID(string) (Product, error)
 	UpdateItem(string, int64) (bool, error)
 	DeleteByID(string) (bool, error)
+	GetProductAvailability(string,int64)(bool,error)
+	FindByCategoryID(string)([]Product, error)
+	FindByManufacturerID(string)([]Product, error)
+	FindByKeyword(string)([]Product, error)
 }
 
 func NewProductObject(model string, quantity int64, price float64, manufacturerID string, sku string,

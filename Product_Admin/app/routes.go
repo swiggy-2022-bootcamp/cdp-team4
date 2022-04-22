@@ -16,6 +16,9 @@ func ProductAdminRouter(gin *gin.Engine) {
 	productApiGroup.PUT("/:id", productAdminHandler.HandleUpdateProduct())
 	productApiGroup.DELETE("/:id", productAdminHandler.HandleDeleteProductByID())
 
-	productApiGroup.GET("/search/{search}", productAdminHandler.HandleSearchProduct())
+	searchRoutes := productApiGroup.Group("/search")
+	searchRoutes.GET("/category/:id", productAdminHandler.HandleSearchByCategoryID())
+	searchRoutes.GET("/manufacturer/:id", productAdminHandler.HandleSearchByManufacturerID())
+	searchRoutes.GET("/keyowrd/:keyword", productAdminHandler.HandleSearchByKeyword())
 
 }

@@ -56,6 +56,29 @@ func (_m *ProductAdminDynamoRepository) Find() ([]domain.Product, error) {
 	return r0, r1
 }
 
+// FindByCategoryID provides a mock function with given fields: _a0
+func (_m *ProductAdminDynamoRepository) FindByCategoryID(_a0 string) ([]domain.Product, error) {
+	ret := _m.Called(_a0)
+
+	var r0 []domain.Product
+	if rf, ok := ret.Get(0).(func(string) []domain.Product); ok {
+		r0 = rf(_a0)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]domain.Product)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(_a0)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // FindByID provides a mock function with given fields: _a0
 func (_m *ProductAdminDynamoRepository) FindByID(_a0 string) (domain.Product, error) {
 	ret := _m.Called(_a0)
@@ -70,6 +93,73 @@ func (_m *ProductAdminDynamoRepository) FindByID(_a0 string) (domain.Product, er
 	var r1 error
 	if rf, ok := ret.Get(1).(func(string) error); ok {
 		r1 = rf(_a0)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// FindByKeyword provides a mock function with given fields: _a0
+func (_m *ProductAdminDynamoRepository) FindByKeyword(_a0 string) ([]domain.Product, error) {
+	ret := _m.Called(_a0)
+
+	var r0 []domain.Product
+	if rf, ok := ret.Get(0).(func(string) []domain.Product); ok {
+		r0 = rf(_a0)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]domain.Product)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(_a0)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// FindByManufacturerID provides a mock function with given fields: _a0
+func (_m *ProductAdminDynamoRepository) FindByManufacturerID(_a0 string) ([]domain.Product, error) {
+	ret := _m.Called(_a0)
+
+	var r0 []domain.Product
+	if rf, ok := ret.Get(0).(func(string) []domain.Product); ok {
+		r0 = rf(_a0)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]domain.Product)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(_a0)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetProductAvailability provides a mock function with given fields: _a0, _a1
+func (_m *ProductAdminDynamoRepository) GetProductAvailability(_a0 string, _a1 int64) (bool, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(string, int64) bool); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string, int64) error); ok {
+		r1 = rf(_a0, _a1)
 	} else {
 		r1 = ret.Error(1)
 	}

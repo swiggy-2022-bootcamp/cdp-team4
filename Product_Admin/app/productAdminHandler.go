@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/Product_Admin/domain"
 )
 
@@ -48,10 +49,14 @@ func (ph ProductAdminHandler) HandleAddProduct() gin.HandlerFunc {
 			product.RelatedProducts, productDescription, productCategories)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+				Error("unable to add product")
 			return
 		}
 
 		ctx.JSON(http.StatusAccepted, gin.H{"message": "New product added", "product id": result})
+		log.WithFields(logrus.Fields{"product id": result, "status": http.StatusOK}).
+			Info("New product added")
 	}
 }
 
@@ -69,9 +74,13 @@ func (ph ProductAdminHandler) HandleGetAllProducts() gin.HandlerFunc {
 		fmt.Print("handlegetallproducts ", records, err)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+				Error("unable to get products")
 			return
 		}
 		ctx.JSON(http.StatusAccepted, gin.H{"records": records})
+		log.WithFields(logrus.Fields{"products": records, "status": http.StatusOK}).
+			Info("All products fetched")
 	}
 }
 
@@ -86,13 +95,16 @@ func (ph ProductAdminHandler) HandleGetAllProducts() gin.HandlerFunc {
 func (ph ProductAdminHandler) HandleGetProductByID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("id")
-		fmt.Println(id)
-		res, err := ph.ProductAdminService.GetProductById(id)
+		product, err := ph.ProductAdminService.GetProductById(id)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Record not found"})
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+				Error("unable to get product")
 			return
 		}
-		ctx.JSON(http.StatusAccepted, gin.H{"record": res})
+		ctx.JSON(http.StatusAccepted, gin.H{"product": product})
+		log.WithFields(logrus.Fields{"product id": product, "status": http.StatusOK}).
+			Info("Product fetched by Id")
 	}
 }
 
@@ -113,13 +125,15 @@ func (ph ProductAdminHandler) HandleUpdateProduct() gin.HandlerFunc {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			return
 		}
-		fmt.Println("Rquestdto", requestDTO)
 		ok, err := ph.ProductAdminService.UpdateProduct(requestDTO.Id, requestDTO.QuantityToBeReduced)
 		if !ok {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+				Error("unable to update product details")
 			return
 		}
 		ctx.JSON(http.StatusAccepted, gin.H{"message": "product record updated"})
+		log.WithFields(logrus.Fields{"status": http.StatusOK}).Info("Product updated")
 	}
 }
 
@@ -134,30 +148,70 @@ func (ph ProductAdminHandler) HandleUpdateProduct() gin.HandlerFunc {
 func (ph ProductAdminHandler) HandleDeleteProductByID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("id")
-		fmt.Println(id)
 		_, err := ph.ProductAdminService.DeleteProductById(id)
 
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+				Error("unable to delete product")
 			return
 		}
 
 		ctx.JSON(http.StatusAccepted, gin.H{"message": "Deleted Succesfully"})
+		log.WithFields(logrus.Fields{"status": http.StatusOK}).Info("Product deleted successfully")
 	}
 }
 
-//Todo
 // Search products
-// @Summary      Search product
-// @Description  This Handles searching a product given a string
+// @Summary      Search product by category id
+// @Description  This Handles searching a product given categoryid
 // @Tags         Product Admin
 // @Produce      json
 // @Success      200  {object}  map[string]interface{}
 // @Failure      400  {number} 	http.StatusBadRequest
-// @Router       /products/:search_string    [delete]
-func (ph ProductAdminHandler) HandleSearchProduct() gin.HandlerFunc {
+// @Router       /products/:id    [delete]
+func (ph ProductAdminHandler) HandleSearchByCategoryID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		categoryId := ctx.Param("id")
+		res, err := ph.ProductAdminService.GetProductByCategoryId(categoryId)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Record not found"})
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+				Error("unable to find product")
+			return
+		}
+		ctx.JSON(http.StatusAccepted, gin.H{"record": res, "status": http.StatusOK})
+		log.WithFields(logrus.Fields{"status": http.StatusOK, "products": res}).Info("Product deleted successfully")
+	}
+}
 
+func (ph ProductAdminHandler) HandleSearchByManufacturerID() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		manufacturerId := ctx.Param("id")
+		res, err := ph.ProductAdminService.GetProductByManufacturerId(manufacturerId)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Record not found"})
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+				Error("unable to find product")
+			return
+		}
+		ctx.JSON(http.StatusAccepted, gin.H{"record": res})
+		log.WithFields(logrus.Fields{"status": http.StatusOK, "products": res}).Info("Product deleted successfully")
+	}
+}
+
+func (ph ProductAdminHandler) HandleSearchByKeyword() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		keyword := ctx.Param("keyword")
+		res, err := ph.ProductAdminService.GetProductByKeyword(keyword)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Record not found"})
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+				Error("unable to find product")
+			return
+		}
+		ctx.JSON(http.StatusAccepted, gin.H{"record": res})
+		log.WithFields(logrus.Fields{"status": http.StatusOK, "products": res}).Info("Product deleted successfully")
 	}
 }
 
