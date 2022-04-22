@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	"net"
 	"os"
 
@@ -13,11 +12,12 @@ import (
 	"github.com/swiggy-2022-bootcamp/cdp-team4/checkout/domain"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/checkout/infra/logger"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/checkout/protos"
-	// gin-swagger middleware
 )
 
 var log logrus.Logger = *logger.GetLogger()
 
+// Function used to get the new gRPC server object
+// after registering checkout server implemented in domain
 func setupServer() *grpc.Server {
 	gs := grpc.NewServer()
 	cs := domain.NewCheckout()
@@ -29,12 +29,13 @@ func setupServer() *grpc.Server {
 	return gs
 }
 
-// func configureSwaggerDoc() {
-// 	docs.SwaggerInfo.Title = "Swagger Checkout API"
-// }
-
+// Function to start the gRPC server after getting the client
+// object from setupServer function and reading the port number
+// from .env file
 func Start() {
 	err := godotenv.Load(".env")
+	// sometime it happens that .env is not present in project directory
+	// as it is not pushed on github
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -44,8 +45,8 @@ func Start() {
 	gServer := setupServer()
 	l, err := net.Listen("tcp", ":"+PORT)
 	if err != nil {
-		fmt.Print(err)
-		os.Exit(1)
+		log.Fatal(err)
+		return
 	}
 
 	gServer.Serve(l)

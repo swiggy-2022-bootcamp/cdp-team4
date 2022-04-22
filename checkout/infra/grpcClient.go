@@ -7,14 +7,14 @@ import (
 	"google.golang.org/grpc"
 )
 
+// Function to get the gRPC client object of shipping service
+// Dialing to shipping service without any security as Dialup option
 func GetShippingGrpcClient() (protos.ShippingClient, error) {
 	conn, err := grpc.Dial("localhost:8001", grpc.WithInsecure())
 	if err != nil {
 		return nil, fmt.Errorf("unable to connect with grpc server")
 	}
-	defer conn.Close()
 
 	client := protos.NewShippingClient(conn)
-
 	return client, nil
 }

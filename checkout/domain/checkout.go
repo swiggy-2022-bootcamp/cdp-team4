@@ -2,20 +2,30 @@ package domain
 
 import (
 	context "context"
-	"fmt"
 
+	"github.com/sirupsen/logrus"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/checkout/infra"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/checkout/infra/logger"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/checkout/protos"
 )
 
+var log logrus.Logger = *logger.GetLogger()
+
+// Checkout is the client API for Checkout service.
 type Checkout struct {
 	protos.UnimplementedCheckoutServer
 }
 
+// Constructor method to get the checkout stuct object
 func NewCheckout() *Checkout {
 	return &Checkout{}
 }
 
+// gRPC service method which is going to calculate the overview of order
+// by getting reward points of user from reward serice, cart details from
+// cart service and shipping cost from shipping service.
+//
+// All the communication between  microservices is happened using gRPC call only
 func (ch *Checkout) OrderOverview(
 	ctx context.Context,
 	rq *protos.OverviewRequest,
@@ -25,15 +35,17 @@ func (ch *Checkout) OrderOverview(
 	// Get the Shipping details by ID 		[grpc call to Shipping service]
 	client, err := infra.GetShippingGrpcClient()
 	if err != nil {
+		log.WithFields(logrus.Fields{"error": err}).Error("get shipping gRPC client")
 		return nil, err
 	}
 
 	response, err := client.GetShippingCost(ctx, &protos.ShippingCostRequest{City: "Chennai"})
 	if err != nil {
+		log.WithFields(logrus.Fields{"error": err}).Error("get shipping cost gRPC call")
 		return nil, err
 	}
 
-	fmt.Print(response, err)
+	log.WithFields(logrus.Fields{"response": response, "error": err}).Debug("shipping cost gRPC response")
 	return &protos.OverviewResponse{
 		UserID:               rq.GetUserID(),
 		TotalPrice:           15,
