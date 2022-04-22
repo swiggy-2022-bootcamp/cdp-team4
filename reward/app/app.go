@@ -17,13 +17,13 @@ func setupRouter() *gin.Engine {
 	router := gin.Default()
 	// health check route
 	HealthCheckRouter(router)
-	
+
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	return router
 }
 
 func configureSwaggerDoc() {
-	docs.SwaggerInfo.Title = "Swagger Payment API"
+	docs.SwaggerInfo.Title = "Swagger Reward API"
 }
 
 func Start() {
