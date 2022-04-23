@@ -19,11 +19,14 @@ var brokers = []string{
 
 var log logrus.Logger = *logger.GetLogger()
 
+// function to generate random key, it's implementation is considering
+// nano seconds of time to make strong random key.
 func getRandomKey() []byte {
 	var src = rand.NewSource(time.Now().UnixNano())
 	return []byte(fmt.Sprint(src.Int63()))
 }
 
+// constructor to get the kafka writer with given brokers list and topic
 func getProducer(ctx context.Context, topic string, brokers []string) *kafka.Writer {
 	// intialize the writer with the broker addresses, and the topic
 	return kafka.NewWriter(kafka.WriterConfig{
@@ -32,6 +35,7 @@ func getProducer(ctx context.Context, topic string, brokers []string) *kafka.Wri
 	})
 }
 
+// function to produce msg to kafka
 func WriteMsgToKafka(topic string, msg interface{}) (bool, error) {
 	ctx := context.Background()
 	jsonString, err := json.Marshal(msg)

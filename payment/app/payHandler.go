@@ -60,6 +60,9 @@ func GenerateUniqueId() string {
 // payment status for that particular user after 10 secs of delay/
 func simulatePaymentDone(data interface{}) {
 	time.Sleep(10 * time.Second)
+	// produce message to kafka with the topic="payment".
+	// so that other services consume it and do cleanup of cart for that user,
+	// send invoice over email or sms, etc.
 	ok, err := gokafka.WriteMsgToKafka("payment", data)
 	if !ok {
 		log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
@@ -107,15 +110,6 @@ func (ph PayHandler) HandlePay() gin.HandlerFunc {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
 				Error("create payment record")
-			return
-		}
-		if data == nil {
-			ctx.JSON(
-				http.StatusBadRequest,
-				gin.H{"message": "unable to create payment link"},
-			)
-			log.WithFields(logrus.Fields{"message": err, "status": http.StatusBadRequest}).
-				Error("unable create payment link")
 			return
 		}
 		ctx.JSON(http.StatusOK, gin.H{"message": "payment record added", "data": data})
@@ -230,6 +224,14 @@ func (ph PayHandler) HandleAddPaymentMethods() gin.HandlerFunc {
 		)
 
 		if !ok {
+			// handle the case where no duplicate payment methods should be added for the
+			// particular user and she gets the correct response message.
+			// If requested payment method is already present then it is going to
+			// give "ConditionalCheckFailedException".
+			// https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/dynamodbv2/model/ConditionalCheckFailedException.html
+			//
+			// Otherwise, this is going to give error that insertion/updation of
+			// pyament method failed.
 			if strings.Contains(err.Error(), "ConditionalCheckFailedException") {
 				ctx.JSON(http.StatusBadRequest, gin.H{"message": "method already exists"})
 				log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
@@ -276,6 +278,9 @@ func (ph PayHandler) HandleGetPaymentMethods() gin.HandlerFunc {
 	}
 }
 
+// constructor method to get the paymend handler object
+// which is used to invoke all the payment handler methods in their
+// respective routes
 func NewPaymentHandler(paymentService domain.PaymentService) PayHandler {
 	return PayHandler{
 		PaymentService: paymentService,

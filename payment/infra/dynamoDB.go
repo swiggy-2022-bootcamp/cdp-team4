@@ -17,20 +17,30 @@ type PaymentDynamoRepository struct {
 	Session *dynamodb.DynamoDB
 }
 
+// function to connect with dynamoDB with the credentials stored in
+// the local system
 func connect() *dynamodb.DynamoDB {
+	// Initialize a session that the SDK will use to load
+	// credentials from the shared credentials file ~/.aws/credentials
+	// and region from the shared configuration file ~/.aws/config.
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	}))
 
-	// create dynamo client
+	// create dynamoDB client
 	svc := dynamodb.New(sess)
 
 	return svc
 }
 
+// inserting the record in dynamoDB
+// Tablename = payment
+//
+// ref: https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/dynamo-example-create-table-item.html
 func (pdr PaymentDynamoRepository) InsertPaymentRecord(p domain.Payment) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+
 	payRecord := _toDynamoPayModel(&p, "XYZ", "0")
 
 	av, err := dynamodbattribute.MarshalMap(payRecord)
@@ -52,6 +62,9 @@ func (pdr PaymentDynamoRepository) InsertPaymentRecord(p domain.Payment) (bool, 
 	return true, nil
 }
 
+// get the record using unique identifier
+//
+// ref: https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/dynamo-example-read-table-item.html
 func (pdr PaymentDynamoRepository) FindPaymentRecordById(
 	paymentID string,
 ) (*domain.Payment, error) {
@@ -86,20 +99,28 @@ func (pdr PaymentDynamoRepository) FindPaymentRecordById(
 	return &payModel, nil
 }
 
+// get the payment records using user id
+// it is going to return all the payments done by the user so far
+//
+// ref: https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/dynamo-example-scan-table-item.html
 func (pdr PaymentDynamoRepository) FindPaymentRecordByUserID(
 	userId string,
 ) ([]domain.Payment, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
+	// Create the Expression to fill the input struct with.
+	// Get all the payment records of given user id
 	filt := expression.Name("UserID").Equal(expression.Value(userId))
 
+	// Get back every fields of the record
 	expr, err := expression.NewBuilder().WithFilter(filt).Build()
 
 	if err != nil {
 		return nil, fmt.Errorf("expression new builder - %s", err.Error())
 	}
 
+	// Build the query input parameters
 	input := &dynamodb.ScanInput{
 		ExpressionAttributeNames:  expr.Names(),
 		FilterExpression:          expr.Filter(),
@@ -107,6 +128,7 @@ func (pdr PaymentDynamoRepository) FindPaymentRecordByUserID(
 		TableName:                 aws.String("payment"),
 	}
 
+	// Make the DynamoDB Query API call with context
 	result, err := pdr.Session.ScanWithContext(ctx, input)
 	if err != nil {
 		return nil, fmt.Errorf("scan with filter - %s", err.Error())
@@ -126,11 +148,16 @@ func (pdr PaymentDynamoRepository) FindPaymentRecordByUserID(
 	return paymentRecords, nil
 }
 
+// upate payment status, it can be done, pending or failed
+//
+// ref: https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/dynamo-example-update-table-item.html
 func (pdr PaymentDynamoRepository) UpdatePaymentRecord(
 	id, attributeValue string,
 ) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+
+	// create update input with expression
 	input := &dynamodb.UpdateItemInput{
 		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
 			":s": {
@@ -154,6 +181,10 @@ func (pdr PaymentDynamoRepository) UpdatePaymentRecord(
 	return true, nil
 }
 
+// delete payment record by id and if it is not present then
+// handle it gracefully
+//
+// ref: https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/dynamo-example-delete-table-item.html
 func (pdr PaymentDynamoRepository) DeletePaymentRecordByID(id string) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -173,6 +204,8 @@ func (pdr PaymentDynamoRepository) DeletePaymentRecordByID(id string) (bool, err
 	return true, nil
 }
 
+// function is used to insert new record of supported payment method
+// for the particular user
 func (pdr PaymentDynamoRepository) InsertPaymentMethod(
 	pm domain.PaymentMethod,
 ) (bool, error) {
@@ -189,6 +222,7 @@ func (pdr PaymentDynamoRepository) InsertPaymentMethod(
 		TableName: aws.String("paymentmethod"),
 	}
 
+	// make dynamo API cal
 	_, err = pdr.Session.PutItemWithContext(ctx, input)
 	if err != nil {
 		return false, fmt.Errorf("unable to put the item - %s", err.Error())
@@ -197,6 +231,8 @@ func (pdr PaymentDynamoRepository) InsertPaymentMethod(
 	return true, nil
 }
 
+// get the supported payment methods which is an array of strings
+// eg. ["debit-card","credit-card","upi"]
 func (pdr PaymentDynamoRepository) GetPaymentMethods(id string) ([]string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -229,6 +265,11 @@ func (pdr PaymentDynamoRepository) GetPaymentMethods(id string) ([]string, error
 	return payMethodModel.Methods, nil
 }
 
+// update the current existing list of supported payment methods
+// for the particular user
+// before updating the array of methods, it first checks whether the element is
+// already present or not. if it is not there then only insert/push the element in the
+// array otherwise do nothing.
 func (pdr PaymentDynamoRepository) UpdatePaymentMethods(
 	id, paymentMethod string,
 ) (bool, error) {
@@ -242,6 +283,8 @@ func (pdr PaymentDynamoRepository) UpdatePaymentMethods(
 	var methodList []*dynamodb.AttributeValue
 	methodList = append(methodList, av)
 
+	// create expression to push element in array datatype
+	// and check method exists or not before pushing it
 	input := &dynamodb.UpdateItemInput{
 		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
 			":method": {
@@ -269,6 +312,7 @@ func (pdr PaymentDynamoRepository) UpdatePaymentMethods(
 	return true, nil
 }
 
+// constructor method to get dynamo Repository after connecting with it
 func NewDynamoRepository() PaymentDynamoRepository {
 	svc := connect()
 	return PaymentDynamoRepository{Session: svc}

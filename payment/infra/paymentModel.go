@@ -4,6 +4,7 @@ import (
 	"time"
 )
 
+// payment record data model that is going to store in dynamo database
 type PayModel struct {
 	Id          string    `json:"id"`
 	Amount      int16     `json:"amount"`
