@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/google/uuid"
-	"github.com/swiggy-2022-bootcamp/cdp-team4/Cart/domain"
-	"github.com/swiggy-2022-bootcamp/cdp-team4/Cart/infra"
+	"github.com/stretchr/testify/assert"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/cart/domain"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/cart/infra"
 )
 
 var testCartService = infra.NewDynamoRepository()
-var insertedid = "853d6ab2-dcd9-49dc-8add-d93af655f8e0"
+var insertedid string
 var inserteduserid string
 
 func TestShouldCreateNewCartinDynamoDB(t *testing.T) {
@@ -38,7 +38,7 @@ func TestShouldGetAllCartDynamoDB(t *testing.T) {
 	t.Logf("Read %v", res)
 	assert.NotNil(t, res)
 	assert.Nil(t, err)
-	
+
 }
 
 func TestShouldGetCartByCartIdDynamoDB(t *testing.T) {
@@ -46,7 +46,7 @@ func TestShouldGetCartByCartIdDynamoDB(t *testing.T) {
 		"Origin of life":  1,
 		"Reynolds trimax": 10,
 	}
-	
+
 	t.Logf("Inserted Id is %s Reading\n", insertedid)
 	res, err := testCartService.FindCartById(insertedid)
 	fmt.Println(res)

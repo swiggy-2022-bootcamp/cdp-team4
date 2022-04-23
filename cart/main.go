@@ -1,12 +1,12 @@
 package main
 
 import (
-	"github.com/swiggy-2022-bootcamp/cdp-team4/Cart/app"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/cart/app"
 )
 
 // @title Gin Swagger Example API
 // @version 2.0
-// @description Order Service.
+// @description Cart Service.
 // @termsOfService http://swagger.io/terms/
 
 // @contact.name API Support

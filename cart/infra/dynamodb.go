@@ -13,8 +13,8 @@ import (
 
 	// "github.com/aws/aws-sdk-go/service/dynamodb/expression"
 	"github.com/google/uuid"
-	"github.com/swiggy-2022-bootcamp/cdp-team4/Cart/domain"
-	"github.com/swiggy-2022-bootcamp/cdp-team4/Cart/utils/errs"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/cart/domain"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/cart/utils/errs"
 )
 
 type CartDynamoRepository struct {
@@ -22,46 +22,46 @@ type CartDynamoRepository struct {
 	Tablename string
 }
 
-func createTable(svc *dynamodb.DynamoDB){
+func createTable(svc *dynamodb.DynamoDB) {
 	tableInput := &dynamodb.CreateTableInput{
-        AttributeDefinitions: []*dynamodb.AttributeDefinition{
-            {
-                AttributeName: aws.String("id"),
-                AttributeType: aws.String("S"),
-            },
-        },
-        KeySchema: []*dynamodb.KeySchemaElement{
-            {
-                AttributeName: aws.String("id"),
-                KeyType:       aws.String("HASH"),
-            },
-        },
-        ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
-            ReadCapacityUnits:  aws.Int64(5),
-            WriteCapacityUnits: aws.Int64(5),
-        },
-        TableName: aws.String("Cart"),
-    }
+		AttributeDefinitions: []*dynamodb.AttributeDefinition{
+			{
+				AttributeName: aws.String("id"),
+				AttributeType: aws.String("S"),
+			},
+		},
+		KeySchema: []*dynamodb.KeySchemaElement{
+			{
+				AttributeName: aws.String("id"),
+				KeyType:       aws.String("HASH"),
+			},
+		},
+		ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
+			ReadCapacityUnits:  aws.Int64(5),
+			WriteCapacityUnits: aws.Int64(5),
+		},
+		TableName: aws.String("Cart"),
+	}
 
-    _, tableErr := svc.CreateTable(tableInput)
+	_, tableErr := svc.CreateTable(tableInput)
 
-    if tableErr != nil {
-        fmt.Println("Got error calling CreateTable:")
-        fmt.Println(tableErr.Error())
-    }
+	if tableErr != nil {
+		fmt.Println("Got error calling CreateTable:")
+		fmt.Println(tableErr.Error())
+	}
 }
 
 func connect() *dynamodb.DynamoDB {
 	sess, err := session.NewSession(&aws.Config{
-		Region:   aws.String("us-east-1"),
-		Endpoint: aws.String("http://localhost:8000"),
+		Region:      aws.String("us-east-1"),
+		Endpoint:    aws.String("http://localhost:8000"),
 		Credentials: credentials.NewStaticCredentials("AKID", "SECRET_KEY", "TOKEN"),
 	})
 
 	if err != nil {
 		panic(err.Error())
 	}
-	
+
 	// create dynamo client
 	svc := dynamodb.New(sess)
 
@@ -74,7 +74,7 @@ func (crt CartDynamoRepository) InsertCart(p domain.Cart) (string, *errs.AppErro
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	cartRecord := toPersistedDynamodbEntity(p)
-	
+
 	av, err := dynamodbattribute.MarshalMap(cartRecord)
 	if err != nil {
 		errstring := fmt.Sprintf("unable to marshal - %s", err.Error())
@@ -157,7 +157,6 @@ func (odr CartDynamoRepository) FindCartById(cartID string) (*domain.Cart, *errs
 	return ordModel, nil
 }
 
-
 func (crt CartDynamoRepository) DeleteCartById(id string) (bool, *errs.AppError) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -177,7 +176,6 @@ func (crt CartDynamoRepository) DeleteCartById(id string) (bool, *errs.AppError)
 	}
 	return true, nil
 }
-
 
 func toPersistedDynamodbEntity(o domain.Cart) *CartModel {
 	return &CartModel{
