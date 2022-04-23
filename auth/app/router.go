@@ -22,3 +22,9 @@ func init() {
 func RegisterHealthStatusRoute(handler HealthHandler) {
 	v1.GET("/health", handler.GetHealthStatus)
 }
+
+func RegisterAuthHandlerRoute(handler AuthHandler) {
+	v1.POST("/login", handler.GetAuthToken)
+	v1.POST("/logout", handler.InvalidateAuthToken)
+	v1.GET("/validate", handler.ValidateAuthToken)
+}

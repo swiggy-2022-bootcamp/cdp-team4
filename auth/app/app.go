@@ -3,6 +3,8 @@ package app
 import (
 	"fmt"
 	"github.com/joho/godotenv"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/auth/domain"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/auth/infra"
 	"log"
 	"os"
 )
@@ -11,7 +13,15 @@ func Start() {
 
 	healthHandler := HealthHandler{}
 
+	userRepo := infra.NewUserRepository()
+	authRepo := infra.NewAuthRepository()
+
+	authService := domain.NewAuthService(userRepo, authRepo)
+	authHandler := AuthHandler{
+		authService: authService,
+	}
 	RegisterHealthStatusRoute(healthHandler)
+	RegisterAuthHandlerRoute(authHandler)
 
 	err := godotenv.Load(".env")
 	if err != nil {
