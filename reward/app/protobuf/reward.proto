@@ -1,0 +1,24 @@
+syntax = "proto3";
+option go_package =".;protos";
+
+message GetRewardPointsRequest {
+    string UserId = 1;
+}
+message GetRewardPointsResponse {
+    uint32 RewardPoints = 1;
+}
+
+message UpdateRewardPointsRequest {
+    string UserId = 1;
+    uint32 RewardPoints = 2;
+}
+message UpdatePointsResponse {
+    bool UpdateResponse= 1;
+}
+
+service Reward {
+    rpc GetRewardPoints (GetRewardPointsRequest) returns (GetRewardPointsResponse);
+    rpc UpdateRewardPoints (UpdateRewardPointsRequest) returns (UpdatePointsResponse);
+}
+
+//protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative reward.proto
