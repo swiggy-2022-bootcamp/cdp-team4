@@ -22,13 +22,12 @@ func NewAuthRepository() domain.AuthRepository {
 	return authRepository{Session: svc, TableName: "auth"}
 }
 
-func (repo authRepository) FindByUserIdAndAuthToken(userId string, authToken string) (*domain.AuthModel, *errs.AppError) {
+func (repo authRepository) FindByAuthToken(authToken string) (*domain.AuthModel, *errs.AppError) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	filt := expression.Name("user_id").Equal(expression.Value(userId)).And(
-		expression.Name("is_expired").Equal(expression.Value(false))).And(
-		expression.Name("auth_token").Equal(expression.Value(authToken)))
+	filt := expression.Name("auth_token").Equal(expression.Value(authToken)).And(
+		expression.Name("is_expired").Equal(expression.Value(false)))
 
 	expr, err := expression.NewBuilder().WithFilter(filt).Build()
 
@@ -46,6 +45,10 @@ func (repo authRepository) FindByUserIdAndAuthToken(userId string, authToken str
 	result, err := repo.Session.ScanWithContext(ctx, input)
 	if err != nil {
 		return nil, errs.NewUnexpectedError(err.Error())
+	}
+
+	if len(result.Items) == 0 {
+		return nil, errs.NewNotFoundError("Auth token is expired or not found")
 	}
 
 	item := result.Items[0]

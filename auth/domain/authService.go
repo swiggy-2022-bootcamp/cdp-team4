@@ -18,6 +18,7 @@ type authService struct {
 type AuthService interface {
 	GenerateAuthToken(string, string) (string, *errs.AppError)
 	ValidateAuthToken(string) (*AuthModel, *errs.AppError)
+	InvalidateAuthToken(string) *errs.AppError
 }
 
 func (as authService) GenerateAuthToken(username string, password string) (string, *errs.AppError) {
@@ -36,15 +37,18 @@ func (as authService) GenerateAuthToken(username string, password string) (strin
 }
 
 func (as authService) ValidateAuthToken(authToken string) (*AuthModel, *errs.AppError) {
-	userId, _, err := as.ParseAuthToken(authToken)
+	_, _, err := as.parseAuthToken(authToken)
 	if err != nil {
 		return nil, err
 	}
-	authModel, _ := as.authRepository.FindByUserIdAndAuthToken(userId, authToken)
+	authModel, err := as.authRepository.FindByAuthToken(authToken)
+	if err != nil {
+		return nil, errs.NewAuthenticationError("Token has Expired")
+	}
 	return authModel, nil
 }
 
-func (as authService) ParseAuthToken(tokenString string) (string, Role, *errs.AppError) {
+func (as authService) parseAuthToken(tokenString string) (string, Role, *errs.AppError) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -86,6 +90,17 @@ func (as authService) generateJWT(userId string, role Role) (string, *errs.AppEr
 	}
 	as.authRepository.Save(newAuth)
 	return token, nil
+}
+
+func (as authService) InvalidateAuthToken(authToken string) *errs.AppError {
+	authModel, err := as.authRepository.FindByAuthToken(authToken)
+	if err != nil {
+		return errs.NewNotFoundError("No auth details found")
+	}
+
+	authModel.IsExpired = true
+	as.authRepository.Save(*authModel)
+	return nil
 }
 
 func NewAuthService(userRepository UserRepository, authRepository AuthRepository) AuthService {

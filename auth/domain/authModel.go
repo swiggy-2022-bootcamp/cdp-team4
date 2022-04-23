@@ -14,6 +14,6 @@ type AuthModel struct {
 }
 
 type AuthRepository interface {
-	FindByUserIdAndAuthToken(string, string) (*AuthModel, *errs.AppError)
+	FindByAuthToken(string) (*AuthModel, *errs.AppError)
 	Save(AuthModel) *errs.AppError
 }

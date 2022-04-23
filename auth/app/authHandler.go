@@ -56,7 +56,7 @@ func (ah AuthHandler) ValidateAuthToken(c *gin.Context) {
 	authModel, err := ah.authService.ValidateAuthToken(authToken)
 
 	if err != nil {
-		customErr := errs.NewValidationError("Invalid token, Access Denied")
+		customErr := errs.NewAuthenticationError("Invalid token, Access Denied")
 		c.JSON(http.StatusUnauthorized, customErr)
 		c.Abort()
 		return
@@ -75,5 +75,30 @@ func (ah AuthHandler) ValidateAuthToken(c *gin.Context) {
 }
 
 func (ah AuthHandler) InvalidateAuthToken(c *gin.Context) {
+	reqToken := c.Request.Header.Get("Authorization")
+	splitToken := strings.Split(reqToken, "Bearer ")
+	authToken := splitToken[1]
+	_, err := ah.authService.ValidateAuthToken(authToken)
+
+	if err != nil {
+		customErr := errs.NewValidationError("Invalid token, Access Denied")
+		c.JSON(http.StatusUnauthorized, customErr)
+		c.Abort()
+		return
+	}
+	err = ah.authService.InvalidateAuthToken(authToken)
+	if err != nil {
+		customErr := errs.NewValidationError(err.Message)
+		c.JSON(http.StatusInternalServerError, customErr)
+		c.Abort()
+		return
+	}
+
+	responseDto := ResponseDTO{
+		Status:  http.StatusOK,
+		Message: "Logged out successfully",
+	}
+
+	c.JSON(responseDto.Status, responseDto)
 
 }
