@@ -12,7 +12,9 @@ import (
 )
 
 var mockOrderRepo = mocks.OrderRepository{}
+var mockOrderOverviewRepo = mocks.OrderOverviewRepository{}
 var orderService = domain.NewOrderService(&mockOrderRepo)
+var orderOverviewService = domain.NewOrderOverviewService(&mockOrderOverviewRepo)
 
 func TestShouldReturnNewOrderService(t *testing.T) {
 	orderService := domain.NewOrderService(nil)
@@ -179,4 +181,41 @@ func TestShouldGetAllOrders(t *testing.T) {
 	assert.Equal(t, prodquant, resOrders[0].ProductsQuantity)
 	assert.Equal(t, prodcost, resOrders[0].ProductsCost)
 	assert.Equal(t, totalcost, resOrders[0].TotalCost)
+}
+
+func TestShouldCreateOrderOverview(t *testing.T) {
+	orderId := "12321324"
+	products_map := map[string]int{
+		"2134123": 10,
+		"2314343": 11,
+	}
+	neworderoverview := domain.OrderOverview{
+		OrderID:            orderId,
+		ProductsIdQuantity: products_map,
+	}
+	mockOrderOverviewRepo.On("InsertOrderOverview", mock.Anything).Return(true, nil)
+
+	resOrder, resnil := orderOverviewService.CreateOrderOverview(neworderoverview)
+
+	assert.Equal(t, resOrder, true)
+	assert.Nil(t, resnil)
+
+}
+
+func TestShouldGetOrderOverview(t *testing.T) {
+	orderId := "12321324"
+	products_map := map[string]int{
+		"2134123": 10,
+		"2314343": 11,
+	}
+
+	neworderoverview := domain.OrderOverview{
+		OrderID:            orderId,
+		ProductsIdQuantity: products_map,
+	}
+
+	mockOrderOverviewRepo.On("GetOrderOverview", orderId).Return(&neworderoverview, nil)
+	_, resnil := orderOverviewService.GetOrderOverviewByOrderID(orderId)
+	assert.Nil(t, resnil)
+
 }

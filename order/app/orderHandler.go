@@ -42,8 +42,8 @@ type OrderConfirmResponseDTO struct {
 }
 
 type OrderOverviewRecordDTO struct {
-	OrderID string `json:"order_id"`
-	CartID  string `json:"cart_id"`
+	OrderID  string         `json:"order_id"`
+	Products map[string]int `json:"products"`
 }
 
 type RequestDTO struct {
@@ -308,7 +308,7 @@ func (oh OrderHandler) HandleAddOrderFromCheckout() gin.HandlerFunc {
 
 		err := godotenv.Load(".env")
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal(err, "handler")
 			return
 		}
 		PORT := os.Getenv("CHECKOUT_SERVICE_PORT")

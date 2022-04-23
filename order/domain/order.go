@@ -46,3 +46,10 @@ func NewOrder(userId string, status string, products_quantity map[string]int, pr
 		TotalCost:        total_cost,
 	}
 }
+
+func Neworderoverview(orderId string, products map[string]int) *OrderOverview {
+	return &OrderOverview{
+		OrderID:            orderId,
+		ProductsIdQuantity: products,
+	}
+}

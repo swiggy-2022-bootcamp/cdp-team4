@@ -50,7 +50,7 @@ func StatusConsumer(ctx context.Context, topic string, db infra.OrderDynamoRepos
 			orderid := statusMsg.OrderID
 			status := statusMsg.Status
 			go db.UpdateOrderStatus(orderid, status)
-			go UpdateProductService("product", orderid, db1)
+			go UpdateProductService("product", orderid, db, status)
 		}
 	}
 }

@@ -90,7 +90,8 @@ func (s service) UpdateOrderStatus(id string, status string) (bool, *errs.AppErr
 }
 
 func (s service1) CreateOrderOverview(ov OrderOverview) (bool, *errs.AppError) {
-	_, err := s.orderOverviewrepo.InsertOrderOverview(ov)
+	ovn := Neworderoverview(ov.OrderID, ov.ProductsIdQuantity)
+	_, err := s.orderOverviewrepo.InsertOrderOverview(*ovn)
 	if err != nil {
 		return false, err
 	}

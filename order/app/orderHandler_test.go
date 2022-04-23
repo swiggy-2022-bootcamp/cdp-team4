@@ -359,7 +359,7 @@ func TestHandleUpdateDeleteOrderByID(t *testing.T) {
 		expected   int
 	}{
 		{
-			name: "SuccesshandleUpdateOrderStatus",
+			name: "SuccesshandleDeleteOrderByID",
 			createStub: func(mps mocks.MockOrderService) {
 				mps.EXPECT().DeleteOrderById("xyx" /* Id */).Return(true, nil)
 			},

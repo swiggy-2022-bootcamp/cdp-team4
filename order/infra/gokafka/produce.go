@@ -20,6 +20,12 @@ var brokers1 = []string{
 
 var log logrus.Logger = *logger.GetLogger()
 
+type OrderOverviewKafkaModel struct {
+	OrderID      string         `json:"order_id"`
+	ProductIdQty map[string]int `json:"products"`
+	Status       string         `json:"status"`
+}
+
 func getRandomKey() []byte {
 	var src = rand.NewSource(time.Now().UnixNano())
 	return []byte(fmt.Sprint(src.Int63()))
@@ -59,7 +65,7 @@ func WriteMsgToKafka(topic string, msg interface{}) (bool, error) {
 	return true, nil
 }
 
-func UpdateProductService(topic string, orderid string, db infra.OrderDynamoRepository) {
+func UpdateProductService(topic string, orderid string, db infra.OrderDynamoRepository, status string) {
 
 	res, err := db.GetOrderOverview(orderid)
 	if err != nil {
@@ -67,5 +73,10 @@ func UpdateProductService(topic string, orderid string, db infra.OrderDynamoRepo
 			Error("could not Read order id ")
 		return
 	}
-	WriteMsgToKafka(topic, res)
+	newKafaMsg := OrderOverviewKafkaModel{
+		OrderID:      res.OrderID,
+		ProductIdQty: res.ProductsIdQuantity,
+		Status:       status,
+	}
+	WriteMsgToKafka(topic, newKafaMsg)
 }

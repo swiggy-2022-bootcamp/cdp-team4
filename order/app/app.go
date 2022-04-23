@@ -40,7 +40,7 @@ func Start() {
 	//go testGrpcServer()
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(err, "start")
 		return
 	}
 	PORT := os.Getenv("ORDER_SERVICE_PORT")
