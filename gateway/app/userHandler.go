@@ -22,13 +22,13 @@ type authModel struct {
 }
 
 func ValidateToken(authorizationHeader string) authModel {
-	authServiceUri := "localhost:8881/api/v1/validate"
+	authServiceUri := "http://localhost:8881/api/v1/validate"
 	req, err := http.NewRequest("GET", authServiceUri, nil)
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
 
-	ctx, cancel := context.WithTimeout(req.Context(), 1*time.Millisecond)
+	ctx, cancel := context.WithTimeout(req.Context(), 1*time.Minute)
 	defer cancel()
 
 	req = req.WithContext(ctx)

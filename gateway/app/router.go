@@ -20,5 +20,6 @@ func init() {
 }
 
 func RegisterUserRoutes() {
-	v1.GET("/users")
+	handler := userHandler{}
+	v1.GET("/users", handler.ValidateAuthToken())
 }
