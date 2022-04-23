@@ -57,25 +57,33 @@ func (h UserHandler) HandleUserCreation() gin.HandlerFunc {
 		var newUser UserDTO
 
 		if err := ctx.BindJSON(&newUser); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			responseDto := ResponseDTO{
+				Status:  http.StatusBadRequest,
+				Message: err.Error(),
+			}
 			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
 				Error("bind json")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
 
 		role, err := domain.GetEnumByIndex(newUser.Role) 
 		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: err.Message,
+			}
 			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
 				Error("unable to get role")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
 
-		fmt.Println("role: ", role, err)
-
+ 
 		shippingAddressId := GetShippingAddressId(newUser.Address)
 
-		fmt.Println("shippingAddressId: ", shippingAddressId)
 
 		user, err1 := h.UserService.CreateUserInDynamodb(
 			newUser.FirstName, 
@@ -85,20 +93,30 @@ func (h UserHandler) HandleUserCreation() gin.HandlerFunc {
 			newUser.Email, 
 			newUser.Password, 
 			role,
-			// shippingAddressId,
-			"abcid",
+			shippingAddressId,
+			// "abcid",
 			newUser.Fax,
 		)
 		
 		if err1 != nil {
-			ctx.JSON(http.StatusInternalServerError, err1)
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: err1.Error(),
+			}
 			log.WithFields(logrus.Fields{"message": err1.Error(), "status": http.StatusInternalServerError}).
 				Error("unable to create user")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
+			return			
 		} else {
 			data, _ := user.MarshalJSON()
+			responseDto := ResponseDTO{
+				Status: http.StatusOK,
+				Data:   data,
+			}
 			log.WithFields(logrus.Fields{"data": data, "status": http.StatusCreated}).
 				Info("User Added")
-			ctx.Data(http.StatusCreated, "application/json", data)
+			ctx.JSON(responseDto.Status, responseDto)
 		}
 	}
 }
@@ -120,12 +138,21 @@ func (h UserHandler) HandleGetUserByID() gin.HandlerFunc {
 		record, err := h.UserService.GetUserById(id)
 
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			responseDto := ResponseDTO{
+				Status:  http.StatusBadRequest,
+				Message: err.Error(),
+			}
 			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
 				Error("unable to get user by id")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
-		ctx.JSON(http.StatusAccepted, gin.H{"record": record})
+		responseDto := ResponseDTO{
+			Status: http.StatusOK,
+			Data:   record,
+		}
+		ctx.JSON(responseDto.Status, responseDto)
 		log.WithFields(logrus.Fields{"data": record, "status": http.StatusAccepted}).
 				Info("User fetched")
 	}
@@ -146,14 +173,23 @@ func (h UserHandler) HandleGetAllUsers() gin.HandlerFunc {
 		records, err := h.UserService.GetAllUsers()
 
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			responseDto := ResponseDTO{
+				Status:  http.StatusBadRequest,
+				Message: err.Error(),
+			}
 			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
 				Error("unable to get users")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
-		ctx.JSON(http.StatusAccepted, gin.H{"records": records})
+		responseDto := ResponseDTO{
+			Status: http.StatusOK,
+			Data:   records,
+		}
 		log.WithFields(logrus.Fields{"data": records, "status": http.StatusAccepted}).
 				Info("Fetched users")
+		ctx.JSON(responseDto.Status, responseDto)
 	}
 }
 
@@ -164,7 +200,7 @@ func (h UserHandler) HandleGetAllUsers() gin.HandlerFunc {
 // @Schemes
 // @Accept json
 // @Param id path string true "User Name"
-// @Param        user	body	domain.User  true  "User structure"
+// @Param        user	body	UserDTO  true  "User structure"
 // @Produce json
 // @Success	202  {string} 	domain.User
 // @Failure	500  {number} 	http.StatusInternalServerError
@@ -175,35 +211,55 @@ func (h UserHandler) HandleUpdateUserByID() gin.HandlerFunc {
 		userId := ctx.Param("id")
 
 		if err := ctx.BindJSON(&newUpdatedUser); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			responseDto := ResponseDTO{
+				Status:  http.StatusBadRequest,
+				Message: err.Error(),
+			}
 			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
 				Error("unable to get user by id")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
 
 		role, err := domain.GetEnumByIndex(newUpdatedUser.Role) 
 		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: err.Message,
+			}
 			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
 				Error("unable to get role")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
-		} 
+		}
 
 		oldUser, err2 := h.UserService.GetUserById(userId)
 
 		if err2 != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"message": err2.Error()})
+			responseDto := ResponseDTO{
+				Status:  http.StatusBadRequest,
+				Message: err2.Error(),
+			}
 			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
 				Error("unable to user with given id")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
 
 		isAddressUpdated := UpdateShippingAddressId(newUpdatedUser.Address, oldUser.AddressID)
 
 		if isAddressUpdated != true {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"message": "unable to update address"})
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: "unable to update address",
+			}
 			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
 				Error("unable to update address")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
 
@@ -221,13 +277,23 @@ func (h UserHandler) HandleUpdateUserByID() gin.HandlerFunc {
 		)
 		
 		if err1 != nil {
-			ctx.JSON(http.StatusInternalServerError, err1)
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: err1.Error(),
+			}
 			log.WithFields(logrus.Fields{"message": err1.Error(), "status": http.StatusInternalServerError}).
 				Error("unable to update user")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
+			return
 		} else {
-			ctx.JSON(http.StatusAccepted, gin.H{"message": "user updated"})
+			responseDto := ResponseDTO{
+				Status: http.StatusAccepted,
+				Message:   "user updated",
+			}
 			log.WithFields(logrus.Fields{"is_updated": ok, "status": http.StatusAccepted}).
 				Info("User updated")
+			ctx.JSON(responseDto.Status, responseDto)
 		}
 	}
 }
@@ -249,14 +315,23 @@ func (h UserHandler) HandleDeleteUserByID() gin.HandlerFunc {
 		ok, err := h.UserService.DeleteUserById(id)
 
 		if !ok {
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			responseDto := ResponseDTO{
+				Status:  http.StatusBadRequest,
+				Message: err.Error(),
+			}
 			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
 				Error("unable to delete user")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
-		ctx.JSON(http.StatusAccepted, gin.H{"message": "user deleted"})
+		responseDto := ResponseDTO{
+			Status: http.StatusAccepted,
+			Message:   "User deleted",
+		}
 		log.WithFields(logrus.Fields{"is_deleted": ok, "status": http.StatusAccepted}).
 				Info("User deleted")
+		ctx.JSON(responseDto.Status, responseDto)
 	}
 }
 

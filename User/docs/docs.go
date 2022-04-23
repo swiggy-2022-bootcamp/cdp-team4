@@ -72,7 +72,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/app.userDTO"
+                            "$ref": "#/definitions/app.UserDTO"
                         }
                     }
                 ],
@@ -196,7 +196,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/domain.User"
+                            "$ref": "#/definitions/app.UserDTO"
                         }
                     }
                 ],
@@ -250,7 +250,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "app.shippingAddressDTO": {
+        "app.ShippingAddressDTO": {
             "type": "object",
             "properties": {
                 "address_1": {
@@ -276,11 +276,11 @@ const docTemplate = `{
                 }
             }
         },
-        "app.userDTO": {
+        "app.UserDTO": {
             "type": "object",
             "properties": {
                 "address": {
-                    "$ref": "#/definitions/app.shippingAddressDTO"
+                    "$ref": "#/definitions/app.ShippingAddressDTO"
                 },
                 "email": {
                     "type": "string"

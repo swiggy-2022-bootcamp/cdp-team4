@@ -1,6 +1,6 @@
 basePath: /
 definitions:
-  app.shippingAddressDTO:
+  app.ShippingAddressDTO:
     properties:
       address_1:
         type: string
@@ -17,10 +17,10 @@ definitions:
       postcode:
         type: integer
     type: object
-  app.userDTO:
+  app.UserDTO:
     properties:
       address:
-        $ref: '#/definitions/app.shippingAddressDTO'
+        $ref: '#/definitions/app.ShippingAddressDTO'
       email:
         type: string
       fax:
@@ -103,7 +103,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/app.userDTO'
+          $ref: '#/definitions/app.UserDTO'
       produces:
       - application/json
       responses:
@@ -184,7 +184,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/domain.User'
+          $ref: '#/definitions/app.UserDTO'
       produces:
       - application/json
       responses:
