@@ -51,6 +51,41 @@ const docTemplate = `{
                 }
             }
         },
+        "/confirm/:userid": {
+            "post": {
+                "description": "This Handle adds order from checkout",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Order"
+                ],
+                "summary": "Confirm Order",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "user id",
+                        "name": "userid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.OrderConfirmResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                }
+            }
+        },
         "/order": {
             "post": {
                 "description": "This Handle allows admin to create new Order",
@@ -76,7 +111,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.OrderConfirmResponseDTO"
+                            "type": "number"
                         }
                     },
                     "400": {
@@ -98,6 +133,15 @@ const docTemplate = `{
                     "Order"
                 ],
                 "summary": "Get Order by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "order id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -122,11 +166,55 @@ const docTemplate = `{
                     "Order"
                 ],
                 "summary": "Delete order",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "order id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "number"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                }
+            }
+        },
+        "/order/invoice/:orderid": {
+            "get": {
+                "description": "This generated invoice given order id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Order"
+                ],
+                "summary": "Get Order Invoice given order id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "order id",
+                        "name": "orderid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.InvoiceDTO"
                         }
                     },
                     "400": {
@@ -185,6 +273,15 @@ const docTemplate = `{
                     "Order"
                 ],
                 "summary": "Get Order by status",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "status",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -214,6 +311,15 @@ const docTemplate = `{
                     "Order"
                 ],
                 "summary": "Get Order by user id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "user id",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -243,6 +349,15 @@ const docTemplate = `{
                     "Order"
                 ],
                 "summary": "Get All Order records",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "order id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -264,6 +379,32 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "app.InvoiceDTO": {
+            "type": "object",
+            "properties": {
+                "products": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.ProductRecordDTO"
+                    }
+                },
+                "reward_points": {
+                    "type": "integer"
+                },
+                "shipping_price": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "total_cost": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
         "app.OrderConfirmResponseDTO": {
             "type": "object",
             "properties": {

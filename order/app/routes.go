@@ -18,4 +18,5 @@ func OrderRouter(router *gin.Engine, orderHandler OrderHandler) {
 	router.PUT("/order/status", orderHandler.handleUpdateOrderStatus())
 	router.DELETE("/order/:id", orderHandler.HandleDeleteOrderById())
 	router.POST("/confirm/:user_id", orderHandler.HandleAddOrderFromCheckout())
+	router.GET("/order/invoice/:order_id", orderHandler.HandleGetOrderInvoice())
 }

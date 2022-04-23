@@ -41,6 +41,15 @@ type OrderConfirmResponseDTO struct {
 	RewardspointsConsumed int16  `json:"reward_points"`
 }
 
+type InvoiceDTO struct {
+	UserID                string             `json:"user_id"`
+	Products              []ProductRecordDTO `json:"products"`
+	Status                string             `json:"status"`
+	TotalCost             int16              `json:"total_cost"`
+	ShippingPrice         int16              `json:"shipping_price"`
+	RewardspointsConsumed int16              `json:"reward_points"`
+}
+
 type OrderOverviewRecordDTO struct {
 	OrderID  string         `json:"order_id"`
 	Products map[string]int `json:"products"`
@@ -57,7 +66,7 @@ type RequestDTO struct {
 // @Tags         Order
 // @Produce      json
 // @Param 		 order body OrderRecordDTO true "Create order"
-// @Success      200  {object}  OrderConfirmResponseDTO
+// @Success      200  {number}  http.StatusAccepted
 // @Failure      400  {number} 	http.StatusBadRequest
 // @Router       /order    [post]
 func (oh OrderHandler) handleOrder() gin.HandlerFunc {
@@ -164,7 +173,7 @@ func (oh OrderHandler) HandleGetOrderRecordsByUserID() gin.HandlerFunc {
 // @Description  This Handle returns Order given status
 // @Tags         Order
 // @Produce      json
-// @Param        id   status    int  true  "status"
+// @Param        id   path    int  true  "status"
 // @Success      200  {object}  []OrderRecordDTO
 // @Failure      400  {number} 	http.StatusBadRequest
 // @Router       /order/status/:status    [get]
@@ -292,10 +301,10 @@ func (oh OrderHandler) HandleDeleteOrderById() gin.HandlerFunc {
 // @Description  This Handle adds order from checkout
 // @Tags         Order
 // @Produce      json
+// @Param        userid   path      int  true  "user id"
 // @Success      200  {object}  OrderConfirmResponseDTO
 // @Failure      400  {number} 	http.StatusBadRequest
 // @Router       /confirm/:userid   [post]
-
 func (oh OrderHandler) HandleAddOrderFromCheckout() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("user_id")
@@ -382,6 +391,82 @@ func (oh OrderHandler) HandleAddOrderFromCheckout() gin.HandlerFunc {
 			RewardspointsConsumed: int16(resp.RewardPointsConsumed),
 		}})
 	}
+}
+
+// Get Order Invoice
+// @Summary      Get Order Invoice given order id
+// @Description  This generated invoice given order id
+// @Tags         Order
+// @Produce      json
+// @Param        orderid   path      int  true  "order id"
+// @Success      200  {object}  InvoiceDTO
+// @Failure      400  {number} 	http.StatusBadRequest
+// @Router       /order/invoice/:orderid   [get]
+func (oh OrderHandler) HandleGetOrderInvoice() gin.HandlerFunc {
+
+	return func(ctx *gin.Context) {
+		id := ctx.Param("order_id")
+		if id == "" {
+			log.WithFields(logrus.Fields{"message": "Invalid ID", "status": http.StatusBadRequest}).
+				Error("Invalid ID")
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Invalid ID"})
+			return
+		}
+
+		order, err := oh.OrderService.GetOrderById(id)
+		if err != nil {
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadGateway}).
+				Error("Error while creating order")
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error while retriving order info"})
+			return
+		}
+
+		err1 := godotenv.Load(".env")
+		if err1 != nil {
+			log.Fatal(err, "handler")
+			return
+		}
+		PORT := os.Getenv("CHECKOUT_SERVICE_PORT")
+		conn, err2 := grpc.Dial("localhost:"+PORT, grpc.WithInsecure())
+		if err2 != nil {
+			log.WithFields(logrus.Fields{"message": "Error while making connection", "status": http.StatusBadGateway}).
+				Error("Error while making connection")
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error while making connection"})
+			return
+		}
+
+		// Create a client instance
+		c := pb.NewCheckoutClient(conn)
+		resp, err3 := c.OrderOverview(context.Background(), &pb.OverviewRequest{
+			UserID: order.UserID,
+		})
+		if err3 != nil {
+			log.WithFields(logrus.Fields{"message": "Error while getting grpc response", "status": http.StatusBadGateway}).
+				Error("Error while getting grpc response")
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error while getting grpc response"})
+			return
+		}
+		var products []ProductRecordDTO
+		for _, item := range resp.Item {
+			newproduct := ProductRecordDTO{
+				Product:  item.Name,
+				Quantity: int(item.Qty),
+				Cost:     int16(item.Price),
+			}
+			products = append(products, newproduct)
+		}
+		ctx.JSON(http.StatusAccepted, gin.H{
+			"Invoice": InvoiceDTO{
+				Products:              products,
+				UserID:                order.UserID,
+				Status:                order.Status,
+				TotalCost:             int16(order.TotalCost),
+				RewardspointsConsumed: int16(resp.RewardPointsConsumed),
+				ShippingPrice:         int16(resp.ShippingPrice),
+			},
+		})
+	}
+
 }
 
 func ConvertProductsDTOtoMaps(products []ProductRecordDTO) (map[string]int, map[string]int) {

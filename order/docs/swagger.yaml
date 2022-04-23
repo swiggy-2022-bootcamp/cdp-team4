@@ -1,5 +1,22 @@
 basePath: /
 definitions:
+  app.InvoiceDTO:
+    properties:
+      products:
+        items:
+          $ref: '#/definitions/app.ProductRecordDTO'
+        type: array
+      reward_points:
+        type: integer
+      shipping_price:
+        type: integer
+      status:
+        type: string
+      total_cost:
+        type: integer
+      user_id:
+        type: string
+    type: object
   app.OrderConfirmResponseDTO:
     properties:
       order_id:
@@ -77,6 +94,29 @@ paths:
       summary: Health of order service
       tags:
       - Health
+  /confirm/:userid:
+    post:
+      description: This Handle adds order from checkout
+      parameters:
+      - description: user id
+        in: path
+        name: userid
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.OrderConfirmResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Confirm Order
+      tags:
+      - Order
   /order:
     post:
       description: This Handle allows admin to create new Order
@@ -93,7 +133,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.OrderConfirmResponseDTO'
+            type: number
         "400":
           description: Bad Request
           schema:
@@ -104,6 +144,12 @@ paths:
   /order/:id:
     delete:
       description: This Handle deletes order given order id
+      parameters:
+      - description: order id
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -120,6 +166,12 @@ paths:
       - Order
     get:
       description: This Handle returns Order given order id
+      parameters:
+      - description: order id
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -132,6 +184,29 @@ paths:
           schema:
             type: number
       summary: Get Order by id
+      tags:
+      - Order
+  /order/invoice/:orderid:
+    get:
+      description: This generated invoice given order id
+      parameters:
+      - description: order id
+        in: path
+        name: orderid
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.InvoiceDTO'
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Get Order Invoice given order id
       tags:
       - Order
   /order/status:
@@ -161,6 +236,12 @@ paths:
   /order/status/:status:
     get:
       description: This Handle returns Order given status
+      parameters:
+      - description: status
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -180,6 +261,12 @@ paths:
   /order/user/:userid:
     get:
       description: This Handle returns Order given user id
+      parameters:
+      - description: user id
+        in: path
+        name: user_id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -199,6 +286,12 @@ paths:
   /orders:
     get:
       description: This Handle returns all of the orders
+      parameters:
+      - description: order id
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
