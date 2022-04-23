@@ -28,9 +28,10 @@ type ShippingAddressRecordDTO struct {
 // @Description  This Handler allow user to create new Shipping Address
 // @Tags         Shipping Address
 // @Produce      json
-// @Success      200  {object}  map[string]interface{}
+// @Param 		 shippingAddress body ShippingAddressRecordDTO true "Create Shipping Address"
+// @Success		 202  string    Shipping Address record added
 // @Failure      400  {number} 	http.StatusBadRequest
-// @Router       /shippingaddress    [post]
+// @Router       /shippingadress    [post]
 func (sh ShippingHandler) handleShippingAddress() gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
@@ -65,7 +66,8 @@ func (sh ShippingHandler) handleShippingAddress() gin.HandlerFunc {
 // @Description  This Handle returns shippingAddress given id
 // @Tags         Shipping Address
 // @Produce      json
-// @Success      200  {object}  map[string]interface{}
+// @Param        id   path      int  true  "shipping address id"
+// @Success      202  {object}  ShippingAddressRecordDTO
 // @Failure      400  {number} 	http.StatusBadRequest
 // @Router       /shippingaddress/:id    [get]
 func (sh ShippingHandler) HandleGetShippingAddrssByID() gin.HandlerFunc {
@@ -89,7 +91,9 @@ func (sh ShippingHandler) HandleGetShippingAddrssByID() gin.HandlerFunc {
 // @Description  This Handle Update shippingAddress given id
 // @Tags         Shipping Address
 // @Produce      json
-// @Success      200  {object}  map[string]interface{}
+// @Param        id   path      int  true  "shipping address id"
+// @Param 		 shippingAddress body ShippingAddressRecordDTO true "Update Shipping Address"
+// @Success      202  {number}  http.StatusAccepted
 // @Failure      400  {number} 	http.StatusBadRequest
 // @Router       /shippingaddress/:id     [put]
 func (sh ShippingHandler) HandleUpdateShippingAddressByID() gin.HandlerFunc {
@@ -118,7 +122,8 @@ func (sh ShippingHandler) HandleUpdateShippingAddressByID() gin.HandlerFunc {
 // @Description  This Handle deletes Delete Shipping Address given sid
 // @Tags         Shipping Address
 // @Produce      json
-// @Success      200  {object}  map[string]interface{}
+// @Param        id   path      int  true  "shipping address id"
+// @Success      202  {number}  http.StatusAccepted
 // @Failure      400  {number} 	http.StatusBadRequest
 // @Router       /shippingaddress/:id   [delete]
 func (sh ShippingHandler) HandleDeleteShippingAddressById() gin.HandlerFunc {

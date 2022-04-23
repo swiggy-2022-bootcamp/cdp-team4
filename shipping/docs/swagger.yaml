@@ -1,4 +1,29 @@
 basePath: /
+definitions:
+  app.ShippingAddressRecordDTO:
+    properties:
+      address_1:
+        type: string
+      address_2:
+        type: string
+      city:
+        type: string
+      country_id:
+        type: integer
+      firstname:
+        type: string
+      lastname:
+        type: string
+      postcode:
+        type: integer
+    type: object
+  app.ShippingCostRecordDTO:
+    properties:
+      city:
+        type: string
+      cost:
+        type: integer
+    type: object
 host: localhost:7001
 info:
   contact:
@@ -31,35 +56,22 @@ paths:
       summary: Health of shipping service
       tags:
       - Health
-  /shippingaddress:
-    post:
-      description: This Handler allow user to create new Shipping Address
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            type: number
-      summary: Create Shipping Address
-      tags:
-      - Shipping Address
   /shippingaddress/:id:
     delete:
       description: This Handle deletes Delete Shipping Address given sid
+      parameters:
+      - description: shipping address id
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "202":
+          description: Accepted
           schema:
-            additionalProperties: true
-            type: object
+            type: number
         "400":
           description: Bad Request
           schema:
@@ -69,14 +81,19 @@ paths:
       - Shipping Address
     get:
       description: This Handle returns shippingAddress given id
+      parameters:
+      - description: shipping address id
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "202":
+          description: Accepted
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/app.ShippingAddressRecordDTO'
         "400":
           description: Bad Request
           schema:
@@ -86,14 +103,25 @@ paths:
       - Shipping Address
     put:
       description: This Handle Update shippingAddress given id
+      parameters:
+      - description: shipping address id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update Shipping Address
+        in: body
+        name: shippingAddress
+        required: true
+        schema:
+          $ref: '#/definitions/app.ShippingAddressRecordDTO'
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "202":
+          description: Accepted
           schema:
-            additionalProperties: true
-            type: object
+            type: number
         "400":
           description: Bad Request
           schema:
@@ -101,9 +129,39 @@ paths:
       summary: Update Shipping Address
       tags:
       - Shipping Address
+  /shippingadress:
+    post:
+      description: This Handler allow user to create new Shipping Address
+      parameters:
+      - description: Create Shipping Address
+        in: body
+        name: shippingAddress
+        required: true
+        schema:
+          $ref: '#/definitions/app.ShippingAddressRecordDTO'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Create Shipping Address
+      tags:
+      - Shipping Address
   /shippingcost:
     delete:
       description: This Handle deletes Shipping Cost of a city
+      parameters:
+      - description: shipping cost city
+        in: path
+        name: city
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -121,14 +179,20 @@ paths:
       - Shipping Cost
     post:
       description: This Handle allows admin to create new Shipping Cost of a city
+      parameters:
+      - description: Create Shipping Cost
+        in: body
+        name: shippingCost
+        required: true
+        schema:
+          $ref: '#/definitions/app.ShippingCostRecordDTO'
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "202":
+          description: Accepted
           schema:
-            additionalProperties: true
-            type: object
+            type: string
         "400":
           description: Bad Request
           schema:
@@ -138,14 +202,20 @@ paths:
       - Shipping Cost
     put:
       description: This Handle Update allows admin to update shipping cost of a city
+      parameters:
+      - description: Update Shipping Cost
+        in: body
+        name: shippingCost
+        required: true
+        schema:
+          $ref: '#/definitions/app.ShippingCostRecordDTO'
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "202":
+          description: Accepted
           schema:
-            additionalProperties: true
-            type: object
+            type: string
         "400":
           description: Bad Request
           schema:
@@ -156,14 +226,19 @@ paths:
   /shippingcost/:city:
     get:
       description: This Handle returns Shipping Cost given city
+      parameters:
+      - description: shipping cost city
+        in: path
+        name: city
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "202":
+          description: Accepted
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/app.ShippingCostRecordDTO'
         "400":
           description: Bad Request
           schema:

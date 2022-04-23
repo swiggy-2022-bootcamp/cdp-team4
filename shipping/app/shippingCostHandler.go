@@ -17,7 +17,8 @@ type ShippingCostRecordDTO struct {
 // @Description  This Handle allows admin to create new Shipping Cost of a city
 // @Tags         Shipping Cost
 // @Produce      json
-// @Success      200  {object}  map[string]interface{}
+// @Param 		 shippingCost body ShippingCostRecordDTO true "Create Shipping Cost"
+// @Success      202  {string}  true
 // @Failure      400  {number} 	http.StatusBadRequest
 // @Router       /shippingcost    [post]
 func (sh ShippingHandler) handleShippingCost() gin.HandlerFunc {
@@ -44,7 +45,8 @@ func (sh ShippingHandler) handleShippingCost() gin.HandlerFunc {
 // @Description  This Handle returns Shipping Cost given city
 // @Tags         Shipping Cost
 // @Produce      json
-// @Success      200  {object}  map[string]interface{}
+// @Param        city   path    int  true  "shipping cost city"
+// @Success      202  {object}  ShippingCostRecordDTO
 // @Failure      400  {number} 	http.StatusBadRequest
 // @Router       /shippingcost/:city    [get]
 func (sh ShippingHandler) HandleGetShippingCostByCity() gin.HandlerFunc {
@@ -65,7 +67,8 @@ func (sh ShippingHandler) HandleGetShippingCostByCity() gin.HandlerFunc {
 // @Description  This Handle Update allows admin to update shipping cost of a city
 // @Tags         Shipping Cost
 // @Produce      json
-// @Success      200  {object}  map[string]interface{}
+// @Param 		 shippingCost body ShippingCostRecordDTO true "Update Shipping Cost"
+// @Success      202  {string}  Shipping Cost record Updated
 // @Failure      400  {number} 	http.StatusBadRequest
 // @Router       /shippingcost    [put]
 func (sh ShippingHandler) HandleUpdateShippingCostByCity() gin.HandlerFunc {
@@ -94,6 +97,7 @@ func (sh ShippingHandler) HandleUpdateShippingCostByCity() gin.HandlerFunc {
 // @Description  This Handle deletes Shipping Cost of a city
 // @Tags         Shipping Cost
 // @Produce      json
+// @Param        city   path    int  true  "shipping cost city"
 // @Success      200  {object}  map[string]interface{}
 // @Failure      400  {number} 	http.StatusBadRequest
 // @Router       /shippingcost    [delete]

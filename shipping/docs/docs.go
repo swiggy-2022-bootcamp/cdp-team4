@@ -52,33 +52,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/shippingaddress": {
-            "post": {
-                "description": "This Handler allow user to create new Shipping Address",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Shipping Address"
-                ],
-                "summary": "Create Shipping Address",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "number"
-                        }
-                    }
-                }
-            }
-        },
         "/shippingaddress/:id": {
             "get": {
                 "description": "This Handle returns shippingAddress given id",
@@ -89,12 +62,20 @@ const docTemplate = `{
                     "Shipping Address"
                 ],
                 "summary": "Get Shipping Address by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "shipping address id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "202": {
+                        "description": "Accepted",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/app.ShippingAddressRecordDTO"
                         }
                     },
                     "400": {
@@ -114,12 +95,29 @@ const docTemplate = `{
                     "Shipping Address"
                 ],
                 "summary": "Update Shipping Address",
-                "responses": {
-                    "200": {
-                        "description": "OK",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "shipping address id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update Shipping Address",
+                        "name": "shippingAddress",
+                        "in": "body",
+                        "required": true,
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/app.ShippingAddressRecordDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "type": "number"
                         }
                     },
                     "400": {
@@ -139,12 +137,57 @@ const docTemplate = `{
                     "Shipping Address"
                 ],
                 "summary": "Delete Shipping Address",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "shipping address id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "202": {
+                        "description": "Accepted",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "type": "number"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                }
+            }
+        },
+        "/shippingadress": {
+            "post": {
+                "description": "This Handler allow user to create new Shipping Address",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Shipping Address"
+                ],
+                "summary": "Create Shipping Address",
+                "parameters": [
+                    {
+                        "description": "Create Shipping Address",
+                        "name": "shippingAddress",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/app.ShippingAddressRecordDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "type": "string"
                         }
                     },
                     "400": {
@@ -166,12 +209,22 @@ const docTemplate = `{
                     "Shipping Cost"
                 ],
                 "summary": "Update Shipping Cost",
-                "responses": {
-                    "200": {
-                        "description": "OK",
+                "parameters": [
+                    {
+                        "description": "Update Shipping Cost",
+                        "name": "shippingCost",
+                        "in": "body",
+                        "required": true,
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/app.ShippingCostRecordDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "type": "string"
                         }
                     },
                     "400": {
@@ -191,12 +244,22 @@ const docTemplate = `{
                     "Shipping Cost"
                 ],
                 "summary": "Create Shipping Cost",
-                "responses": {
-                    "200": {
-                        "description": "OK",
+                "parameters": [
+                    {
+                        "description": "Create Shipping Cost",
+                        "name": "shippingCost",
+                        "in": "body",
+                        "required": true,
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/app.ShippingCostRecordDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "type": "string"
                         }
                     },
                     "400": {
@@ -216,6 +279,15 @@ const docTemplate = `{
                     "Shipping Cost"
                 ],
                 "summary": "Delete Shipping Cost",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "shipping cost city",
+                        "name": "city",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -243,12 +315,20 @@ const docTemplate = `{
                     "Shipping Cost"
                 ],
                 "summary": "Get Shipping Cost given city",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "shipping cost city",
+                        "name": "city",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "202": {
+                        "description": "Accepted",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/app.ShippingCostRecordDTO"
                         }
                     },
                     "400": {
@@ -257,6 +337,45 @@ const docTemplate = `{
                             "type": "number"
                         }
                     }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "app.ShippingAddressRecordDTO": {
+            "type": "object",
+            "properties": {
+                "address_1": {
+                    "type": "string"
+                },
+                "address_2": {
+                    "type": "string"
+                },
+                "city": {
+                    "type": "string"
+                },
+                "country_id": {
+                    "type": "integer"
+                },
+                "firstname": {
+                    "type": "string"
+                },
+                "lastname": {
+                    "type": "string"
+                },
+                "postcode": {
+                    "type": "integer"
+                }
+            }
+        },
+        "app.ShippingCostRecordDTO": {
+            "type": "object",
+            "properties": {
+                "city": {
+                    "type": "string"
+                },
+                "cost": {
+                    "type": "integer"
                 }
             }
         }
