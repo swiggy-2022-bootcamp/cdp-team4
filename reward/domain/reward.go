@@ -12,9 +12,9 @@ type Reward struct {
 
 type RewardRepository interface {
 	InsertReward(Reward) (string, *errs.AppError)
-	FindAllRewards() ([]Reward, *errs.AppError)
 	FindRewardById(string) (*Reward, *errs.AppError)
-	DeleteRewardById(string) (bool, *errs.AppError)
+	FindRewardByUserId(string) (*Reward, *errs.AppError)
+	UpdateRewardByUserId(string,int) (bool, *errs.AppError)
 }
 
 func NewReward(userId string, rewardpoints int) *Reward {

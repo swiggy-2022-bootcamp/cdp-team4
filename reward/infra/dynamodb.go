@@ -171,7 +171,7 @@ func (rwd RewardDynamoRepository) FindRewardByUserId(userId string) (*domain.Rew
 	return rwdModel, nil
 }
 
-func (rwd RewardDynamoRepository) UpdateRewardByUserId(userId string, points int) (bool, error) {
+func (rwd RewardDynamoRepository) UpdateRewardByUserId(userId string, points int) (bool, *errs.AppError) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	//find the current record
@@ -180,13 +180,13 @@ func (rwd RewardDynamoRepository) UpdateRewardByUserId(userId string, points int
 		newDomainRecord := domain.NewReward(userId,int(points))
 		_,err=rwd.InsertReward(*newDomainRecord)
 		if err != nil {
-			return false, fmt.Errorf("unable to update - %s", err.Error())
+			return false,&errs.AppError{Message: "Unable to update"}
 		}
 		return true,nil
 	}
 
 	if points<0 && currentReward.RewardPoints < points {
-		return false, fmt.Errorf("reward Point shortage - %s", err.Error())
+		return false, &errs.AppError{Message:"Reward point shortage"}
 	}
 	updatedRewardPoints := currentReward.RewardPoints + points
 	//updatedRewardPoints
@@ -208,7 +208,7 @@ func (rwd RewardDynamoRepository) UpdateRewardByUserId(userId string, points int
 
 	_, updError := rwd.Session.UpdateItemWithContext(ctx, input)
 	if updError  != nil {
-		return false, fmt.Errorf("unable to update - %s", updError.Error())
+		return false, &errs.AppError{Message: "Unable to update"}
 	}
 	return true, nil
 }
