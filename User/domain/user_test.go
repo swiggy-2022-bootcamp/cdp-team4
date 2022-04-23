@@ -16,7 +16,7 @@ func TestShouldGetRoleString(t *testing.T) {
 
 func TestShouldReturnEnumIndexForRole(t *testing.T) {
 	role := Admin
-	var expected int = 0
+	var expected int = 1
 	var actual int = role.EnumIndex()
 
 	assert.Equal(t, expected, actual)
@@ -211,11 +211,11 @@ func TestShouldUpdateRole(t *testing.T) {
 
 func TestShouldMarshallJson(t *testing.T) {
 	id := "absbs"
-	firstName := "Murtaza"
-	lastName := "Sadriwala"
+	firstName := "Swastik"
+	lastName := "Sahoo"
 	phone := "9900887766"
-	email := "murtaza896@gmail.com"
-	username := "murtaza896"
+	email := "swastik123@gmail.com"
+	username := "swastik123"
 	password := "Pass!23"
 	role := Admin
 	addressID := "addressid"
@@ -223,7 +223,7 @@ func TestShouldMarshallJson(t *testing.T) {
 
 	user := NewUser(id, firstName, lastName, username, phone, email, password, role, addressID, fax)
 
-	expectedJson := "{\"address_id\":\"addressid\",\"email\":\"murtaza896@gmail.com\",\"fax\":\"18-1918-10101\",\"firstName\":\"Murtaza\",\"lastName\":\"Sadriwala\",\"password\":\"Pass!23\",\"phone\":\"9900887766\",\"role\":0,\"user_id\":\"absbs\",\"username\":\"murtaza896\"}"
+	expectedJson := "{\"address_id\":\"addressid\",\"email\":\"swastik123@gmail.com\",\"fax\":\"18-1918-10101\",\"firstName\":\"Swastik\",\"lastName\":\"Sahoo\",\"password\":\"Pass!23\",\"phone\":\"9900887766\",\"role\":1,\"user_id\":\"absbs\",\"username\":\"swastik123\"}"
 	actualJson, _ := user.MarshalJSON()
 
 	assert.Equal(t, expectedJson, string(actualJson))

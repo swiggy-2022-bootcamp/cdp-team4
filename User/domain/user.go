@@ -8,13 +8,13 @@ import (
 
 type Role int
 
-const (
-	Admin    Role = iota // EnumIndex = 0
-	Customer             // EnumIndex = 1
+const ( 
+	Admin Role = iota + 1
+	Customer
 )
 
 func (r Role) String() string {
-	return [...]string{"admin", "seller", "customer"}[r]
+	return [...]string{"admin", "customer"}[r-1]
 }
 
 func (r Role) EnumIndex() int {
