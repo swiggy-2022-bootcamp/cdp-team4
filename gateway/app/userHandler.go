@@ -21,6 +21,12 @@ type authModel struct {
 	Role   int
 }
 
+type ValidationDTO struct {
+	UserId string      `json:"user_id"`
+	Role   int         `json:"role"`
+}
+
+
 func ValidateToken(authorizationHeader string) authModel {
 	authServiceUri := "http://localhost:8881/api/v1/validate"
 	req, err := http.NewRequest("GET", authServiceUri, nil)
@@ -43,20 +49,23 @@ func ValidateToken(authorizationHeader string) authModel {
 	err = json.NewDecoder(res.Body).Decode(&resDTO)
 
 	if err != nil {
-
+		log.Fatalf("unable to decode response %v", err)
 	}
 
-	model := resDTO.Data.(authModel)
+	var valDTO ValidationDTO
+	jsonbytes, _ := json.Marshal(resDTO.Data)
+	json.Unmarshal(jsonbytes, &valDTO)
 
 	return authModel{
-		UserId: model.UserId,
-		Role:   model.Role,
+		UserId: valDTO.UserId,
+		Role:   valDTO.Role,
 	}
 }
 
 func (h userHandler) ValidateAuthToken() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		res := ValidateToken(c.Request.Header.Get("Authorization"))
+
 		c.JSON(http.StatusOK, res)
 	}
 }
