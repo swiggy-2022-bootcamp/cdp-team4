@@ -3,7 +3,7 @@ package domain
 import "github.com/swiggy-2022-bootcamp/cdp-team4/cart/utils/errs"
 
 type CartService interface {
-	CreateCart(string,map[string]int) (string, *errs.AppError)
+	CreateCart(string,map[string]int,map[string]int) (string, *errs.AppError)
 	GetCartById(string) (*Cart, *errs.AppError)
 	GetAllCarts() ([]Cart, *errs.AppError)
 	DeleteCartById(string) (bool, *errs.AppError)
@@ -13,8 +13,8 @@ type service struct {
 	cartRepository CartRepository
 }
 
-func (s service) CreateCart(userId string, products_quantity map[string]int) (string, *errs.AppError) {
-	cart := NewCart(userId, products_quantity)
+func (s service) CreateCart(userId string, products_quantity map[string]int, products_cost map[string]int) (string, *errs.AppError) {
+	cart := NewCart(userId, products_quantity, products_cost)
 	resultid, err := s.cartRepository.InsertCart(*cart)
 	if err != nil {
 		return "", err

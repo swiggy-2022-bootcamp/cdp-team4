@@ -177,11 +177,12 @@ func (crt CartDynamoRepository) DeleteCartById(id string) (bool, *errs.AppError)
 	return true, nil
 }
 
-func toPersistedDynamodbEntity(o domain.Cart) *CartModel {
+func toPersistedDynamodbEntity(c domain.Cart) *CartModel {
 	return &CartModel{
 		Id:               uuid.New().String(),
-		UserID:           o.UserID,
-		ProductsQuantity: o.ProductsQuantity,
+		UserID:           c.UserID,
+		ProductsQuantity: c.ProductsQuantity,
+		ProductsCost:     c.ProductsCost,
 		CreatedAt:        time.Now(),
 		UpdatedAt:        time.Now(),
 	}
@@ -192,6 +193,7 @@ func toModelfromDynamodbEntity(c CartModel) *domain.Cart {
 		Id:               c.Id,
 		UserID:           c.UserID,
 		ProductsQuantity: c.ProductsQuantity,
+		ProductsCost:     c.ProductsCost,
 	}
 }
 

@@ -21,8 +21,12 @@ func TestShouldCreateNewCartinDynamoDB(t *testing.T) {
 		"Origin of life":  1,
 		"Reynolds trimax": 10,
 	}
+	prodcost := map[string]int{
+		"Origin of life":  999,
+		"Reynolds trimax": 70,
+	}
 
-	newCart := domain.NewCart(userid, prodquant)
+	newCart := domain.NewCart(userid, prodquant,prodcost)
 	res, err := testCartService.InsertCart(*newCart)
 	insertedid = res
 	fmt.Println(insertedid)
@@ -46,6 +50,10 @@ func TestShouldGetCartByCartIdDynamoDB(t *testing.T) {
 		"Origin of life":  1,
 		"Reynolds trimax": 10,
 	}
+	prodcost := map[string]int{
+		"Origin of life":  999,
+		"Reynolds trimax": 70,
+	}
 
 	t.Logf("Inserted Id is %s Reading\n", insertedid)
 	res, err := testCartService.FindCartById(insertedid)
@@ -54,6 +62,7 @@ func TestShouldGetCartByCartIdDynamoDB(t *testing.T) {
 	assert.NotNil(t, res)
 	assert.Nil(t, err)
 	assert.Equal(t, res.ProductsQuantity, prodquant)
+	assert.Equal(t, res.ProductsCost, prodcost)
 }
 
 func TestShouldDeleteCartByCartIdDynamoDB(t *testing.T) {
