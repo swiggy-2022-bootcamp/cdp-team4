@@ -189,6 +189,24 @@ func (h UserHandler) HandleUpdateUserByID() gin.HandlerFunc {
 			return
 		} 
 
+		oldUser, err2 := h.UserService.GetUserById(userId)
+
+		if err2 != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"message": err2.Error()})
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
+				Error("unable to user with given id")
+			return
+		}
+
+		isAddressUpdated := UpdateShippingAddressId(newUpdatedUser.Address, oldUser.AddressID)
+
+		if isAddressUpdated != true {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"message": "unable to update address"})
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
+				Error("unable to update address")
+			return
+		}
+
 		ok, err1 := h.UserService.UpdateUserById(
 			userId,
 			newUpdatedUser.FirstName, 
@@ -198,8 +216,8 @@ func (h UserHandler) HandleUpdateUserByID() gin.HandlerFunc {
 			newUpdatedUser.Email, 
 			newUpdatedUser.Password, 
 			role,
-			"",
-			"",
+			oldUser.AddressID,
+			newUpdatedUser.Fax,
 		)
 		
 		if err1 != nil {
@@ -269,11 +287,46 @@ func GetShippingAddressId(address ShippingAddressDTO) (string){
 	)
 	
 	if err1 != nil {
-		fmt.Printf("Error while inserting address, %v\n", err1)
 		log.WithFields(logrus.Fields{"message": err1.Error(), "status": http.StatusInternalServerError}).
 				Error("unable to add address")
 		return "abcid"
 	}
 
 	return resp.ShippingAddressID
+}
+
+
+func UpdateShippingAddressId(address ShippingAddressDTO, id string) (bool){
+	// Set up connection with the grpc server
+
+	conn, err := grpc.Dial("localhost:7776", grpc.WithInsecure())
+	if err != nil {
+		fmt.Printf("Error while making connection, %v\n", err)
+	}
+
+	// Create a client instance
+	c := pb.NewShippingClient(conn)
+
+	// Lets invoke the remote function from client on the server
+	_, err1 := c.UpdateShippingAddress(
+		context.Background(),
+		&pb.ShippingAddressUpdateRequest{
+			ShippingAddressID: id,
+			Firstname: address.FirstName,
+			Lastname:  address.LastName,
+			City:      address.City,
+			Address1:  address.Address1,
+			Address2:  address.Address2,
+			Countryid: address.CountryID,
+			Postcode:  address.PostCode,
+		},
+	)
+	
+	if err1 != nil {
+		log.WithFields(logrus.Fields{"message": err1.Error(), "status": http.StatusInternalServerError}).
+				Error("unable to update address")
+		return false
+	}
+
+	return true
 }
