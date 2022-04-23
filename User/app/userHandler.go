@@ -13,10 +13,10 @@ import (
 )
 
 type UserHandler struct {
-	userService domain.UserService
+	UserService domain.UserService
 }
 
-type shippingAddressDTO struct {
+type ShippingAddressDTO struct {
 	FirstName string    `json:"firstname"`
 	LastName  string    `json:"lastname"`
 	City      string    `json:"city"`
@@ -26,7 +26,7 @@ type shippingAddressDTO struct {
 	PostCode  uint32    `json:"postcode"`
 }
 
-type userDTO struct {
+type UserDTO struct {
 	FirstName string 				`json:"first_name"`
 	LastName  string 				`json:"last_name"`
 	Username  string 				`json:"username"`
@@ -34,8 +34,12 @@ type userDTO struct {
 	Phone     string 				`json:"phone"`
 	Email     string 				`json:"email"`
 	Role      int    				`json:"role"`
-	Address   shippingAddressDTO 	`json:"address"`
+	Address   ShippingAddressDTO 	`json:"address"`
 	Fax		  string 				`json:"fax"`
+}
+
+type GrpcHelper interface {
+	GetShippingAddressId(ShippingAddressDTO) (string)
 }
 
 // @Summary Create User
@@ -44,13 +48,13 @@ type userDTO struct {
 // @Schemes
 // @Accept json
 // @Produce json
-// @Param        user	body	userDTO  true  "User structure"
+// @Param        user	body	UserDTO  true  "User structure"
 // @Success	201  {string} 	http.StatusCreated
 // @Failure	400  {number} 	http.http.StatusBadRequest
 // @Router /user [POST]
 func (h UserHandler) HandleUserCreation() gin.HandlerFunc {
 	return func (ctx *gin.Context) {
-		var newUser userDTO
+		var newUser UserDTO
 
 		if err := ctx.BindJSON(&newUser); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
@@ -67,9 +71,13 @@ func (h UserHandler) HandleUserCreation() gin.HandlerFunc {
 			return
 		}
 
-		shippingAddressId := getShippingAddressId(newUser.Address)
+		fmt.Println("role: ", role, err)
 
-		user, err1 := h.userService.CreateUserInDynamodb(
+		shippingAddressId := GetShippingAddressId(newUser.Address)
+
+		fmt.Println("shippingAddressId: ", shippingAddressId)
+
+		user, err1 := h.UserService.CreateUserInDynamodb(
 			newUser.FirstName, 
 			newUser.LastName, 
 			newUser.Username, 
@@ -77,7 +85,8 @@ func (h UserHandler) HandleUserCreation() gin.HandlerFunc {
 			newUser.Email, 
 			newUser.Password, 
 			role,
-			shippingAddressId,
+			// shippingAddressId,
+			"abcid",
 			newUser.Fax,
 		)
 		
@@ -108,7 +117,7 @@ func (h UserHandler) HandleUserCreation() gin.HandlerFunc {
 func (h UserHandler) HandleGetUserByID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("id")
-		record, err := h.userService.GetUserById(id)
+		record, err := h.UserService.GetUserById(id)
 
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
@@ -134,7 +143,7 @@ func (h UserHandler) HandleGetUserByID() gin.HandlerFunc {
 // @Router /users [GET]
 func (h UserHandler) HandleGetAllUsers() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		records, err := h.userService.GetAllUsers()
+		records, err := h.UserService.GetAllUsers()
 
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
@@ -162,7 +171,7 @@ func (h UserHandler) HandleGetAllUsers() gin.HandlerFunc {
 // @Router /user/{id} [PATCH]
 func (h UserHandler) HandleUpdateUserByID() gin.HandlerFunc {
 	return func (ctx *gin.Context) {
-		var newUpdatedUser userDTO
+		var newUpdatedUser UserDTO
 		userId := ctx.Param("id")
 
 		if err := ctx.BindJSON(&newUpdatedUser); err != nil {
@@ -178,9 +187,9 @@ func (h UserHandler) HandleUpdateUserByID() gin.HandlerFunc {
 			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
 				Error("unable to get role")
 			return
-		}
+		} 
 
-		ok, err1 := h.userService.UpdateUserById(
+		ok, err1 := h.UserService.UpdateUserById(
 			userId,
 			newUpdatedUser.FirstName, 
 			newUpdatedUser.LastName, 
@@ -219,11 +228,11 @@ func (h UserHandler) HandleUpdateUserByID() gin.HandlerFunc {
 func (h UserHandler) HandleDeleteUserByID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("id")
-		ok, err := h.userService.DeleteUserById(id)
+		ok, err := h.UserService.DeleteUserById(id)
 
 		if !ok {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
 				Error("unable to delete user")
 			return
 		}
@@ -234,7 +243,7 @@ func (h UserHandler) HandleDeleteUserByID() gin.HandlerFunc {
 }
 
 
-func getShippingAddressId(address shippingAddressDTO) (string){
+func GetShippingAddressId(address ShippingAddressDTO) (string){
 	// Set up connection with the grpc server
 
 	conn, err := grpc.Dial("localhost:7776", grpc.WithInsecure())
@@ -263,6 +272,7 @@ func getShippingAddressId(address shippingAddressDTO) (string){
 		fmt.Printf("Error while inserting address, %v\n", err1)
 		log.WithFields(logrus.Fields{"message": err1.Error(), "status": http.StatusInternalServerError}).
 				Error("unable to add address")
+		return "abcid"
 	}
 
 	return resp.ShippingAddressID

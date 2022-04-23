@@ -3,7 +3,6 @@ package app
 import (
 	"os"
 	// "fmt"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -25,16 +24,14 @@ type Routes struct {
 	router *gin.Engine
 }
 
-var userHandler UserHandler
-
-func setupRouter() *gin.Engine {
+func SetupRouter(userHandler UserHandler) *gin.Engine {
 	router := gin.Default()
 	
 	// health check route
 	HealthCheckRouter(router)
 
 	// user route
-	UserRouter(router)
+	UserRouter(router, userHandler)
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	return router
 }
@@ -51,16 +48,15 @@ func Start() {
 	}
 	PORT := os.Getenv("PORT")
 
-	log.WithFields(logrus.Fields{"message": "message", "status": http.StatusBadRequest}).Error("Error Check")
 
 	userDynamodbRepository := infra.NewDynamoRepository()
 
-	userHandler = UserHandler{
-		userService: domain.NewUserService(userDynamodbRepository),
+	userHandler := UserHandler{
+		UserService: domain.NewUserService(userDynamodbRepository),
 	}
 
 	configureSwaggerDoc()
-	router := setupRouter()
+	router := SetupRouter(userHandler)
 
 	router.Run(":" + PORT)
 }

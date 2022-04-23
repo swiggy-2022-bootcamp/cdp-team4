@@ -8,7 +8,7 @@ func HealthCheckRouter(gin *gin.Engine) {
 	gin.GET("/", HealthCheck())
 }
 
-func UserRouter(gin *gin.Engine) {
+func UserRouter(gin *gin.Engine, userHandler UserHandler) {
 	gin.POST("/user", userHandler.HandleUserCreation())
 	gin.GET("/users", userHandler.HandleGetAllUsers())
 	gin.GET("/user/:id", userHandler.HandleGetUserByID())
