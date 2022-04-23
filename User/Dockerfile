@@ -12,6 +12,6 @@ RUN go get ./...
 # build
 RUN go build -o /UserService
 
-EXPOSE 8000
+EXPOSE 8001
 
 CMD [ "/UserService" ]

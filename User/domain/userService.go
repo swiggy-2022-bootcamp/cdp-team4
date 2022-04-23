@@ -3,6 +3,9 @@ package domain
 import (
 	"golang.org/x/crypto/bcrypt"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"regexp"
+	"unicode"
+	"fmt"
 )
 
 type UserService interface {
@@ -26,6 +29,13 @@ func NewUserService(userDynamodbRepository UserDynamoDBRepository) UserService {
 
 func (s service) CreateUserInDynamodb(firstName, lastName, username, phone, email, password string, role Role, addressId, fax string) (User, error) {
 	id := _generateUniqueId()
+
+	isValid, message := validateFeilds(firstName, lastName, username, phone, email, password, fax)
+
+	if isValid != true{
+		return User{}, fmt.Errorf(message)
+	}
+
 	hashedPassword, err := HashPassword(password)
 	if err != nil {
 		return User{}, err
@@ -86,4 +96,82 @@ func HashPassword(password string) (string, error) {
 		return string(bytes), err
 	}
 	return string(bytes), nil
+}
+
+func validateFeilds(firstName, lastName, username, phone, email, password, fax string) (bool, string){
+	isValid := true
+	message := ""
+
+	//email
+	emailRegex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
+	if emailRegex.MatchString(email) != true {
+		isValid = false
+		message += "Invalid Email"
+		message += "\n"
+	}
+
+	//password
+	number := false
+	upper := false
+	special := false
+	letters := 0
+    for _, c := range password {
+        switch {
+        case unicode.IsNumber(c):
+            number = true
+        case unicode.IsUpper(c):
+            upper = true
+            letters++
+        case unicode.IsPunct(c) || unicode.IsSymbol(c):
+            special = true
+        case unicode.IsLetter(c) || c == ' ':
+            letters++
+        default:
+            //return false, false, false, false
+        }
+    }
+    sevenOrMore := letters >= 7
+    
+	if (number!=true) || (upper!=true) || (special!=true) || (sevenOrMore!=true){
+		isValid = false
+		message += "Invalid Password, should have the following: number, uppercase letter, special character and seven or more characters"
+		message += "\n"
+	}
+
+	//firstname
+	if (firstName == ""){
+		isValid = false
+		message += "Cannot have first name empty"
+		message += "\n"
+	}
+
+	//lastname
+	if (lastName == ""){
+		isValid = false
+		message += "Cannot have last name empty"
+		message += "\n"
+	}
+
+	//username
+	if (username == ""){
+		isValid = false
+		message += "Cannot have username empty"
+		message += "\n"
+	}
+
+	//phone
+	if (phone == ""){
+		isValid = false
+		message += "Cannot have phone number empty"
+		message += "\n"
+	}
+
+	//fax
+	if (fax == ""){
+		isValid = false
+		message += "Cannot have fax empty"
+		message += "\n"
+	}
+
+	return isValid, message
 }

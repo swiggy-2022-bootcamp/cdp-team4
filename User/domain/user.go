@@ -3,6 +3,7 @@ package domain
 import (
 	"encoding/json"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/user/utils/errs"
+
 )
 
 type Role int
@@ -44,7 +45,10 @@ type User struct {
 	Fax				string			   `json:"fax"`
 }
 
+
+
 func (u User) MarshalJSON() ([]byte, error) {
+
 	return json.Marshal(map[string]interface{}{
 		"user_id":          u.UserID,
 		"firstName":        u.FirstName,

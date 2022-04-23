@@ -38,6 +38,25 @@ func TestShouldCreateNewUser(t *testing.T) {
 	mockUserRepo.AssertNumberOfCalls(t, "Save", 1)
 }
 
+func TestShouldCreateNewInvalidUser(t *testing.T) {
+	userID := "afshsjgj14151jou"
+	firstName := ""
+	lastName := ""
+	phone := ""
+	email := "swastiksahoo22"
+	username := ""
+	password := "Pas"
+	role := domain.Admin
+	addressID := ""
+	fax := ""
+
+
+	user := domain.NewUser(userID, firstName, lastName, username, phone, email, password, role, addressID, fax)
+	mockUserRepo.On("Save", mock.Anything).Return(*user, nil)
+	userService.CreateUserInDynamodb(firstName, lastName, username, phone, email, password, role, addressID, fax)
+	// mockUserRepo.AssertNumberOfCalls(t, "Save", 1)
+}
+
 func TestShouldGetUserByUserId(t *testing.T) {
 	userID := "afshsjgj14151jou"
 	firstName := "Swastik"
