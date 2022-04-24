@@ -4,13 +4,14 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+//go:generate mockgen -source=productAdminService.go -destination=mocks\ProductAdminService.go -package=mocks . ProductAdminService
 type ProductAdminService interface {
 	CreateDynamoProductAdminRecord(string, int64, float64, string, string,
 		[]ProductSEOURL, int64, int64, string, bool, float64, float64, float64,
 		float64, int64, []string, []ProductDescription, []string) (string, error)
 	GetProduct() ([]Product, error)
 	GetProductById(string) (Product, error)
-	UpdateProduct(string, int64) (bool, error)
+	UpdateProduct(Product) (bool, error)
 	DeleteProductById(string) (bool, error)
 	GetProductAvailability(string, int64) (bool, error)
 	GetProductByCategoryId(string) ([]Product, error)
@@ -22,7 +23,9 @@ type productAdminService struct {
 	ProductAdminDynamoRepository ProductAdminDynamoRepository
 }
 
-func _generateUniqueId() string {
+// function to generate unique id which internally uses the primitive's Object id
+// that is used in MongoDb to automatically create an ID.
+func GenerateUniqueId() string {
 	return primitive.NewObjectID().Hex()
 }
 func (service productAdminService) CreateDynamoProductAdminRecord(model string, quantity int64,
@@ -30,7 +33,7 @@ func (service productAdminService) CreateDynamoProductAdminRecord(model string, 
 	reward int64, imageURL string, isShippable bool, weight float64, length float64, width float64,
 	height float64, minimumQunatity int64, relatedProducts []string, productDescription []ProductDescription,
 	productCategories []string) (string, error) {
-	id := _generateUniqueId()
+	id := GenerateUniqueId()
 	productRecord := Product{
 		Id:                  id,
 		Model:               model,
@@ -76,8 +79,8 @@ func (service productAdminService) GetProductById(id string) (Product, error) {
 	return productRecord, nil
 }
 
-func (service productAdminService) UpdateProduct(productId string, quantityReduction int64) (bool, error) {
-	_, err := service.ProductAdminDynamoRepository.UpdateItem(productId, quantityReduction)
+func (service productAdminService) UpdateProduct(product Product) (bool, error) {
+	_, err := service.ProductAdminDynamoRepository.UpdateItem(product)
 	if err != nil {
 		return false, err
 	}

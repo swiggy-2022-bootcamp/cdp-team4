@@ -1,5 +1,6 @@
 package infra
 
+// Product record data model that is going to store in dynamo database
 type ProductSEOURLModel struct {
 	Keyword    string `json:"keyword"`
 	LanguageID string `json:"language_id"`

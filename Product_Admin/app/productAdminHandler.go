@@ -9,6 +9,8 @@ import (
 	"github.com/swiggy-2022-bootcamp/cdp-team4/Product_Admin/domain"
 )
 
+// ProductAdminHandler wraps up the ProductAdminServices along with
+// all the handler methods of respective routes
 type ProductAdminHandler struct {
 	ProductAdminService domain.ProductAdminService
 }
@@ -18,6 +20,8 @@ type ProductAdminHandler struct {
 // @Description  This Handle allows admin to create a new product
 // @Tags         Product Admin
 // @Produce      json
+// @Accept       json
+// @Param        product body ProductDTO  true "product request structure"
 // @Success      200  {object}  map[string]interface{}
 // @Failure      400  {number} 	http.StatusBadRequest
 // @Router       /products/    [post]
@@ -65,6 +69,7 @@ func (ph ProductAdminHandler) HandleAddProduct() gin.HandlerFunc {
 // @Description  This Handle allows admin to fetch all the products in the datastore
 // @Tags         Product Admin
 // @Produce      json
+// @Accept 		 json
 // @Success      200  {object}  map[string]interface{}
 // @Failure      400  {number} 	http.StatusBadRequest
 // @Router       /products/    [get]
@@ -91,7 +96,7 @@ func (ph ProductAdminHandler) HandleGetAllProducts() gin.HandlerFunc {
 // @Produce      json
 // @Success      200  {object}  map[string]interface{}
 // @Failure      400  {number} 	http.StatusBadRequest
-// @Router       /products/    [post]
+// @Router       /products/{id}    [get]
 func (ph ProductAdminHandler) HandleGetProductByID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("id")
@@ -113,19 +118,36 @@ func (ph ProductAdminHandler) HandleGetProductByID() gin.HandlerFunc {
 // @Description  This Handles Updation of product details given product id
 // @Tags         Product Admin
 // @Produce      json
+// @Accept       json
 // @Success      200  {object}  map[string]interface{}
 // @Failure      400  {number} 	http.StatusBadRequest
-// @Router       /products/:id    [put]
+// @Router       /products/{id}    [put]
 func (ph ProductAdminHandler) HandleUpdateProduct() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		//Todo - update any field of product
-		//currently it supports only updation of product quantity
-		var requestDTO RequestDTO
-		if err := ctx.BindJSON(&requestDTO); err != nil {
+		var productDTO ProductDTO
+		if err := ctx.BindJSON(&productDTO); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			return
 		}
-		ok, err := ph.ProductAdminService.UpdateProduct(requestDTO.Id, requestDTO.QuantityToBeReduced)
+		var productSEOURL []domain.ProductSEOURL
+		for _, item := range productDTO.ProductSEOURLs {
+			productSEOURL = append(productSEOURL, domain.ProductSEOURL{Keyword: item.Keyword, LanguageID: item.LanguageID, StoreID: item.StoreID})
+		}
+		var productDescription []domain.ProductDescription
+		for _, item := range productDTO.ProductDescriptions {
+			productDescription = append(productDescription, domain.ProductDescription{LanguageID: item.LanguageID, Name: item.Name,
+				Description: item.Description, MetaTitle: item.MetaTitle, MetaDescription: item.MetaDescription, MetaKeyword: item.MetaKeyword,
+				Tag: item.Tag})
+		}
+		var productCategories []string
+		for _, item := range productDTO.ProductCategories {
+			productCategories = append(productCategories, item)
+		}
+		product := domain.NewProductObject(productDTO.Model, productDTO.Quantity, productDTO.Price, productDTO.ManufacturerID, productDTO.SKU,
+			productSEOURL, productDTO.Points, productDTO.Reward, productDTO.ImageURL, productDTO.IsShippable, productDTO.Weight, productDTO.Length,
+			productDTO.Width, productDTO.Height, productDTO.MinimumQuantity, productDTO.RelatedProducts, productDescription, productCategories)
+
+		ok, err := ph.ProductAdminService.UpdateProduct(*product)
 		if !ok {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
@@ -142,9 +164,10 @@ func (ph ProductAdminHandler) HandleUpdateProduct() gin.HandlerFunc {
 // @Description  This Handles deletion of a product given product id
 // @Tags         Product Admin
 // @Produce      json
+// @Accept       json
 // @Success      200  {object}  map[string]interface{}
 // @Failure      400  {number} 	http.StatusBadRequest
-// @Router       /products/:id    [delete]
+// @Router       /products/{id}    [delete]
 func (ph ProductAdminHandler) HandleDeleteProductByID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("id")
@@ -162,17 +185,18 @@ func (ph ProductAdminHandler) HandleDeleteProductByID() gin.HandlerFunc {
 	}
 }
 
-// Search products
-// @Summary      Search product by category id
-// @Description  This Handles searching a product given categoryid
+// Search product
+// @Summary      Search product
+// @Description  This Handles search of a product given category id
 // @Tags         Product Admin
 // @Produce      json
+// @Accept       json
 // @Success      200  {object}  map[string]interface{}
 // @Failure      400  {number} 	http.StatusBadRequest
-// @Router       /products/:id    [delete]
+// @Router       /products/search/{id}    [get]
 func (ph ProductAdminHandler) HandleSearchByCategoryID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		categoryId := ctx.Param("id")
+		categoryId := ctx.Param("categoryid")
 		res, err := ph.ProductAdminService.GetProductByCategoryId(categoryId)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Record not found"})
@@ -215,45 +239,8 @@ func (ph ProductAdminHandler) HandleSearchByKeyword() gin.HandlerFunc {
 	}
 }
 
-/**********DTO***********/
-type ProductSEOURLDTO struct {
-	Keyword    string `json:"keyword"`
-	LanguageID string `json:"language_id"`
-	StoreID    string `json:"store_id"`
-}
-
-type ProductDescriptionDTO struct {
-	LanguageID      string `json:"language_id"`
-	Name            string `json:"name"`
-	Description     string `json:"description"`
-	MetaTitle       string `json:"meta_title"`
-	MetaDescription string `json:"meta_description"`
-	MetaKeyword     string `json:"meta_keyword"`
-	Tag             string `json:"tag"`
-}
-
-type ProductDTO struct {
-	Model               string                  `json:"model"`
-	Quantity            int64                   `json:"quantity"`
-	Price               float64                 `json:"price"`
-	ManufacturerID      string                  `json:"manufacturer_id"`
-	SKU                 string                  `json:"sku"`
-	ProductSEOURLs      []ProductSEOURLDTO      `json:"product_seo_url"`
-	Points              int64                   `json:"points"`
-	Reward              int64                   `json:"reward"`
-	ImageURL            string                  `json:"image_url"`
-	IsShippable         bool                    `json:"is_shippable"`
-	Weight              float64                 `json:"weight"`
-	Length              float64                 `json:"length"`
-	Width               float64                 `json:"width"`
-	Height              float64                 `json:"height"`
-	MinimumQuantity     int64                   `json:"minimum_quantity"`
-	RelatedProducts     []string                `json:"related_products"`
-	ProductDescriptions []ProductDescriptionDTO `json:"product_description"`
-	ProductCategories   []string                `json:"product_categories"`
-}
-
-type RequestDTO struct {
-	Id                  string `json:"id"`
-	QuantityToBeReduced int64  `json:"quantity_to_be_reduced"`
+func NewProductAdminHandler(productAdminService domain.ProductAdminService) ProductAdminHandler {
+	return ProductAdminHandler{
+		ProductAdminService: productAdminService,
+	}
 }

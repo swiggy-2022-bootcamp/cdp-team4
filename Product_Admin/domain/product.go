@@ -47,12 +47,13 @@ type ProductAdminDynamoRepository interface {
 	Insert(Product) (bool, error)
 	Find() ([]Product, error)
 	FindByID(string) (Product, error)
-	UpdateItem(string, int64) (bool, error)
+	UpdateItem(Product) (bool, error)
+	UpdateQuantity(string, int64) (bool, error)
 	DeleteByID(string) (bool, error)
-	GetProductAvailability(string,int64)(bool,error)
-	FindByCategoryID(string)([]Product, error)
-	FindByManufacturerID(string)([]Product, error)
-	FindByKeyword(string)([]Product, error)
+	GetProductAvailability(string, int64) (bool, error)
+	FindByCategoryID(string) ([]Product, error)
+	FindByManufacturerID(string) ([]Product, error)
+	FindByKeyword(string) ([]Product, error)
 }
 
 func NewProductObject(model string, quantity int64, price float64, manufacturerID string, sku string,
@@ -60,7 +61,7 @@ func NewProductObject(model string, quantity int64, price float64, manufacturerI
 	weight float64, length float64, width float64, height float64, minimumQuantity int64,
 	relatedProducts []string, productDescription []ProductDescription, productCategories []string) *Product {
 	return &Product{
-		Id:                  _generateUniqueId(),
+		Id:                  GenerateUniqueId(),
 		Model:               model,
 		Quantity:            quantity,
 		Price:               price,

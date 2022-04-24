@@ -1,6 +1,7 @@
 package domain_test
 
 import (
+	// "errors"
 	"errors"
 	"testing"
 
@@ -139,8 +140,8 @@ func TestShouldUpdateProductDetails(t *testing.T) {
 		imageURL, isShippable, weight, length, width, height, minimumQuantity, relatedProducts, productDescription,
 		productCategories)
 
-	mockProductAdminRepo.On("UpdateItem", newProduct.Id, int64(5)).Return(true, nil)
-	res, err := productService.UpdateProduct(newProduct.Id, int64(5))
+	mockProductAdminRepo.On("UpdateItem", *newProduct).Return(true, nil)
+	res, err := productService.UpdateProduct(*newProduct)
 
 	assert.Nil(t, err)
 	assert.Equal(t, res, true)
@@ -189,4 +190,96 @@ func TestShouldGetAllPeoducts(t *testing.T) {
 	assert.Equal(t, relatedProducts, resProducts[0].RelatedProducts)
 	assert.Equal(t, productDescription, resProducts[0].ProductDescriptions)
 	assert.Equal(t, productCategories, resProducts[0].ProductCategories)
+}
+
+func TestShouldGetProductAvailability(t *testing.T) {
+	model := "boat bassheads 100"
+	quantity := int64(100)
+	price := float64(299)
+	manufacturerID := "boat_company_id"
+	sku := "ZG011AQA"
+	productSEOURLs := []domain.ProductSEOURL{}
+	points := int64(15)
+	rewards := int64(20)
+	imageURL := "http://usnews.com/vivamus/metus/arcu/adipiscing.json?luctus=placerat&ultricies=praesent"
+	isShippable := true
+	weight := 120.25
+	length := 0.0
+	width := 0.0
+	height := 30.5
+	minimumQuantity := int64(2)
+	relatedProducts := []string{"boat bassheads 102", "boat bassheads 152"}
+	productDescription := []domain.ProductDescription{}
+	productCategories := []string{}
+
+	newProduct := domain.NewProductObject(model, quantity, price, manufacturerID, sku, productSEOURLs, points, rewards,
+		imageURL, isShippable, weight, length, width, height, minimumQuantity, relatedProducts, productDescription,
+		productCategories)
+	mockProductAdminRepo.On("GetProductAvailability", newProduct.Id, int64(10)).Return(true, nil)
+	res, err := productService.GetProductAvailability(newProduct.Id, int64(10))
+
+	assert.Nil(t, err)
+	assert.Equal(t, res, true)
+}
+
+func TestShouldGetProductByManufacturereId(t *testing.T) {
+	model := "boat bassheads 100"
+	quantity := int64(100)
+	price := float64(299)
+	manufacturerID := "boat_company_id"
+	sku := "ZG011AQA"
+	productSEOURLs := []domain.ProductSEOURL{}
+	points := int64(15)
+	rewards := int64(20)
+	imageURL := "http://usnews.com/vivamus/metus/arcu/adipiscing.json?luctus=placerat&ultricies=praesent"
+	isShippable := true
+	weight := 120.25
+	length := 0.0
+	width := 0.0
+	height := 30.5
+	minimumQuantity := int64(2)
+	relatedProducts := []string{"boat bassheads 102", "boat bassheads 152"}
+	productDescription := []domain.ProductDescription{}
+	productCategories := []string{}
+
+	newProduct := domain.NewProductObject(model, quantity, price, manufacturerID, sku, productSEOURLs, points, rewards,
+		imageURL, isShippable, weight, length, width, height, minimumQuantity, relatedProducts, productDescription,
+		productCategories)
+	products := []domain.Product{*newProduct}
+	mockProductAdminRepo.On("FindByManufacturerID", newProduct.ManufacturerID).Return(products, nil)
+	res, err := productService.GetProductByManufacturerId(manufacturerID)
+
+	assert.Nil(t, err)
+	assert.Equal(t, manufacturerID, res[0].ManufacturerID)
+}
+
+func TestShouldGetProductByKeyword(t *testing.T) {
+	model := "boat bassheads 100"
+	quantity := int64(100)
+	price := float64(299)
+	manufacturerID := "boat_company_id"
+	sku := "ZG011AQA"
+	productSEOURLs := []domain.ProductSEOURL{}
+	points := int64(15)
+	rewards := int64(20)
+	imageURL := "http://usnews.com/vivamus/metus/arcu/adipiscing.json?luctus=placerat&ultricies=praesent"
+	isShippable := true
+	weight := 120.25
+	length := 0.0
+	width := 0.0
+	height := 30.5
+	minimumQuantity := int64(2)
+	relatedProducts := []string{"boat bassheads 102", "boat bassheads 152"}
+	productDescription := []domain.ProductDescription{}
+	productCategories := []string{}
+
+	newProduct := domain.NewProductObject(model, quantity, price, manufacturerID, sku, productSEOURLs, points, rewards,
+		imageURL, isShippable, weight, length, width, height, minimumQuantity, relatedProducts, productDescription,
+		productCategories)
+	products := []domain.Product{*newProduct}
+	mockProductAdminRepo.On("FindByKeyword", model).Return(products, nil)
+	res, err := productService.GetProductByKeyword(model)
+
+	assert.Nil(t, err)
+	assert.Equal(t, model, res[0].Model)
 }

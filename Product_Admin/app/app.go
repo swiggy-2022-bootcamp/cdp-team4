@@ -22,7 +22,9 @@ import (
 var productAdminHandler ProductAdminHandler
 var log logrus.Logger = *logger.GetLogger()
 
-func setupRouter() *gin.Engine {
+// Function used to get the new http gin engine object
+// after registering all the routers
+func SetupRouter(productAdminHandler ProductAdminHandler) *gin.Engine {
 	router := gin.Default()
 	// health check route
 	HealthCheckRouter(router)
@@ -31,10 +33,16 @@ func setupRouter() *gin.Engine {
 	return router
 }
 
-func configureSwaggerDoc() {
+func ConfigureSwaggerDoc() {
 	docs.SwaggerInfo.Title = "Swagger Product Admin API"
 }
 
+// Function to start an asynchronous gRPC server such that the inter service
+// calls can be made and reading the port number
+// from .env file
+//
+// it also intiliases the all repositories, services and handlers present
+// in the this micro-service.
 func startGrpcProductServer(pah ProductAdminHandler) {
 	grpcServer := grpc.NewServer()
 	productServer := NewProductGrpcServer()
@@ -58,9 +66,19 @@ func startGrpcProductServer(pah ProductAdminHandler) {
 
 }
 
+// Function to start the http server after getting the client
+// object from setupServer function and reading the port number
+// from .env file
+//
+// it also intiliases the all repositories, services and handlers present
+// in the this micro-service.
+//
+// Also configures the Swagger UI:
+// http//localhost:8004/swagger/index.html
 func Start() {
 	dynamoRepository := infra.NewDynamoRepository()
-	productAdminHandler = ProductAdminHandler{ProductAdminService: domain.NewProductAdminService(dynamoRepository)}
+	productAdminService := domain.NewProductAdminService(dynamoRepository)
+	productAdminHandler = NewProductAdminHandler(productAdminService)
 
 	go startGrpcProductServer(productAdminHandler)
 
@@ -70,9 +88,9 @@ func Start() {
 		return
 	}
 
-	configureSwaggerDoc()
+	ConfigureSwaggerDoc()
 
 	PORT := os.Getenv("PORT")
-	router := setupRouter()
+	router := SetupRouter(productAdminHandler)
 	router.Run(":" + PORT)
 }

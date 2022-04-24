@@ -19,7 +19,12 @@ type ProductAdminDynamoRepository struct {
 	Session *dynamodb.DynamoDB
 }
 
+// function to connect with dynamoDB with the credentials stored in
+// the local system
 func connect() *dynamodb.DynamoDB {
+	// Initialize a session that the SDK will use to load
+	// credentials from the shared credentials file ~/.aws/credentials
+	// and region from the shared configuration file ~/.aws/config.
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	}))
@@ -28,6 +33,8 @@ func connect() *dynamodb.DynamoDB {
 	svc := dynamodb.New(sess)
 	return svc
 }
+
+// inserting the record in dynamoDB
 
 func (padr ProductAdminDynamoRepository) Insert(product domain.Product) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -39,7 +46,7 @@ func (padr ProductAdminDynamoRepository) Insert(product domain.Product) (bool, e
 	}
 	input := &dynamodb.PutItemInput{
 		Item:      av,
-		TableName: aws.String("Product"),
+		TableName: aws.String(PRODUCT_TABLE),
 	}
 
 	_, err = padr.Session.PutItemWithContext(ctx, input)
@@ -58,7 +65,7 @@ func (padr ProductAdminDynamoRepository) Insert(product domain.Product) (bool, e
 			}
 			input := &dynamodb.PutItemInput{
 				Item:      av,
-				TableName: aws.String("ProductCategoryRelation"),
+				TableName: aws.String(PRODUCT_CATEGORY_TABLE),
 			}
 			_, err = padr.Session.PutItemWithContext(ctx, input)
 
@@ -75,7 +82,7 @@ func (padr ProductAdminDynamoRepository) Find() ([]domain.Product, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	input := &dynamodb.ScanInput{
-		TableName: aws.String("Product"),
+		TableName: aws.String(PRODUCT_TABLE),
 	}
 	result, err := padr.Session.ScanWithContext(ctx, input)
 	if err != nil {
@@ -97,7 +104,7 @@ func (padr ProductAdminDynamoRepository) FindByID(productID string) (domain.Prod
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	input := &dynamodb.GetItemInput{
-		TableName: aws.String("Product"),
+		TableName: aws.String(PRODUCT_TABLE),
 		Key: map[string]*dynamodb.AttributeValue{
 			"id": {
 				S: aws.String(productID),
@@ -122,15 +129,110 @@ func (padr ProductAdminDynamoRepository) FindByID(productID string) (domain.Prod
 	return productModel, nil
 }
 
-func (padr ProductAdminDynamoRepository) UpdateItem(productID string, quantiyReduction int64) (bool, error) {
+func (padr ProductAdminDynamoRepository) UpdateItem(product domain.Product) (bool, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	fmt.Println("product in dynamo", product)
+	prodDescription, err := dynamodbattribute.Marshal(product.ProductDescriptions)
+	if err != nil {
+		return false, fmt.Errorf("error in getting product details %v", err.Error())
+	}
+	prodSEO, err := dynamodbattribute.Marshal(product.ProductSEOURLs)
+	if err != nil {
+		return false, fmt.Errorf("error in getting product details %v", err.Error())
+	}
+	relatedProd, err := dynamodbattribute.Marshal(product.RelatedProducts)
+	if err != nil {
+		return false, fmt.Errorf("error in getting product details %v", err.Error())
+	}
+	prodCategory, err := dynamodbattribute.Marshal(product.ProductCategories)
+	if err != nil {
+		return false, fmt.Errorf("error in getting product details %v", err.Error())
+	}
+	fmt.Println("============================av", product.Price)
+	condtionExpression := "attribute_exists(id)"
+	input := &dynamodb.UpdateItemInput{
+		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
+			":model": {
+				S: aws.String(product.Model),
+			},
+			":quantity": {
+				N: aws.String(strconv.Itoa(int(product.Quantity))),
+			},
+			":price": {
+				N: aws.String(strconv.Itoa(int(product.Price))),
+			},
+			":manufacturer_id": {
+				S: aws.String(product.ManufacturerID),
+			},
+			":sku": {
+				S: aws.String(product.SKU),
+			},
+			":product_seo_url": {
+				L: prodSEO.L,
+			},
+			":points": {
+				S: aws.String(strconv.Itoa(int(product.Points))),
+			},
+			":reward": {
+				S: aws.String(strconv.Itoa(int(product.Reward))),
+			},
+			":image_url": {
+				S: aws.String(product.ImageURL),
+			},
+			":is_shippable": {
+				BOOL: &product.IsShippable,
+			},
+			":weight": {
+				S: aws.String(strconv.Itoa(int(product.Weight))),
+			},
+			":width": {
+				S: aws.String(strconv.Itoa(int(product.Width))),
+			},
+			":height": {
+				S: aws.String(strconv.Itoa(int(product.Height))),
+			},
+			":minimum_quantity": {
+				S: aws.String(strconv.Itoa(int(product.MinimumQuantity))),
+			},
+			":related_products": {
+				L: relatedProd.L,
+			},
+			":product_description": {
+				L: prodDescription.L,
+			},
+			":product_categories": {
+				L: prodCategory.L,
+			},
+		},
+		Key: map[string]*dynamodb.AttributeValue{
+			"id": {
+				S: aws.String(product.Id),
+			},
+		},
+		ReturnValues: aws.String("UPDATED_NEW"),
+		UpdateExpression: aws.String(
+			"set model= :model, quantity= :quantity, price= :price, manufacturer_id= :manufacturer_id, sku= :sku, product_seo_url= :product_seo_url, points= :points, reward= :reward, image_url= :image_url, is_shippable= :is_shippable, weight= :weight, width= :width, height= :height, minimum_quantity= :minimum_quantity, related_products= :related_products, product_description= :product_description, product_categories= :product_categories",
+		),
+		ConditionExpression: &condtionExpression,
+		TableName:           aws.String(PRODUCT_TABLE),
+	}
+	_, err = padr.Session.UpdateItemWithContext(ctx, input)
+	if err != nil {
+		return false, fmt.Errorf("error in updating product details %v", err.Error())
+	}
+	return true, nil
+}
+
+func (padr ProductAdminDynamoRepository) UpdateQuantity(productId string, quantity int64) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	//find the total quantity
-	currentProduct, err := padr.FindByID(productID)
-	if currentProduct.Quantity < quantiyReduction {
+	currentProduct, err := padr.FindByID(productId)
+	if currentProduct.Quantity < quantity {
 		return false, fmt.Errorf("Product shortage - %s", err.Error())
 	}
-	updatedQuantity := currentProduct.Quantity - quantiyReduction
+	updatedQuantity := currentProduct.Quantity - quantity
 	//update the quantity
 	input := &dynamodb.UpdateItemInput{
 		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
@@ -140,12 +242,12 @@ func (padr ProductAdminDynamoRepository) UpdateItem(productID string, quantiyRed
 		},
 		Key: map[string]*dynamodb.AttributeValue{
 			"id": {
-				S: aws.String(productID),
+				S: aws.String(productId),
 			},
 		},
 		ReturnValues:     aws.String("UPDATED_NEW"),
 		UpdateExpression: aws.String("set quantity = :s"),
-		TableName:        aws.String("Product"),
+		TableName:        aws.String(PRODUCT_TABLE),
 	}
 
 	_, err = padr.Session.UpdateItemWithContext(ctx, input)
@@ -164,7 +266,7 @@ func (padr ProductAdminDynamoRepository) DeleteByID(productID string) (bool, err
 				N: aws.String(productID),
 			},
 		},
-		TableName: aws.String("Product"),
+		TableName: aws.String(PRODUCT_TABLE),
 	}
 
 	_, err := padr.Session.DeleteItemWithContext(ctx, input)
@@ -178,7 +280,7 @@ func (padr ProductAdminDynamoRepository) GetProductAvailability(productId string
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	input := &dynamodb.GetItemInput{
-		TableName: aws.String("Product"),
+		TableName: aws.String(PRODUCT_TABLE),
 		Key: map[string]*dynamodb.AttributeValue{
 			"id": {
 				S: aws.String(productId),
@@ -220,7 +322,7 @@ func (padr ProductAdminDynamoRepository) FindByCategoryID(categoryId string) ([]
 		ExpressionAttributeNames:  expr.Names(),
 		FilterExpression:          expr.Filter(),
 		ExpressionAttributeValues: expr.Values(),
-		TableName:                 aws.String("ProductCategoryRelation"),
+		TableName:                 aws.String(PRODUCT_CATEGORY_TABLE),
 	}
 	result, err := padr.Session.ScanWithContext(ctx, input)
 	if err != nil {
@@ -284,7 +386,7 @@ func (padr ProductAdminDynamoRepository) GetProductsByCondition(condition expres
 		ExpressionAttributeValues: condition.Values(),
 		FilterExpression:          condition.Filter(),
 		ProjectionExpression:      condition.Projection(),
-		TableName:                 aws.String("Product"),
+		TableName:                 aws.String(PRODUCT_TABLE),
 	}
 	response, err := padr.Session.ScanWithContext(ctx, input)
 	if err != nil {

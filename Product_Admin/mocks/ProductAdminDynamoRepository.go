@@ -188,8 +188,29 @@ func (_m *ProductAdminDynamoRepository) Insert(_a0 domain.Product) (bool, error)
 	return r0, r1
 }
 
-// UpdateItem provides a mock function with given fields: _a0, _a1
-func (_m *ProductAdminDynamoRepository) UpdateItem(_a0 string, _a1 int64) (bool, error) {
+// UpdateItem provides a mock function with given fields: _a0
+func (_m *ProductAdminDynamoRepository) UpdateItem(_a0 domain.Product) (bool, error) {
+	ret := _m.Called(_a0)
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(domain.Product) bool); ok {
+		r0 = rf(_a0)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(domain.Product) error); ok {
+		r1 = rf(_a0)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// UpdateQuantity provides a mock function with given fields: _a0, _a1
+func (_m *ProductAdminDynamoRepository) UpdateQuantity(_a0 string, _a1 int64) (bool, error) {
 	ret := _m.Called(_a0, _a1)
 
 	var r0 bool
