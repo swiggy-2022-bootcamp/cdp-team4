@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option go_package ="./;protobuf";
+
+message UserCityResponse {
+    string City = 1;
+}
+
+message UserCityRequest {
+    string UserID = 1;
+}
+
+service User{
+    rpc GetUserCity (UserCityRequest) returns (UserCityResponse);
+}
