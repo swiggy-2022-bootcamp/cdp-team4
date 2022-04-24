@@ -61,7 +61,11 @@ func (ah AuthHandler) ValidateAuthToken(c *gin.Context) {
 
 	if err != nil {
 		customErr := errs.NewAuthenticationError("Invalid token, Access Denied")
-		c.JSON(http.StatusUnauthorized, customErr)
+		responseDto := ResponseDTO{
+			Status:  customErr.Code,
+			Message: customErr.Message,
+		}
+		c.JSON(responseDto.Status, responseDto)
 		c.Abort()
 		return
 	}
@@ -86,14 +90,22 @@ func (ah AuthHandler) InvalidateAuthToken(c *gin.Context) {
 
 	if err != nil {
 		customErr := errs.NewValidationError("Invalid token, Access Denied")
-		c.JSON(http.StatusUnauthorized, customErr)
+		responseDto := ResponseDTO{
+			Status:  customErr.Code,
+			Message: customErr.Message,
+		}
+		c.JSON(responseDto.Status, responseDto)
 		c.Abort()
 		return
 	}
 	err = ah.authService.InvalidateAuthToken(authToken)
 	if err != nil {
 		customErr := errs.NewValidationError(err.Message)
-		c.JSON(http.StatusInternalServerError, customErr)
+		responseDto := ResponseDTO{
+			Status:  customErr.Code,
+			Message: customErr.Message,
+		}
+		c.JSON(responseDto.Status, responseDto)
 		c.Abort()
 		return
 	}
