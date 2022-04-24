@@ -33,7 +33,11 @@ func (ah AuthHandler) GetAuthToken(c *gin.Context) {
 
 	if err != nil {
 		customErr := errs.NewValidationError("Invalid request paylaod")
-		c.JSON(http.StatusBadRequest, customErr)
+		responseDto := ResponseDTO{
+			Status:  customErr.Code,
+			Message: customErr.Message,
+		}
+		c.JSON(responseDto.Status, responseDto)
 		c.Abort()
 		return
 	}
