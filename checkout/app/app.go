@@ -9,7 +9,6 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
-	"github.com/swiggy-2022-bootcamp/cdp-team4/checkout/domain"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/checkout/infra/logger"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/checkout/protos"
 )
@@ -20,7 +19,7 @@ var log logrus.Logger = *logger.GetLogger()
 // after registering checkout server implemented in domain
 func setupServer() *grpc.Server {
 	gs := grpc.NewServer()
-	cs := domain.NewCheckout()
+	cs := NewCheckout()
 
 	protos.RegisterCheckoutServer(gs, cs)
 	log.Debug("gRPC server registered!")

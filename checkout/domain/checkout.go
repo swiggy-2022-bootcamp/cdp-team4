@@ -11,48 +11,33 @@ import (
 
 var log logrus.Logger = *logger.GetLogger()
 
-// Checkout is the client API for Checkout service.
-type Checkout struct {
-	protos.UnimplementedCheckoutServer
-}
-
-// Constructor method to get the checkout stuct object
-func NewCheckout() *Checkout {
-	return &Checkout{}
-}
-
-// gRPC service method which is going to calculate the overview of order
-// by getting reward points of user from reward serice, cart details from
-// cart service and shipping cost from shipping service.
-//
-// All the communication between  microservices is happened using gRPC call only
-func (ch *Checkout) OrderOverview(
-	ctx context.Context,
-	rq *protos.OverviewRequest,
-) (*protos.OverviewResponse, error) {
-	// Get the User Cart details by ID 		[grpc call to Cart service]
-	// Get the Reward points details by ID 	[grpc call to Reward service]
-	// Get the Shipping details by ID 		[grpc call to Shipping service]
+func GetShippingCost(ctx context.Context, request *protos.ShippingCostRequest) (*protos.ShippingCostResponse, error) {
 	client, err := infra.GetShippingGrpcClient()
 	if err != nil {
 		log.WithFields(logrus.Fields{"error": err}).Error("get shipping gRPC client")
 		return nil, err
 	}
 
-	response, err := client.GetShippingCost(ctx, &protos.ShippingCostRequest{City: "Chennai"})
+	response, err := client.GetShippingCost(ctx, request)
 	if err != nil {
 		log.WithFields(logrus.Fields{"error": err}).Error("get shipping cost gRPC call")
 		return nil, err
 	}
+	return response, nil
+}
 
-	log.WithFields(logrus.Fields{"response": response, "error": err}).Debug("shipping cost gRPC response")
-	return &protos.OverviewResponse{
-		UserID:               rq.GetUserID(),
-		TotalPrice:           15,
-		ShippingPrice:        5,
-		RewardPointsConsumed: 2,
-		Item: []*protos.OverviewResponse_Item{
-			{Name: "item1", Id: "item1", Price: 5, Qty: "3"},
-		},
-	}, nil
+func GetRewardPoints(ctx context.Context, request *protos.GetRewardPointsRequest) (*protos.GetRewardPointsResponse, error) {
+	client, err := infra.GetRewardGrpcClient()
+	if err != nil {
+		log.WithFields(logrus.Fields{"error": err}).Error("get reward gRPC client")
+		return nil, err
+	}
+
+	response, err := client.GetRewardPoints(ctx, request)
+	if err != nil {
+		log.WithFields(logrus.Fields{"error": err}).Error("get reward cost gRPC call")
+		return nil, err
+	}
+
+	return response, nil
 }
