@@ -5,6 +5,6 @@ services:
       dockerfile: Dockerfile
       context: .
     ports:
-      - "127.0.0.1:7774:7774"
+      - "127.0.0.1:8007:8007"
     volumes:
       - c:/.aws:/root/.aws:ro
