@@ -32,7 +32,7 @@ func GetRewardGrpcClient() (protos.RewardClient, error) {
 
 // Function to get the gRPC client object of cart service
 func GetCartGrpcClient() (protos.CartClient, error) {
-	conn, err := grpc.Dial("localhost:7010", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:7006", grpc.WithInsecure())
 	if err != nil {
 		return nil, fmt.Errorf("unable to connect with grpc server")
 	}

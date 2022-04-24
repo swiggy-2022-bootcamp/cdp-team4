@@ -28,23 +28,35 @@ func (ch *Checkout) OrderOverview(
 	rq *protos.OverviewRequest,
 ) (*protos.OverviewResponse, error) {
 	// Get the User Cart details by ID 		[grpc call to Cart service]
-	cartDetails, err := domain.GetCartDetails(ctx, &protos.GetCartByUserIDRequest{UserId: rq.GetUserID()})
+	cartDetails, err := domain.GetCartDetails(
+		ctx,
+		&protos.GetCartByUserIDRequest{UserId: rq.GetUserID()},
+	)
 	if err != nil {
-		log.WithFields(logrus.Fields{"response": cartDetails, "error": err}).Debug("shipping cost gRPC response")
+		log.WithFields(logrus.Fields{"response": cartDetails, "error": err}).
+			Debug("shipping cost gRPC response")
 		return nil, err
 	}
 
 	// Get the Shipping details by ID 		[grpc call to Shipping service]
-	shippingCost, err := domain.GetShippingCost(ctx, &protos.ShippingCostRequest{City: "chennai"})
+	shippingCost, err := domain.GetShippingCost(
+		ctx,
+		&protos.ShippingCostRequest{City: "chennai"},
+	)
 	if err != nil {
-		log.WithFields(logrus.Fields{"response": shippingCost, "error": err}).Debug("shipping cost gRPC response")
+		log.WithFields(logrus.Fields{"response": shippingCost, "error": err}).
+			Debug("shipping cost gRPC response")
 		return nil, err
 	}
 
 	// Get the Reward points details by ID 	[grpc call to Reward service]
-	rewardPoints, err := domain.GetRewardPoints(ctx, &protos.GetRewardPointsRequest{UserId: rq.GetUserID()})
+	rewardPoints, err := domain.GetRewardPoints(
+		ctx,
+		&protos.GetRewardPointsRequest{UserId: rq.GetUserID()},
+	)
 	if err != nil {
-		log.WithFields(logrus.Fields{"response": rewardPoints, "error": err}).Debug("shipping cost gRPC response")
+		log.WithFields(logrus.Fields{"response": rewardPoints, "error": err}).
+			Debug("shipping cost gRPC response")
 		return nil, err
 	}
 
