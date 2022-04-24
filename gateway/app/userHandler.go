@@ -39,13 +39,19 @@ func ValidateToken(authorizationHeader string) (*AuthModel, *errs.AppError) {
 	res, err := client.Do(req)
 	if err != nil {
 		log.Fatalf("%v", err)
+		return nil, errs.NewAuthenticationError(err.Error())
 	}
 
 	var resDTO ResponseDTO
 	err = json.NewDecoder(res.Body).Decode(&resDTO)
 
 	if err != nil {
-		log.Fatalf("unable to decode response %v", err)
+		//log.Fatalf("unable to decode response %v", err)
+		return nil, errs.NewUnexpectedError(err.Error())
+	}
+
+	if resDTO.Status == http.StatusUnauthorized {
+		return nil, errs.NewAuthenticationError(resDTO.Message)
 	}
 
 	var valDTO ValidationDTO
