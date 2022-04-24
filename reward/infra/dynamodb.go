@@ -50,6 +50,7 @@ func createTable(svc *dynamodb.DynamoDB) {
 		fmt.Println("Got error calling CreateTable:")
 		fmt.Println(tableErr.Error())
 	}
+	fmt.Println("Table Creatad")
 }
 
 func connect() *dynamodb.DynamoDB {
@@ -67,7 +68,7 @@ func connect() *dynamodb.DynamoDB {
 	svc := dynamodb.New(sess)
 
 	//createTable(svc)
-
+	
 	return svc
 }
 
@@ -177,7 +178,7 @@ func (rwd RewardDynamoRepository) UpdateRewardByUserId(userId string, points int
 	//find the current record
 	currentReward, err := rwd.FindRewardByUserId(userId)
 	if err!=nil{
-		newDomainRecord := domain.NewReward(userId,int(points))
+		newDomainRecord := domain.NewReward(userId,points)
 		_,err=rwd.InsertReward(*newDomainRecord)
 		if err != nil {
 			return false,&errs.AppError{Message: "Unable to update"}
@@ -185,20 +186,19 @@ func (rwd RewardDynamoRepository) UpdateRewardByUserId(userId string, points int
 		return true,nil
 	}
 
-	if points<0 && currentReward.RewardPoints < points {
+	updatedRewardPoints := currentReward.RewardPoints + points
+	if updatedRewardPoints<0 {
 		return false, &errs.AppError{Message:"Reward point shortage"}
 	}
-	updatedRewardPoints := currentReward.RewardPoints + points
-	//updatedRewardPoints
 	input := &dynamodb.UpdateItemInput{
 		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
 			":s": {
-				N: aws.String(strconv.Itoa(int(updatedRewardPoints))),
+				N: aws.String(strconv.Itoa(updatedRewardPoints)),
 			},
 		},
 		Key: map[string]*dynamodb.AttributeValue{
 			"id": {
-				S: aws.String(userId),
+				S: aws.String(currentReward.Id),
 			},
 		},
 		ReturnValues:     aws.String("UPDATED_NEW"),
@@ -208,10 +208,51 @@ func (rwd RewardDynamoRepository) UpdateRewardByUserId(userId string, points int
 
 	_, updError := rwd.Session.UpdateItemWithContext(ctx, input)
 	if updError  != nil {
-		return false, &errs.AppError{Message: "Unable to update"}
+		return false, &errs.AppError{Message: updError.Error()+"Unable to update"}
 	}
+	fmt.Println("Updated exisitng user with points",updatedRewardPoints)
 	return true, nil
 }
+
+// func (odr RewardDynamoRepository) FindAllRewardUserId(userId string) {
+// 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+// 	defer cancel()
+
+// 	filt := expression.Name("user_id").Equal(expression.Value(userId))
+
+// 	expr, err := expression.NewBuilder().WithFilter(filt).Build()
+
+// 	if err != nil {
+// 		errstring := fmt.Sprintf("expression new builder - %s", err.Error())
+// 		fmt.Println(&errs.AppError{Message: errstring})
+// 	}
+
+// 	input := &dynamodb.ScanInput{
+// 		ExpressionAttributeNames:  expr.Names(),
+// 		FilterExpression:          expr.Filter(),
+// 		ExpressionAttributeValues: expr.Values(),
+// 		TableName:                 aws.String("Reward"),
+// 	}
+
+// 	result, err := odr.Session.ScanWithContext(ctx, input)
+// 	if err != nil {
+// 		errstring := fmt.Sprintf("scan with filter - %s", err.Error())
+// 		fmt.Println(&errs.AppError{Message: errstring})
+// 	}
+
+	
+
+// 	for _, item := range result.Items {
+// 		record := RewardModel{}
+// 		err := dynamodbattribute.UnmarshalMap(item, &record)
+// 		if err != nil {
+// 			fmt.Println("Stray records inside db")
+// 		} else {
+// 			recordm := toModelfromDynamodbEntity(record)
+// 			fmt.Println(recordm)
+// 		}
+// 	}
+// }
 
 func toPersistedDynamodbEntity(r domain.Reward) *RewardModel {
 	return &RewardModel{

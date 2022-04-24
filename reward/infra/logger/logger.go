@@ -26,13 +26,10 @@ func GetLogger() *logrus.Logger {
 					return
 				}
 				LOG_FILE := os.Getenv("LOG_FILE")
-				src, err := os.OpenFile(LOG_FILE, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
-				fmt.Print(LOG_FILE)
+				src, err := os.OpenFile(LOG_FILE, os.O_CREATE|os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 				if err != nil {
 					fmt.Print(err.Error())
-					fmt.Print("unable to create log file")
-				} else {
-					fmt.Print("No error")
+					fmt.Println("unable to create log file")
 				}
 
 				multiWriter := io.MultiWriter(os.Stdout, src)
