@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/gateway/utils/errs"
 	"log"
 	"net/http"
 	"time"
@@ -12,22 +13,17 @@ import (
 type userHandler struct {
 }
 
-type ResponseDTO struct {
-	Data interface{}
-}
-
-type authModel struct {
+type AuthModel struct {
 	UserId string
 	Role   int
 }
 
 type ValidationDTO struct {
-	UserId string      `json:"user_id"`
-	Role   int         `json:"role"`
+	UserId string `json:"user_id"`
+	Role   int    `json:"role"`
 }
 
-
-func ValidateToken(authorizationHeader string) authModel {
+func ValidateToken(authorizationHeader string) (*AuthModel, *errs.AppError) {
 	authServiceUri := "http://localhost:8881/api/v1/validate"
 	req, err := http.NewRequest("GET", authServiceUri, nil)
 	if err != nil {
@@ -53,19 +49,37 @@ func ValidateToken(authorizationHeader string) authModel {
 	}
 
 	var valDTO ValidationDTO
-	jsonbytes, _ := json.Marshal(resDTO.Data)
-	json.Unmarshal(jsonbytes, &valDTO)
+	marshalledData, _ := json.Marshal(resDTO.Data)
+	err = json.Unmarshal(marshalledData, &valDTO)
+	if err != nil {
+		return nil, errs.NewAuthenticationError(err.Error())
+	}
 
-	return authModel{
+	return &AuthModel{
 		UserId: valDTO.UserId,
 		Role:   valDTO.Role,
-	}
+	}, nil
 }
 
 func (h userHandler) ValidateAuthToken() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		res := ValidateToken(c.Request.Header.Get("Authorization"))
+		res, err := ValidateToken(c.Request.Header.Get("Authorization"))
 
-		c.JSON(http.StatusOK, res)
+		if err != nil {
+			response := ResponseDTO{
+				Status:  err.Code,
+				Message: err.Message,
+			}
+			c.JSON(response.Status, response)
+			c.Abort()
+			return
+		}
+
+		response := ResponseDTO{
+			Status:  http.StatusOK,
+			Data:    res,
+			Message: "User authenticated successfully",
+		}
+		c.JSON(response.Status, response)
 	}
 }
