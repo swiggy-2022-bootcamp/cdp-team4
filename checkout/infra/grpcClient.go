@@ -29,3 +29,14 @@ func GetRewardGrpcClient() (protos.RewardClient, error) {
 	client := protos.NewRewardClient(conn)
 	return client, nil
 }
+
+// Function to get the gRPC client object of cart service
+func GetCartGrpcClient() (protos.CartClient, error) {
+	conn, err := grpc.Dial("localhost:7010", grpc.WithInsecure())
+	if err != nil {
+		return nil, fmt.Errorf("unable to connect with grpc server")
+	}
+
+	client := protos.NewCartClient(conn)
+	return client, nil
+}

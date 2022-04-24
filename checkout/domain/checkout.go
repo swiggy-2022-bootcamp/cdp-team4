@@ -41,3 +41,19 @@ func GetRewardPoints(ctx context.Context, request *protos.GetRewardPointsRequest
 
 	return response, nil
 }
+
+func GetCartDetails(ctx context.Context, request *protos.GetCartByUserIDRequest) (*protos.GetCartResponse, error) {
+	client, err := infra.GetCartGrpcClient()
+	if err != nil {
+		log.WithFields(logrus.Fields{"error": err}).Error("get reward gRPC client")
+		return nil, err
+	}
+
+	response, err := client.GetCartByUserId(ctx, request)
+	if err != nil {
+		log.WithFields(logrus.Fields{"error": err}).Error("get reward cost gRPC call")
+		return nil, err
+	}
+
+	return response, nil
+}
