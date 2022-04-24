@@ -1,8 +1,8 @@
 package app_test
 
 import (
-	// "bytes"
-	// "encoding/json"
+	"bytes"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -16,7 +16,6 @@ import (
 )
 
 
-/*
 func TestCreateUser(t *testing.T) {
 
 	shippingAddress := app.ShippingAddressDTO{
@@ -43,14 +42,12 @@ func TestCreateUser(t *testing.T) {
 
 	testCases := []struct {
 		name       string
-		createStub func(*mocks.MockUserService, *mocks.MockGrpcHelper)
+		createStub func(*mocks.MockUserService)
 		expected   int
 	}{
 		{
 			name: "SucessCreateUser",
-			createStub: func(mus *mocks.MockUserService, mgs *mocks.MockGrpcHelper) {
-
-				mgs.EXPECT().GetShippingAddressId(requestData.Address).Return("abcid")
+			createStub: func(mus *mocks.MockUserService) {
 				mus.EXPECT().
 					CreateUserInDynamodb(
 						requestData.FirstName,
@@ -65,25 +62,7 @@ func TestCreateUser(t *testing.T) {
 					Return(domain.User{}, nil)
 				
 			},
-			expected: 201,
-		},
-		{
-			name: "ErrorCreateRole",
-			createStub: func(mus *mocks.MockUserService) {
-				mus.EXPECT().
-					CreateUserInDynamodb(
-						requestData.FirstName,
-						requestData.LastName,
-						requestData.Username,
-						requestData.Phone,
-						requestData.Email,
-						requestData.Password,
-						domain.Admin,
-						"abcid",
-						requestData.Fax).
-					Return(domain.User{}, nil)
-			},
-			expected: 201,
+			expected: 200,
 		},
 		{
 			name: "ErrorCreateUser",
@@ -111,12 +90,11 @@ func TestCreateUser(t *testing.T) {
 			defer mockCtrl.Finish()
 
 			mockService := mocks.NewMockUserService(mockCtrl)
-			mockGrpc := mocks.NewMockGrpcHelper(mockCtrl)
-			testcase.createStub(mockService, mockGrpc)
-
+			testcase.createStub(mockService)
 
 			router := app.SetupRouter(app.UserHandler{
 				UserService: mockService,
+				TestMode: true,
 			})
 
 			data, _ := json.Marshal(requestData)
@@ -137,6 +115,7 @@ func TestCreateUser(t *testing.T) {
 
 	router := app.SetupRouter(app.UserHandler{
 		UserService: mockService,
+		TestMode: true,
 	})
 
 	recorder := httptest.NewRecorder()
@@ -144,9 +123,167 @@ func TestCreateUser(t *testing.T) {
 	router.ServeHTTP(recorder, req)
 
 	assert.Equal(t, 400, recorder.Code)
+
+	// Test invalid role
+	invalidRoleRequestData := app.UserDTO{
+		FirstName:		"Swastik",
+		LastName:		"Sahoo",
+		Username:		"swastik15",
+		Password:		"abc",
+		Phone:			"95181818181",
+		Email:			"swastiksahoo22@gmail.com",
+		Role:			100,
+		Fax:			"12-203-9181",
+		Address:		shippingAddress,
+	}
+
+	data, _ := json.Marshal(invalidRoleRequestData)
+
+	req = httptest.NewRequest(http.MethodPost, "/user",  bytes.NewReader(data))
+	router.ServeHTTP(recorder, req)
+
+	assert.Equal(t, 400, recorder.Code)
 }
 
-*/
+
+func TestUpdateUser(t *testing.T) {
+
+	shippingAddress := app.ShippingAddressDTO{
+		FirstName:		"Swastik",
+		LastName:		"Sahoo",
+		City:			"swastik15",
+		Address1:		"abc",
+		Address2:		"95181818181",
+		CountryID:		12,
+		PostCode:		234,
+	}
+
+	requestData := app.UserDTO{
+		FirstName:		"Swastik",
+		LastName:		"Sahoo",
+		Username:		"swastik15",
+		Password:		"abc",
+		Phone:			"95181818181",
+		Email:			"swastiksahoo22@gmail.com",
+		Role:			0,
+		Fax:			"12-203-9181",
+		Address:		shippingAddress,
+	}
+
+	testCases := []struct {
+		name       string
+		createStub func(*mocks.MockUserService)
+		expected   int
+	}{
+		{
+			name: "SucessUpdateUser",
+			createStub: func(mus *mocks.MockUserService) {
+				mus.EXPECT().GetUserById("userid").Return(&domain.User{}, nil)
+				mus.EXPECT().UpdateUserById(
+					"userid",
+					requestData.FirstName,
+					requestData.LastName,
+					requestData.Username,
+					requestData.Phone,
+					requestData.Email,
+					requestData.Password,
+					domain.Admin,
+					"abcid",
+					requestData.Fax,
+				).Return(true, nil)
+			},
+			expected: 202,
+		},
+		{
+			name: "ErrorUpdateUser",
+			createStub: func(mus *mocks.MockUserService) {
+				mus.EXPECT().GetUserById("userid").Return(&domain.User{}, nil)
+				mus.EXPECT().UpdateUserById(
+					"userid",
+					requestData.FirstName,
+					requestData.LastName,
+					requestData.Username,
+					requestData.Phone,
+					requestData.Email,
+					requestData.Password,
+					domain.Admin,
+					"abcid",
+					requestData.Fax,
+				).Return(true, fmt.Errorf("unable to update record"))
+			},
+			expected: 500,
+		},
+		{
+			name: "ErrorGetUser",
+			createStub: func(mus *mocks.MockUserService) {
+				mus.EXPECT().GetUserById("userid").Return(&domain.User{}, fmt.Errorf("unable to get user by id"))
+			},
+			expected: 500,
+		},
+	}
+
+	for _, testcase := range testCases {
+		t.Run(testcase.name, func(t *testing.T) {
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+
+			mockService := mocks.NewMockUserService(mockCtrl)
+			testcase.createStub(mockService)
+
+			router := app.SetupRouter(app.UserHandler{
+				UserService: mockService,
+				TestMode: true,
+			})
+
+			data, _ := json.Marshal(requestData)
+
+			recorder := httptest.NewRecorder()
+			req := httptest.NewRequest(http.MethodPatch, "/user/userid", bytes.NewReader(data))
+			router.ServeHTTP(recorder, req)
+
+			assert.Equal(t, testcase.expected, recorder.Code)
+		})
+	}
+
+	// FailBindJSON
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockService := mocks.NewMockUserService(mockCtrl)
+
+	router := app.SetupRouter(app.UserHandler{
+		UserService: mockService,
+		TestMode: true,
+	})
+
+	recorder := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodPatch, "/user/userid", nil)
+	router.ServeHTTP(recorder, req)
+
+	assert.Equal(t, 400, recorder.Code)
+
+	// Test invalid role
+	invalidRoleRequestData := app.UserDTO{
+		FirstName:		"Swastik",
+		LastName:		"Sahoo",
+		Username:		"swastik15",
+		Password:		"abc",
+		Phone:			"95181818181",
+		Email:			"swastiksahoo22@gmail.com",
+		Role:			100,
+		Fax:			"12-203-9181",
+		Address:		shippingAddress,
+	}
+
+	data, _ := json.Marshal(invalidRoleRequestData)
+
+	req = httptest.NewRequest(http.MethodPatch, "/user/userid",  bytes.NewReader(data))
+	router.ServeHTTP(recorder, req)
+
+	assert.Equal(t, 400, recorder.Code)
+}
+
+
 
 func TestHandleGetUserByID(t *testing.T) {
 

@@ -14,6 +14,7 @@ import (
 
 type UserHandler struct {
 	UserService domain.UserService
+	TestMode    bool
 }
 
 type ShippingAddressDTO struct {
@@ -64,7 +65,7 @@ func (h UserHandler) HandleUserCreation() gin.HandlerFunc {
 				Message: err.Error(),
 			}
 			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
-				Error("bind json")
+				Error("bind json error")
 			ctx.JSON(responseDto.Status, responseDto)
 			ctx.Abort()
 			return
@@ -83,7 +84,11 @@ func (h UserHandler) HandleUserCreation() gin.HandlerFunc {
 			return
 		}
 
-		shippingAddressId := GetShippingAddressId(newUser.Address)
+		shippingAddressId := "abcid"
+
+		if h.TestMode == false {
+			shippingAddressId = GetShippingAddressId(newUser.Address)
+		}
 
 		user, err1 := h.UserService.CreateUserInDynamodb(
 			newUser.FirstName, 
@@ -94,11 +99,8 @@ func (h UserHandler) HandleUserCreation() gin.HandlerFunc {
 			newUser.Password, 
 			role,
 			shippingAddressId,
-			// "abcid",
 			newUser.Fax,
 		)
-
-		fmt.Printf("here1: %v", user)
 		
 		if err1 != nil {
 			responseDto := ResponseDTO{
@@ -217,7 +219,7 @@ func (h UserHandler) HandleUpdateUserByID() gin.HandlerFunc {
 				Message: err.Error(),
 			}
 			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
-				Error("unable to get user by id")
+				Error("unable to bind json")
 			ctx.JSON(responseDto.Status, responseDto)
 			ctx.Abort()
 			return
@@ -250,7 +252,14 @@ func (h UserHandler) HandleUpdateUserByID() gin.HandlerFunc {
 			return
 		}
 
-		isAddressUpdated := UpdateShippingAddressId(newUpdatedUser.Address, oldUser.AddressID)
+		isAddressUpdated := true
+		addressId := oldUser.AddressID
+
+		if h.TestMode == false {
+			isAddressUpdated = UpdateShippingAddressId(newUpdatedUser.Address, oldUser.AddressID)
+		} else {
+			addressId = "abcid"
+		}
 
 		if isAddressUpdated != true {
 			responseDto := ResponseDTO{
@@ -273,7 +282,7 @@ func (h UserHandler) HandleUpdateUserByID() gin.HandlerFunc {
 			newUpdatedUser.Email, 
 			newUpdatedUser.Password, 
 			role,
-			oldUser.AddressID,
+			addressId,
 			newUpdatedUser.Fax,
 		)
 		
