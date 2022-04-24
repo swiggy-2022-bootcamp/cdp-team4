@@ -1,65 +1,54 @@
 package app
 
-import (
-	"context"
-	"fmt"
-	"os"
-	"testing"
+// func TestGrpcAddressClient(t *testing.T) {
+// 	// Set up connection with the grpc server
 
-	"github.com/stretchr/testify/assert"
-	pb "github.com/swiggy-2022-bootcamp/cdp-team4/shipping/app/protobuf"
-	"google.golang.org/grpc"
-)
+// 	conn, err := grpc.Dial("localhost:"+os.Getenv("GRPC_SHIPPING_PORT"), grpc.WithInsecure())
+// 	if err != nil {
+// 		fmt.Printf("Error while making connection, %v\n", err)
+// 	}
 
-func TestGrpcAddressClient(t *testing.T) {
-	// Set up connection with the grpc server
+// 	// Create a client instance
+// 	c := pb.NewShippingClient(conn)
 
-	conn, err := grpc.Dial("localhost:"+os.Getenv("GRPC_SHIPPING_PORT"), grpc.WithInsecure())
-	if err != nil {
-		fmt.Printf("Error while making connection, %v\n", err)
-	}
+// 	// Lets invoke the remote function from client on the server
+// 	resp, err := c.GetShippingAddress(
+// 		context.Background(),
+// 		&pb.ShippingAddressRequest{
+// 			ShippingAddressID: "73e1285b-58d0-40ff-bf38-beda77712b5d",
+// 		},
+// 	)
+// 	assert.Nil(t, err)
+// 	assert.Equal(t, resp.Firstname, "Naveen")
+// 	assert.Equal(t, resp.City, "Banglore")
 
-	// Create a client instance
-	c := pb.NewShippingClient(conn)
+// 	resp2, err := c.DeleteShippingAddress(context.Background(),
+// 		&pb.ShippingAddressRequest{
+// 			ShippingAddressID: "8c87aaa5-81b0-43a7-88e8-31b2026ea3b3",
+// 		},
+// 	)
+// 	assert.Nil(t, err)
+// 	assert.Equal(t, resp2.Confirm, true)
+// }
 
-	// Lets invoke the remote function from client on the server
-	resp, err := c.GetShippingAddress(
-		context.Background(),
-		&pb.ShippingAddressRequest{
-			ShippingAddressID: "73e1285b-58d0-40ff-bf38-beda77712b5d",
-		},
-	)
-	assert.Nil(t, err)
-	assert.Equal(t, resp.Firstname, "Naveen")
-	assert.Equal(t, resp.City, "Banglore")
+// func TestGrpcCostClient(t *testing.T) {
+// 	// Set up connection with the grpc server
 
-	resp2, err := c.DeleteShippingAddress(context.Background(),
-		&pb.ShippingAddressRequest{
-			ShippingAddressID: "8c87aaa5-81b0-43a7-88e8-31b2026ea3b3",
-		},
-	)
-	assert.Nil(t, err)
-	assert.Equal(t, resp2.Confirm, true)
-}
+// 	conn, err := grpc.Dial("localhost:7776", grpc.WithInsecure())
+// 	if err != nil {
+// 		fmt.Printf("Error while making connection, %v\n", err)
+// 	}
 
-func TestGrpcCostClient(t *testing.T) {
-	// Set up connection with the grpc server
-
-	conn, err := grpc.Dial("localhost:7776", grpc.WithInsecure())
-	if err != nil {
-		fmt.Printf("Error while making connection, %v\n", err)
-	}
-
-	// Create a client instance
-	c := pb.NewShippingClient(conn)
-	// Lets invoke the remote function from client on the server
-	resp, err := c.GetShippingCost(
-		context.Background(),
-		&pb.ShippingCostRequest{
-			City: "Chennai",
-		},
-	)
-	assert.Nil(t, err)
-	assert.Equal(t, resp.City, "Chennai")
-	assert.Equal(t, int(resp.Cost), 199)
-}
+// 	// Create a client instance
+// 	c := pb.NewShippingClient(conn)
+// 	// Lets invoke the remote function from client on the server
+// 	resp, err := c.GetShippingCost(
+// 		context.Background(),
+// 		&pb.ShippingCostRequest{
+// 			City: "Chennai",
+// 		},
+// 	)
+// 	assert.Nil(t, err)
+// 	assert.Equal(t, resp.City, "Chennai")
+// 	assert.Equal(t, int(resp.Cost), 199)
+// }

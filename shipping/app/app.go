@@ -3,7 +3,6 @@ package app
 import (
 	"fmt"
 	"net"
-	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -32,28 +31,28 @@ func SetupRouter(shippingHandler ShippingHandler) *gin.Engine {
 	return router
 }
 
-func configureSwaggerDoc() {
+func ConfigureSwaggerDoc() {
 	docs.SwaggerInfo.Title = "Swagger Order API"
 }
 
-func Start() {
+func Start(testMode bool) {
 	dynamoRepository := infra.NewDynamoShippingAddressRepository()
 	dynamoRepository1 := infra.NewShippingCostDynamoRepository()
 	shippingAddressSerivce := domain.NewShippingAddressService(dynamoRepository)
 	shippingCostSerivce := domain.NewShippingCostService(dynamoRepository1)
 	shippingHandler = NewShippingHandler(shippingAddressSerivce, shippingCostSerivce)
-	log.WithFields(logrus.Fields{"message": "message", "status": http.StatusBadRequest}).Error("Error Check")
-	go startGrpcCostServer(shippingHandler)
-	err := godotenv.Load(".env")
-	if err != nil {
-		fmt.Print(err)
-		return
-	}
-	PORT := os.Getenv("SHIPPING_SERVICE_PORT")
+	ConfigureSwaggerDoc()
 	router := SetupRouter(shippingHandler)
-	configureSwaggerDoc()
-
-	router.Run(":" + PORT)
+	if !testMode {
+		go startGrpcCostServer(shippingHandler)
+		err := godotenv.Load(".env")
+		if err != nil {
+			fmt.Print(err)
+			return
+		}
+		PORT := os.Getenv("SHIPPING_SERVICE_PORT")
+		router.Run(":" + PORT)
+	}
 }
 
 func startGrpcCostServer(sh ShippingHandler) {

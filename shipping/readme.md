@@ -1,5 +1,3 @@
-# cdp-team4
-2022-Capability Dev Program - Team4
+# Order Service
 
-# Shipping Service
-Created Health check route
+PORT=8012

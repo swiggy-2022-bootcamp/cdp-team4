@@ -1,4 +1,4 @@
-POST http://localhost:7775/shippingaddress
+POST http://localhost:8012/shippingaddress
 Content-Type: application/json
 
 {
@@ -14,10 +14,10 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:7775/shippingaddress/e661bee1-a682-4f8e-a37f-d44f0f4b897d
+GET http://localhost:8012/shippingaddress/9b718e72-ca0a-410c-a817-97b1bbef416d
 ###
 
-PUT http://localhost:7775/shippingaddress/e661bee1-a682-4f8e-a37f-d44f0f4b897d
+PUT http://localhost:8012/shippingaddress/9b718e72-ca0a-410c-a817-97b1bbef416d
 
 {
  "firstname": "Vineet",
@@ -31,12 +31,12 @@ PUT http://localhost:7775/shippingaddress/e661bee1-a682-4f8e-a37f-d44f0f4b897d
 
 ###
 
-DELETE http://localhost:7775/shippingaddress/2ae72080-59f8-43b9-b514-af0ea970c242
+DELETE http://localhost:8012/shippingaddress/2ae72080-59f8-43b9-b514-af0ea970c242
 
 
 ###
 
-POST http://localhost:7775/shippingcost
+POST http://localhost:8012/shippingcost
 Content-Type: application/json
 
 {
@@ -45,10 +45,10 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:7775/shippingcost/Mumbai
+GET http://localhost:8012/shippingcost/Mumbai
 
 ###
-PUT http://localhost:7775/shippingcost
+PUT http://localhost:8012/shippingcost
 Content-Type: application/json
 
 {
@@ -57,4 +57,4 @@ Content-Type: application/json
 }
 
 ###
-DELETE  http://localhost:7775/shippingcost/Mumbai
+DELETE  http://localhost:8012/shippingcost/Mumbai
