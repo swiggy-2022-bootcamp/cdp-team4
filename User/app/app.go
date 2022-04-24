@@ -2,7 +2,11 @@ package app
 
 import (
 	"os"
-	// "fmt"
+	"fmt"
+	"net"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -16,6 +20,7 @@ import (
 
 	"github.com/swiggy-2022-bootcamp/cdp-team4/user/infra"	
 	"github.com/swiggy-2022-bootcamp/cdp-team4/user/domain"		
+	pb "github.com/swiggy-2022-bootcamp/cdp-team4/user/app/protobuf"
 )
 
 var log logrus.Logger = *logger.GetLogger()
@@ -40,7 +45,7 @@ func configureSwaggerDoc() {
 	docs.SwaggerInfo.Title = "Swagger User API"
 }
 
-func Start() {
+func StartHttpServer() {
 	err1 := godotenv.Load(".env")
 	if err1 != nil {
 		logrus.Fatal(err1)
@@ -59,4 +64,43 @@ func Start() {
 	router := SetupRouter(userHandler)
 
 	router.Run(":" + PORT)
+}
+
+func setupServer() *grpc.Server {
+	gs := grpc.NewServer()
+	cs := NewUserGrpcServer()
+
+	pb.RegisterUserServer(gs, cs)
+	log.Debug("gRPC server registered!")
+
+	reflection.Register(gs)
+	return gs
+}
+
+// Function to start the gRPC server after getting the client
+// object from setupServer function and reading the port number
+// from .env file
+func StartGrpcServer() {
+	fmt.Println("grpc starting...")
+	err := godotenv.Load(".env")
+	// sometime it happens that .env is not present in project directory
+	// as it is not pushed on github
+	if err != nil {
+		log.Fatal(err)
+		fmt.Printf("error %v", err)
+		return
+	}
+	PORT := os.Getenv("GRPC_PORT")
+
+	fmt.Println("port: ",PORT)
+
+	gServer := setupServer()
+	l, err := net.Listen("tcp", ":"+PORT)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	fmt.Println("here::::")
+	gServer.Serve(l)
 }

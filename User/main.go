@@ -1,6 +1,9 @@
 package main
 
-import "github.com/swiggy-2022-bootcamp/cdp-team4/user/app"
+import (
+	"github.com/swiggy-2022-bootcamp/cdp-team4/user/app"
+	"time"
+)
 
 // @title User API
 // @version 1.0
@@ -16,5 +19,8 @@ import "github.com/swiggy-2022-bootcamp/cdp-team4/user/app"
 
 // @BasePath /
 func main() {
-	app.Start()
+	go app.StartHttpServer()
+	app.StartGrpcServer()
+	time.Sleep(5*time.Second)
+
 }

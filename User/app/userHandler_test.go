@@ -162,7 +162,7 @@ func TestHandleGetUserByID(t *testing.T) {
 					GetUserById("xyx" /* id */).
 					Return(&domain.User{}, nil)
 			},
-			expected: 202,
+			expected: 200,
 		},
 		{
 			name: "FailGetUserByID",
@@ -213,7 +213,7 @@ func TestHandleGetAllUsers(t *testing.T) {
 					GetAllUsers().
 					Return([]domain.User{}, nil)
 			},
-			expected: 202,
+			expected: 200,
 		},
 		{
 			name: "FailGetAllUsers",
