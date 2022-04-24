@@ -365,6 +365,13 @@ func TestHandleUpdateDeleteOrderByID(t *testing.T) {
 			},
 			expected: 202,
 		},
+		{
+			name: "FailurehandleDeleteOrderByID",
+			createStub: func(mps mocks.MockOrderService) {
+				mps.EXPECT().DeleteOrderById("xyx" /* Id */).Return(false, &errs.AppError{Message: "errstring"})
+			},
+			expected: 400,
+		},
 	}
 
 	for _, testcase := range testcases {
@@ -388,4 +395,29 @@ func TestHandleUpdateDeleteOrderByID(t *testing.T) {
 		})
 	}
 
+}
+
+func TestShouldReturnNewOrderHandler(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+	mockService := mocks.NewMockOrderService(mockCtrl)
+	orderHandler := app.NewOrderHandler(mockService, nil)
+	assert.NotNil(t, orderHandler)
+}
+
+func TestConvertProductsDTOtoMaps(t *testing.T) {
+	testproductdto := []app.ProductRecordDTO{
+		{
+			Product:  "Pen",
+			Cost:     10,
+			Quantity: 4,
+		}, {
+			Product:  "Pen",
+			Cost:     12,
+			Quantity: 5,
+		},
+	}
+	res, res1 := app.ConvertProductsDTOtoMaps(testproductdto)
+	assert.NotNil(t, res)
+	assert.NotNil(t, res1)
 }

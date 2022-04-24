@@ -8,17 +8,10 @@ import (
 	"time"
 
 	"github.com/swiggy-2022-bootcamp/cdp-team4/order/infra"
-	"github.com/swiggy-2022-bootcamp/cdp-team4/order/infra/logger"
 
 	kafka "github.com/segmentio/kafka-go"
 	"github.com/sirupsen/logrus"
 )
-
-var brokers1 = []string{
-	"localhost:9091",
-}
-
-var log logrus.Logger = *logger.GetLogger()
 
 type OrderOverviewKafkaModel struct {
 	OrderID      string         `json:"order_id"`
@@ -48,7 +41,7 @@ func WriteMsgToKafka(topic string, msg interface{}) (bool, error) {
 		return false, err
 	}
 
-	writer := getProducer(ctx, topic, brokers1)
+	writer := getProducer(ctx, topic, KafkaBrokers)
 	defer writer.Close()
 
 	err = writer.WriteMessages(ctx, kafka.Message{

@@ -1,9 +1,9 @@
-GET http://localhost:7774/order/user/482b7e39-da41-461d-8676-cee6bf3654f7
+GET http://localhost:8007/order/user/482b7e39-da41-461d-8676-cee6bf3654f7
 
 
 ###
 
-POST http://localhost:7774/order
+POST http://localhost:8007/order
 content-type: application/json
 
 {
@@ -26,29 +26,29 @@ content-type: application/json
 
 ###
 
-GET http://localhost:7774/order/9ab4afd6-359f-4df7-b45b-d2139f8d9bf2
+GET http://localhost:8007/order/fc2e08ca-1e6f-4e10-bedb-8c5e4ff3a98d
 
 
 ###
 
-GET http://localhost:7774/orders/
+GET http://localhost:8007/orders/
 
 
 ###
-GET http://localhost:7774/order/status/confirmed
+GET http://localhost:8007/order/status/confirmed
 
 ####
-PUT http://localhost:7774/order/status
+PUT http://localhost:8007/order/status
 Content-Type: application/json
 
 {
-    "id":"b441c1f2-4395-472b-bcdf-5855f1e95cf6",
+    "id":"b072ad81-2d45-43e0-b4a9-5a376aba9e08",
     "status":"pending"
 }
 
 ####
-DELETE http://localhost:7774/order/79d97b2c-6dd7-4a75-893a-f958e2f82a91
+DELETE http://localhost:8007/order/b072ad81-2d45-43e0-b4a9-5a376aba9e08
 
 ####
-POST http://localhost:7774/confirm/1576570
+POST http://localhost:8007/confirm/1576570
 

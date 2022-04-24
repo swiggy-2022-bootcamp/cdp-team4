@@ -19,5 +19,5 @@ import (
 // @BasePath /
 // @schemes http
 func main() {
-	app.Start()
+	app.Start(false /*testMode*/)
 }

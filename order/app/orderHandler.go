@@ -469,6 +469,8 @@ func (oh OrderHandler) HandleGetOrderInvoice() gin.HandlerFunc {
 
 }
 
+// Function that converts Product DTO to products quantity and products cost map which
+// are directly stored in dynamodb
 func ConvertProductsDTOtoMaps(products []ProductRecordDTO) (map[string]int, map[string]int) {
 	var product_quantity map[string]int = make(map[string]int)
 	var product_cost map[string]int = make(map[string]int)
@@ -479,6 +481,8 @@ func ConvertProductsDTOtoMaps(products []ProductRecordDTO) (map[string]int, map[
 	return product_quantity, product_cost
 }
 
+// Function that converts Order Model to Order DTO which is
+// returned as a response to the caller
 func convertOrderModeltoOrderDTO(order domain.Order) OrderRecordDTO {
 	var prodcts []ProductRecordDTO
 	for k, v := range order.ProductsQuantity {

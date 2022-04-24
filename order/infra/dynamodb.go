@@ -15,8 +15,8 @@ import (
 	"github.com/swiggy-2022-bootcamp/cdp-team4/order/utils/errs"
 )
 
-var OrderTableName string = "order"
-var OrderOverviewTableName string = "order-overview"
+var OrderTableName string = "Order"
+var OrderOverviewTableName string = "OrderOverview"
 
 type OrderDynamoRepository struct {
 	Session   *dynamodb.DynamoDB

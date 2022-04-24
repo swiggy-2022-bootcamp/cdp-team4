@@ -18,6 +18,8 @@ import (
 
 var log logrus.Logger = *logger.GetLogger()
 
+// Function used to get the new http gin engine object
+// after registering all the routers
 func SetupRouter(orderHandler OrderHandler) *gin.Engine {
 	router := gin.Default()
 	// health check route
@@ -27,27 +29,36 @@ func SetupRouter(orderHandler OrderHandler) *gin.Engine {
 	return router
 }
 
-func configureSwaggerDoc() {
+func ConfigureSwaggerDoc() {
 	docs.SwaggerInfo.Title = "Swagger Order API"
 }
 
-func Start() {
+// Function to start the http server after getting the client
+// object from setupServer function and reading the port number
+// from .env file
+//
+// it also intiliases the all repositories, services and handlers present
+// in the this micro-service.
+func Start(testMode bool) {
 	dynamoRepository := infra.NewDynamoRepository()
 	dynamoRepositoryOrderOverview := infra.NewDynomoOrderOverviewRepository()
 	orderHandler := NewOrderHandler(domain.NewOrderService(dynamoRepository), domain.NewOrderOverviewService(dynamoRepositoryOrderOverview))
 	startKafkaConsumer(dynamoRepository, dynamoRepositoryOrderOverview)
 	// grpcserver for testing
 	//go testGrpcServer()
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal(err, "start")
-		return
-	}
-	PORT := os.Getenv("ORDER_SERVICE_PORT")
+	ConfigureSwaggerDoc()
 	router := SetupRouter(orderHandler)
-	configureSwaggerDoc()
 
-	router.Run(":" + PORT)
+	if !testMode {
+		err := godotenv.Load(".env")
+		if err != nil {
+			log.Fatal(err, "start")
+			return
+		}
+		PORT := os.Getenv("ORDER_SERVICE_PORT")
+		startKafkaConsumer(dynamoRepository, dynamoRepositoryOrderOverview)
+		router.Run(":" + PORT)
+	}
 }
 
 func startKafkaConsumer(repo infra.OrderDynamoRepository, repo1 infra.OrderDynamoRepository) {
