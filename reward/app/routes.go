@@ -11,6 +11,6 @@ func HealthCheckRouter(gin *gin.Engine) {
 
 func rewardRouter(gin *gin.Engine,rewardHandler RewardHandler) {
 	productApiGroup := gin.Group("/reward")
-	productApiGroup.GET("/:userid", rewardHandler.HandleGetRewardRecordByUserID())
+	productApiGroup.GET("/:userId", rewardHandler.HandleGetRewardRecordByUserID())
 	productApiGroup.PUT("/:userId", rewardHandler.HandleUpdateRewardByUserId())
 }

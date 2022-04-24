@@ -13,8 +13,8 @@ type RewardHandler struct {
 }
 
 type RewardRecordDTO struct {
-	UserID   string `json:"user_id"`
-	RewardPoints int `json:"reward_points"`
+	UserID       string `json:"user_id"`
+	RewardPoints int    `json:"reward_points"`
 }
 
 // Get Reward by userID
@@ -37,9 +37,9 @@ func (rh RewardHandler) HandleGetRewardRecordByUserID() gin.HandlerFunc {
 		res, err := rh.RewardService.GetRewardByUserId(id)
 
 		if err != nil {
-			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+			log.WithFields(logrus.Fields{"message": err.Message, "status": http.StatusBadRequest}).
 				Error("Record not found")
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Record not found"})
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Record not found: "+err.Message})
 			return
 		}
 		rewarddto := convertRewardModeltoRewardDTO(*res)
@@ -70,9 +70,9 @@ func (oh RewardHandler) HandleUpdateRewardByUserId() gin.HandlerFunc {
 
 		ok, err := oh.RewardService.UpdateRewardByUserId(requestDTO.UserID, requestDTO.RewardPoints)
 		if !ok {
-			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
+			log.WithFields(logrus.Fields{"message": err.Message, "status": http.StatusBadRequest}).
 				Error(err.Error())
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Message})
 			return
 		}
 		ctx.JSON(http.StatusAccepted, gin.H{"message": "reward record updated"})
@@ -81,7 +81,7 @@ func (oh RewardHandler) HandleUpdateRewardByUserId() gin.HandlerFunc {
 
 func convertRewardModeltoRewardDTO(reward domain.Reward) RewardRecordDTO {
 	return RewardRecordDTO{
-		UserID:    reward.UserID,
+		UserID:       reward.UserID,
 		RewardPoints: reward.RewardPoints,
 	}
 }
