@@ -7,6 +7,7 @@ import (
 	"github.com/swiggy-2022-bootcamp/cdp-team4/gateway/utils/errs"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -21,8 +22,10 @@ type ValidationDTO struct {
 }
 
 func ValidateToken(authorizationHeader string) (*AuthModel, *errs.AppError) {
-	authServiceUri := "http://localhost:8881/api/v1/validate"
-	req, err := http.NewRequest("GET", authServiceUri, nil)
+	authServiceUri := os.Getenv("AUTH_SERVICE_URI")
+	validateTokenApi := "/api/v1/validate"
+
+	req, err := http.NewRequest("GET", authServiceUri+validateTokenApi, nil)
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
