@@ -6,7 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/checkout/infra"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/checkout/infra/logger"
-	"github.com/swiggy-2022-bootcamp/cdp-team4/checkout/protos"
+	protos "github.com/swiggy-2022-bootcamp/cdp-team4/checkout/protos/protoImpl"
 )
 
 var log logrus.Logger = *logger.GetLogger()

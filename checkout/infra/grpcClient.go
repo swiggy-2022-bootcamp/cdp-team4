@@ -3,7 +3,7 @@ package infra
 import (
 	"fmt"
 
-	"github.com/swiggy-2022-bootcamp/cdp-team4/checkout/protos"
+	protos "github.com/swiggy-2022-bootcamp/cdp-team4/checkout/protos/protoImpl"
 	"google.golang.org/grpc"
 )
 

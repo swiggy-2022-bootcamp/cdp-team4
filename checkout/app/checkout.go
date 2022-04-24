@@ -5,7 +5,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/checkout/domain"
-	"github.com/swiggy-2022-bootcamp/cdp-team4/checkout/protos"
+	protos "github.com/swiggy-2022-bootcamp/cdp-team4/checkout/protos/protoImpl"
 )
 
 // Checkout is the client API for Checkout service.
