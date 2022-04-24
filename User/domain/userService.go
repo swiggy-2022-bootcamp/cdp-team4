@@ -119,6 +119,7 @@ func validateFeilds(firstName, lastName, username, phone, email, password, fax s
         switch {
         case unicode.IsNumber(c):
             number = true
+			letters++
         case unicode.IsUpper(c):
             upper = true
             letters++
@@ -131,7 +132,7 @@ func validateFeilds(firstName, lastName, username, phone, email, password, fax s
         }
     }
     sevenOrMore := letters >= 7
-    
+
 	if (number!=true) || (upper!=true) || (special!=true) || (sevenOrMore!=true){
 		isValid = false
 		message += "Invalid Password, should have the following: number, uppercase letter, special character and seven or more characters"

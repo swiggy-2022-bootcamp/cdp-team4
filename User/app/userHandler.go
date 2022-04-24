@@ -42,6 +42,8 @@ type GrpcHelper interface {
 	GetShippingAddressId(ShippingAddressDTO) (string)
 }
 
+var SHIPPING_GRPC_URI string = "localhost:7012"
+
 // @Summary Create User
 // @Description To register a new user for the app.
 // @Tags User
@@ -81,9 +83,7 @@ func (h UserHandler) HandleUserCreation() gin.HandlerFunc {
 			return
 		}
 
- 
 		shippingAddressId := GetShippingAddressId(newUser.Address)
-
 
 		user, err1 := h.UserService.CreateUserInDynamodb(
 			newUser.FirstName, 
@@ -97,6 +97,8 @@ func (h UserHandler) HandleUserCreation() gin.HandlerFunc {
 			// "abcid",
 			newUser.Fax,
 		)
+
+		fmt.Printf("here1: %v", user)
 		
 		if err1 != nil {
 			responseDto := ResponseDTO{
@@ -109,12 +111,11 @@ func (h UserHandler) HandleUserCreation() gin.HandlerFunc {
 			ctx.Abort()
 			return			
 		} else {
-			data, _ := user.MarshalJSON()
 			responseDto := ResponseDTO{
 				Status: http.StatusOK,
-				Data:   data,
+				Data:   user,
 			}
-			log.WithFields(logrus.Fields{"data": data, "status": http.StatusCreated}).
+			log.WithFields(logrus.Fields{"data": user, "status": http.StatusCreated}).
 				Info("User Added")
 			ctx.JSON(responseDto.Status, responseDto)
 		}
@@ -339,7 +340,7 @@ func (h UserHandler) HandleDeleteUserByID() gin.HandlerFunc {
 func GetShippingAddressId(address ShippingAddressDTO) (string){
 	// Set up connection with the grpc server
 
-	conn, err := grpc.Dial("localhost:7776", grpc.WithInsecure())
+	conn, err := grpc.Dial(SHIPPING_GRPC_URI, grpc.WithInsecure())
 	if err != nil {
 		fmt.Printf("Error while making connection, %v\n", err)
 	}
@@ -374,7 +375,7 @@ func GetShippingAddressId(address ShippingAddressDTO) (string){
 func UpdateShippingAddressId(address ShippingAddressDTO, id string) (bool){
 	// Set up connection with the grpc server
 
-	conn, err := grpc.Dial("localhost:7776", grpc.WithInsecure())
+	conn, err := grpc.Dial(SHIPPING_GRPC_URI, grpc.WithInsecure())
 	if err != nil {
 		fmt.Printf("Error while making connection, %v\n", err)
 	}
