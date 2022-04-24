@@ -20,6 +20,13 @@ func init() {
 }
 
 func RegisterUserRoutes() {
-	handler := userHandler{}
-	v1.GET("/users", handler.ValidateAuthToken())
+	userHandler := userHandler{}
+	users := v1.Group("/user")
+
+	v1.GET("/users", ValidateAuthToken(), userHandler.GetAllUsers)
+
+	users.POST("/", userHandler.CreateUser)
+	users.GET("/", ValidateAuthToken(), userHandler.GetUser)
+	users.PATCH("/", ValidateAuthToken(), userHandler.UpdateUser)
+	users.DELETE("/", ValidateAuthToken(), userHandler.DeleteUser)
 }
