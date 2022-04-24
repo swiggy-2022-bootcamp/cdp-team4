@@ -58,6 +58,7 @@ func StartHttpServer() {
 
 	userHandler := UserHandler{
 		UserService: domain.NewUserService(userDynamodbRepository),
+		TestMode: false,
 	}
 
 	configureSwaggerDoc()
@@ -92,8 +93,6 @@ func StartGrpcServer() {
 	}
 	PORT := os.Getenv("GRPC_PORT")
 
-	fmt.Println("port: ",PORT)
-
 	gServer := setupServer()
 	l, err := net.Listen("tcp", ":"+PORT)
 	if err != nil {
@@ -101,6 +100,5 @@ func StartGrpcServer() {
 		return
 	}
 
-	fmt.Println("here::::")
 	gServer.Serve(l)
 }
