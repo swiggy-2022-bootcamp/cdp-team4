@@ -24,7 +24,7 @@ func TestHandleShippingAddress(t *testing.T) {
 		City:      "Banglore",
 		Address1:  "address1",
 		Address2:  "address2",
-		CountryID: 56,
+		CountryID: 59,
 		PostCode:  454645,
 	}
 
@@ -43,7 +43,7 @@ func TestHandleShippingAddress(t *testing.T) {
 						gomock.Any(), gomock.Any(), requestData.CountryID, requestData.PostCode).
 					Return(response, nil)
 			},
-			expected: 202,
+			expected: 200,
 		},
 		{
 			name: "ErrorCreateShippingAddressRecord",
@@ -53,7 +53,7 @@ func TestHandleShippingAddress(t *testing.T) {
 						gomock.Any(), gomock.Any(), requestData.CountryID, requestData.PostCode).
 					Return("", &errs.AppError{Message: "Unable to insert record"})
 			},
-			expected: 400,
+			expected: 500,
 		},
 		{
 			name: "ErrorNothingReturnFromCreateShippingAddressRecord",
@@ -63,7 +63,7 @@ func TestHandleShippingAddress(t *testing.T) {
 						gomock.Any(), gomock.Any(), requestData.CountryID, requestData.PostCode).
 					Return("", &errs.AppError{Message: "Unable to insert record"})
 			},
-			expected: 400,
+			expected: 500,
 		},
 	}
 
@@ -120,14 +120,14 @@ func TestHandleGetShippingAddressRecordByID(t *testing.T) {
 			createStub: func(mps *mocks.MockShippingAddressService) {
 				mps.EXPECT().GetShippingAddressById("xyx" /* id */).Return(&domain.ShippingAddress{}, nil)
 			},
-			expected: 202,
+			expected: 200,
 		},
 		{
 			name: "FailGetShippingAddressRecordByID",
 			createStub: func(mps *mocks.MockShippingAddressService) {
 				mps.EXPECT().GetShippingAddressById("xyx" /* id */).Return(nil, &errs.AppError{Message: "errstring"})
 			},
-			expected: 400,
+			expected: 500,
 		},
 	}
 
@@ -183,14 +183,14 @@ func TestHandleUpdateShippingAddressStatus(t *testing.T) {
 				mps.EXPECT().UpdateShippingAddressById("xyz",
 					reqdomain).Return(true, nil)
 			},
-			expected: 202,
+			expected: 200,
 		},
 		{
 			name: "FailurehandleUpdateShippingAddressStatus",
 			createStub: func(mps mocks.MockShippingAddressService) {
 				mps.EXPECT().UpdateShippingAddressById("xyz", reqdomain).Return(false, &errs.AppError{Message: "error"})
 			},
-			expected: 400,
+			expected: 500,
 		},
 	}
 
@@ -217,7 +217,6 @@ func TestHandleUpdateShippingAddressStatus(t *testing.T) {
 		})
 	}
 
-	// FailBindJSON
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
@@ -245,7 +244,7 @@ func TestHandleUpdateDeleteShippingAddressByID(t *testing.T) {
 			createStub: func(mps mocks.MockShippingAddressService) {
 				mps.EXPECT().DeleteShippingAddressById("xyz" /* Id */).Return(true, nil)
 			},
-			expected: 202,
+			expected: 200,
 		},
 	}
 

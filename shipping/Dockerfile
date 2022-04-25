@@ -12,6 +12,7 @@ RUN go get ./...
 # build
 RUN go build -o /shippingService
 
-EXPOSE 7775
+EXPOSE 8012
+EXPOSE 7012
 
 CMD [ "/shippingService" ] 

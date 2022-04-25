@@ -14,10 +14,10 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:8012/shippingaddress/9b718e72-ca0a-410c-a817-97b1bbef416d
+GET http://localhost:8012/shippingaddress/3b3d2ca1-15fa-4888-96be-cfbee043d1af
 ###
 
-PUT http://localhost:8012/shippingaddress/9b718e72-ca0a-410c-a817-97b1bbef416d
+PUT http://localhost:8012/shippingaddress/3b3d2ca1-15fa-4888-96be-cfbee043d1af
 
 {
  "firstname": "Vineet",
@@ -31,7 +31,7 @@ PUT http://localhost:8012/shippingaddress/9b718e72-ca0a-410c-a817-97b1bbef416d
 
 ###
 
-DELETE http://localhost:8012/shippingaddress/2ae72080-59f8-43b9-b514-af0ea970c242
+DELETE http://localhost:8012/shippingaddress/3b3d2ca1-15fa-4888-96be-cfbee043d1af
 
 
 ###

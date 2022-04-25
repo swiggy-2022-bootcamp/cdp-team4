@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/shipping/domain"
 )
 
@@ -18,25 +19,45 @@ type ShippingCostRecordDTO struct {
 // @Tags         Shipping Cost
 // @Produce      json
 // @Param 		 shippingCost body ShippingCostRecordDTO true "Create Shipping Cost"
-// @Success      202  {string}  true
-// @Failure      400  {number} 	http.StatusBadRequest
+// @Success      200  {string}  true
+// @Failure      500  {number} 	http.StatusBadRequest
 // @Router       /shippingcost    [post]
 func (sh ShippingHandler) handleShippingCost() gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
 		var scDto ShippingCostRecordDTO
 		if err := ctx.BindJSON(&scDto); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: err.Error(),
+			}
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
+				Error("bind json")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
 
 		res, err := sh.ShippingCostService.CreateShippingCost(scDto.City, scDto.Cost)
 
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: err.Message,
+			}
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
+				Error("create Shipping Cost Record")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
-		ctx.JSON(http.StatusAccepted, gin.H{"message": res})
+		responseDto := ResponseDTO{
+			Status:  http.StatusOK,
+			Message: "Shipping Cost Record Created",
+		}
+		log.WithFields(logrus.Fields{"data": res, "status": http.StatusCreated}).
+			Info("Shipping Cost Record Created")
+		ctx.JSON(responseDto.Status, responseDto)
 	}
 }
 
@@ -46,8 +67,8 @@ func (sh ShippingHandler) handleShippingCost() gin.HandlerFunc {
 // @Tags         Shipping Cost
 // @Produce      json
 // @Param        city   path    int  true  "shipping cost city"
-// @Success      202  {object}  ShippingCostRecordDTO
-// @Failure      400  {number} 	http.StatusBadRequest
+// @Success      200  {object}  ShippingCostRecordDTO
+// @Failure      500  {number} 	http.StatusBadRequest
 // @Router       /shippingcost/:city    [get]
 func (sh ShippingHandler) HandleGetShippingCostByCity() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -55,10 +76,21 @@ func (sh ShippingHandler) HandleGetShippingCostByCity() gin.HandlerFunc {
 		res, err := sh.ShippingCostService.GetShippingCostByCity(city)
 
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Record not found"})
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: err.Message,
+			}
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
+				Error("Error Record Not Found")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
-		ctx.JSON(http.StatusAccepted, gin.H{"record": res})
+		responseDto := ResponseDTO{
+			Status: http.StatusOK,
+			Data:   res,
+		}
+		ctx.JSON(responseDto.Status, responseDto)
 	}
 }
 
@@ -68,14 +100,21 @@ func (sh ShippingHandler) HandleGetShippingCostByCity() gin.HandlerFunc {
 // @Tags         Shipping Cost
 // @Produce      json
 // @Param 		 shippingCost body ShippingCostRecordDTO true "Update Shipping Cost"
-// @Success      202  {string}  Shipping Cost record Updated
-// @Failure      400  {number} 	http.StatusBadRequest
+// @Success      200  {string}  Shipping Cost record Updated
+// @Failure      500  {number} 	http.StatusBadRequest
 // @Router       /shippingcost    [put]
 func (sh ShippingHandler) HandleUpdateShippingCostByCity() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var scDto ShippingCostRecordDTO
 		if err := ctx.BindJSON(&scDto); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: err.Error(),
+			}
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
+				Error("Error binding")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
 		newshipCost := domain.ShippingCost{
@@ -85,10 +124,21 @@ func (sh ShippingHandler) HandleUpdateShippingCostByCity() gin.HandlerFunc {
 
 		ok, err := sh.ShippingCostService.UpdateShippingCost(newshipCost)
 		if !ok {
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: err.Message,
+			}
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
+				Error("Error Updating Record")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
-		ctx.JSON(http.StatusAccepted, gin.H{"message": "Shipping Cost record Updated"})
+		responseDto := ResponseDTO{
+			Status:  http.StatusOK,
+			Message: "Record Updated",
+		}
+		ctx.JSON(responseDto.Status, responseDto)
 	}
 }
 
@@ -99,7 +149,7 @@ func (sh ShippingHandler) HandleUpdateShippingCostByCity() gin.HandlerFunc {
 // @Produce      json
 // @Param        city   path    int  true  "shipping cost city"
 // @Success      200  {object}  map[string]interface{}
-// @Failure      400  {number} 	http.StatusBadRequest
+// @Failure      500  {number} 	http.StatusBadRequest
 // @Router       /shippingcost    [delete]
 func (sh ShippingHandler) HandleDeleteShippingCostByCity() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -107,10 +157,21 @@ func (sh ShippingHandler) HandleDeleteShippingCostByCity() gin.HandlerFunc {
 		_, err := sh.ShippingCostService.DeleteShippingCostByCity(city)
 
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: err.Message,
+			}
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
+				Error("Error Deleting Record")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
 
-		ctx.JSON(http.StatusAccepted, gin.H{"message": "Deleted Succesfully"})
+		responseDto := ResponseDTO{
+			Status:  http.StatusOK,
+			Message: "Record Deleted",
+		}
+		ctx.JSON(responseDto.Status, responseDto)
 	}
 }

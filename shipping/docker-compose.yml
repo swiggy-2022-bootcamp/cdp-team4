@@ -1,0 +1,11 @@
+version: "3.9"
+services:
+  shipping:
+    build: .
+      container-name: shipping
+      restart: always
+    ports:
+      - "8012:8012"
+      - "7012:7012"
+    volumes:
+      - /home/ubuntu/.aws:/root/.aws:ro

@@ -20,7 +20,7 @@ func TestHandleShippingCost(t *testing.T) {
 
 	requestData := app.ShippingCostRecordDTO{
 		City: "Banglore",
-		Cost: 100,
+		Cost: 101,
 	}
 
 	testCases := []struct {
@@ -36,7 +36,7 @@ func TestHandleShippingCost(t *testing.T) {
 					CreateShippingCost(gomock.Any(), gomock.Any()).
 					Return(true, nil)
 			},
-			expected: 202,
+			expected: 200,
 		},
 		{
 			name: "ErrorCreateShippingCostRecord",
@@ -45,7 +45,7 @@ func TestHandleShippingCost(t *testing.T) {
 					CreateShippingCost(gomock.Any(), gomock.Any()).
 					Return(false, &errs.AppError{Message: "Unable to insert record"})
 			},
-			expected: 400,
+			expected: 500,
 		},
 		{
 			name: "ErrorNothingReturnFromCreateShippingCostRecord",
@@ -54,7 +54,7 @@ func TestHandleShippingCost(t *testing.T) {
 					CreateShippingCost(gomock.Any(), gomock.Any()).
 					Return(false, &errs.AppError{Message: "Unable to insert record"})
 			},
-			expected: 400,
+			expected: 500,
 		},
 	}
 
@@ -111,14 +111,14 @@ func TestHandleGetShippingCostRecordByID(t *testing.T) {
 			createStub: func(mps *mocks.MockShippingCostService) {
 				mps.EXPECT().GetShippingCostByCity("xyx" /* id */).Return(&domain.ShippingCost{}, nil)
 			},
-			expected: 202,
+			expected: 200,
 		},
 		{
 			name: "FailGetShippingCostRecordByID",
 			createStub: func(mps *mocks.MockShippingCostService) {
 				mps.EXPECT().GetShippingCostByCity("xyx" /* id */).Return(nil, &errs.AppError{Message: "errstring"})
 			},
-			expected: 400,
+			expected: 500,
 		},
 	}
 
@@ -159,14 +159,14 @@ func TestHandleUpdateShippingCostStatus(t *testing.T) {
 			createStub: func(mps mocks.MockShippingCostService) {
 				mps.EXPECT().UpdateShippingCost(requestData).Return(true, nil)
 			},
-			expected: 202,
+			expected: 200,
 		},
 		{
 			name: "FailurehandleUpdateShippingCostStatus",
 			createStub: func(mps mocks.MockShippingCostService) {
 				mps.EXPECT().UpdateShippingCost(requestData).Return(false, &errs.AppError{Message: "error"})
 			},
-			expected: 400,
+			expected: 500,
 		},
 	}
 
@@ -221,7 +221,7 @@ func TestHandleUpdateDeleteShippingCostByID(t *testing.T) {
 			createStub: func(mps mocks.MockShippingCostService) {
 				mps.EXPECT().DeleteShippingCostByCity("xyz" /* Id */).Return(true, nil)
 			},
-			expected: 202,
+			expected: 200,
 		},
 	}
 
