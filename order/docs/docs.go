@@ -63,7 +63,7 @@ const docTemplate = `{
                 "summary": "Confirm Order",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "user id",
                         "name": "userid",
                         "in": "path",
@@ -135,7 +135,7 @@ const docTemplate = `{
                 "summary": "Get Order by id",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "order id",
                         "name": "id",
                         "in": "path",
@@ -168,7 +168,7 @@ const docTemplate = `{
                 "summary": "Delete order",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "order id",
                         "name": "id",
                         "in": "path",
@@ -203,7 +203,7 @@ const docTemplate = `{
                 "summary": "Get Order Invoice given order id",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "order id",
                         "name": "orderid",
                         "in": "path",
@@ -275,7 +275,7 @@ const docTemplate = `{
                 "summary": "Get Order by status",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "status",
                         "name": "id",
                         "in": "path",
@@ -313,7 +313,7 @@ const docTemplate = `{
                 "summary": "Get Order by user id",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "user id",
                         "name": "user_id",
                         "in": "path",
@@ -351,7 +351,7 @@ const docTemplate = `{
                 "summary": "Get All Order records",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "order id",
                         "name": "id",
                         "in": "path",

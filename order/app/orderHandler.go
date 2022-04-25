@@ -121,7 +121,7 @@ func (oh OrderHandler) handleOrder() gin.HandlerFunc {
 // @Description  This Handle returns Order given order id
 // @Tags         Order
 // @Produce      json
-// @Param        id   path      int  true  "order id"
+// @Param        id   path      string  true  "order id"
 // @Success      200  {object}  OrderRecordDTO
 // @Failure      500  {number} 	http.StatusInternalServerError
 // @Router       /order/:id    [get]
@@ -155,7 +155,7 @@ func (oh OrderHandler) HandleGetOrderRecordByID() gin.HandlerFunc {
 // @Description  This Handle returns Order given user id
 // @Tags         Order
 // @Produce      json
-// @Param        user_id   path      int  true  "user id"
+// @Param        user_id   path  string  true  "user id"
 // @Success      200  {object}  []OrderRecordDTO
 // @Failure      500  {number} 	http.StatusInternalServerError
 // @Router       /order/user/:userid    [get]
@@ -196,7 +196,7 @@ func (oh OrderHandler) HandleGetOrderRecordsByUserID() gin.HandlerFunc {
 // @Description  This Handle returns Order given status
 // @Tags         Order
 // @Produce      json
-// @Param        id   path    int  true  "status"
+// @Param        id   path    string  true  "status"
 // @Success      200  {object}  []OrderRecordDTO
 // @Failure      500  {number} 	http.StatusInternalServerError
 // @Router       /order/status/:status    [get]
@@ -237,7 +237,7 @@ func (oh OrderHandler) HandleGetOrderRecordsByStatus() gin.HandlerFunc {
 // @Description  This Handle returns all of the orders
 // @Tags         Order
 // @Produce      json
-// @Param        id   path      int  true  "order id"
+// @Param        id   path      string  true  "order id"
 // @Success      200  {object}  []OrderRecordDTO
 // @Failure      500  {number} 	http.StatusInternalServerError
 // @Router       /orders    [get]
@@ -319,7 +319,7 @@ func (oh OrderHandler) handleUpdateOrderStatus() gin.HandlerFunc {
 // @Description  This Handle deletes order given order id
 // @Tags         Order
 // @Produce      json
-// @Param        id   path      int  true  "order id"
+// @Param        id   path      string  true  "order id"
 // @Success      200  {number}  http.StatusAccepted
 // @Failure      500  {number} 	http.StatusInternalServerError
 // @Router       /order/:id   [delete]
@@ -352,7 +352,7 @@ func (oh OrderHandler) HandleDeleteOrderById() gin.HandlerFunc {
 // @Description  This Handle adds order from checkout
 // @Tags         Order
 // @Produce      json
-// @Param        userid   path      int  true  "user id"
+// @Param        userid   path      string  true  "user id"
 // @Success      200  {object}  OrderConfirmResponseDTO
 // @Failure      500  {number} 	http.StatusInternalServerError
 // @Router       /confirm/:userid   [post]
@@ -474,7 +474,7 @@ func (oh OrderHandler) HandleAddOrderFromCheckout() gin.HandlerFunc {
 // @Description  This generated invoice given order id
 // @Tags         Order
 // @Produce      json
-// @Param        orderid   path      int  true  "order id"
+// @Param        orderid   path      string  true  "order id"
 // @Success      200  {object}  InvoiceDTO
 // @Failure      500  {number} 	http.StatusInternalServerError
 // @Router       /order/invoice/:orderid   [get]
