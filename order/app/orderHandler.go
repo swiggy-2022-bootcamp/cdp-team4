@@ -67,16 +67,21 @@ type RequestDTO struct {
 // @Produce      json
 // @Param 		 order body OrderRecordDTO true "Create order"
 // @Success      200  {number}  http.StatusAccepted
-// @Failure      400  {number} 	http.StatusBadRequest
+// @Failure      500  {number} 	http.StatusInternalServerError
 // @Router       /order    [post]
 func (oh OrderHandler) handleOrder() gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
 		var orderDto OrderRecordDTO
 		if err := ctx.BindJSON(&orderDto); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
-				Error("Error while creating order")
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: err.Error(),
+			}
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
+				Error("bind json")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
 
@@ -90,12 +95,24 @@ func (oh OrderHandler) handleOrder() gin.HandlerFunc {
 			int(orderDto.TotalCost),
 		)
 		if err != nil {
-			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
-				Error("Error while creating order")
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: err.Message,
+			}
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
+				Error("Error while creating order!")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
-		ctx.JSON(http.StatusAccepted, gin.H{"message": "Order Record Added", "order id": res})
+		responseDto := ResponseDTO{
+			Status:  http.StatusOK,
+			Data:    res,
+			Message: "Order ID",
+		}
+		log.WithFields(logrus.Fields{"data": res, "status": http.StatusCreated}).
+			Info("Order Added")
+		ctx.JSON(responseDto.Status, responseDto)
 	}
 }
 
@@ -106,27 +123,30 @@ func (oh OrderHandler) handleOrder() gin.HandlerFunc {
 // @Produce      json
 // @Param        id   path      int  true  "order id"
 // @Success      200  {object}  OrderRecordDTO
-// @Failure      400  {number} 	http.StatusBadRequest
+// @Failure      500  {number} 	http.StatusInternalServerError
 // @Router       /order/:id    [get]
 func (oh OrderHandler) HandleGetOrderRecordByID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("id")
-		if id == "" {
-			log.WithFields(logrus.Fields{"message": "Invalid ID", "status": http.StatusBadRequest}).
-				Error("Error while Getting order by order id")
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Invalid ID"})
-			return
-		}
 		res, err := oh.OrderService.GetOrderById(id)
 
 		if err != nil {
-			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
-				Error("Record not found")
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Record not found"})
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: err.Message,
+			}
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
+				Error("Record not found!")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
 		orderdto := convertOrderModeltoOrderDTO(*res)
-		ctx.JSON(http.StatusAccepted, gin.H{"record": orderdto})
+		responseDto := ResponseDTO{
+			Status: http.StatusOK,
+			Data:   orderdto,
+		}
+		ctx.JSON(responseDto.Status, responseDto)
 	}
 }
 
@@ -137,23 +157,22 @@ func (oh OrderHandler) HandleGetOrderRecordByID() gin.HandlerFunc {
 // @Produce      json
 // @Param        user_id   path      int  true  "user id"
 // @Success      200  {object}  []OrderRecordDTO
-// @Failure      400  {number} 	http.StatusBadRequest
+// @Failure      500  {number} 	http.StatusInternalServerError
 // @Router       /order/user/:userid    [get]
 func (oh OrderHandler) HandleGetOrderRecordsByUserID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("user_id")
-		if id == "" {
-			log.WithFields(logrus.Fields{"message": "Invalid ID", "status": http.StatusBadRequest}).
-				Error("Error while getting order by user id")
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Invalid ID"})
-			return
-		}
 		record, err := oh.OrderService.GetOrderByUserId(id)
 
 		if err != nil {
-			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
-				Error("Record not found")
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Record not found"})
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: err.Message,
+			}
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
+				Error("Record not found!")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
 
@@ -164,7 +183,11 @@ func (oh OrderHandler) HandleGetOrderRecordsByUserID() gin.HandlerFunc {
 			orderdto = append(orderdto, respdto)
 		}
 
-		ctx.JSON(http.StatusAccepted, gin.H{"record": orderdto})
+		responseDto := ResponseDTO{
+			Status: http.StatusOK,
+			Data:   orderdto,
+		}
+		ctx.JSON(responseDto.Status, responseDto)
 	}
 }
 
@@ -175,23 +198,22 @@ func (oh OrderHandler) HandleGetOrderRecordsByUserID() gin.HandlerFunc {
 // @Produce      json
 // @Param        id   path    int  true  "status"
 // @Success      200  {object}  []OrderRecordDTO
-// @Failure      400  {number} 	http.StatusBadRequest
+// @Failure      500  {number} 	http.StatusInternalServerError
 // @Router       /order/status/:status    [get]
 func (oh OrderHandler) HandleGetOrderRecordsByStatus() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		status := ctx.Param("status")
-		if status == "" {
-			log.WithFields(logrus.Fields{"message": "No Status param", "status": http.StatusBadRequest}).
-				Error("Record not found")
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": "No Status param"})
-			return
-		}
 		record, err := oh.OrderService.GetOrderByStatus(status)
 
 		if err != nil {
-			log.WithFields(logrus.Fields{"message": "Record not found", "status": http.StatusBadRequest}).
-				Error("Record not found")
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Record not found"})
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: err.Message,
+			}
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
+				Error("Record not found!")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
 
@@ -202,7 +224,11 @@ func (oh OrderHandler) HandleGetOrderRecordsByStatus() gin.HandlerFunc {
 			orderdto = append(orderdto, respdto)
 		}
 
-		ctx.JSON(http.StatusAccepted, gin.H{"record": orderdto})
+		responseDto := ResponseDTO{
+			Status: http.StatusOK,
+			Data:   orderdto,
+		}
+		ctx.JSON(responseDto.Status, responseDto)
 	}
 }
 
@@ -213,15 +239,20 @@ func (oh OrderHandler) HandleGetOrderRecordsByStatus() gin.HandlerFunc {
 // @Produce      json
 // @Param        id   path      int  true  "order id"
 // @Success      200  {object}  []OrderRecordDTO
-// @Failure      400  {number} 	http.StatusBadRequest
+// @Failure      500  {number} 	http.StatusInternalServerError
 // @Router       /orders    [get]
 func (oh OrderHandler) HandleGetAllRecords() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		record, err := oh.OrderService.GetAllOrders()
 		if err != nil {
-			log.WithFields(logrus.Fields{"message": "Record not found", "status": http.StatusBadRequest}).
-				Error("Record not found")
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Record not found"})
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: err.Message,
+			}
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
+				Error("Records not found!")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
 		orderdto := make([]OrderRecordDTO, 0)
@@ -231,7 +262,11 @@ func (oh OrderHandler) HandleGetAllRecords() gin.HandlerFunc {
 			orderdto = append(orderdto, respdto)
 		}
 
-		ctx.JSON(http.StatusAccepted, gin.H{"record": orderdto})
+		responseDto := ResponseDTO{
+			Status: http.StatusOK,
+			Data:   orderdto,
+		}
+		ctx.JSON(responseDto.Status, responseDto)
 	}
 }
 
@@ -242,26 +277,40 @@ func (oh OrderHandler) HandleGetAllRecords() gin.HandlerFunc {
 // @Produce      json
 // @Param 		 order body RequestDTO true "Update order"
 // @Success      200  {number}  http.StatusAccepted
-// @Failure      400  {number} 	http.StatusBadRequest
+// @Failure      500  {number} 	http.StatusInternalServerError
 // @Router       /order/status    [put]
 func (oh OrderHandler) handleUpdateOrderStatus() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var requestDTO RequestDTO
 		if err := ctx.BindJSON(&requestDTO); err != nil {
-			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
-				Error(err.Error())
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: err.Error(),
+			}
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
+				Error("Bind Json")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
 
 		ok, err := oh.OrderService.UpdateOrderStatus(requestDTO.Id, requestDTO.Status)
 		if !ok {
-			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
-				Error(err.Error())
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: err.Message,
+			}
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
+				Error("Unable to Update Order")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
-		ctx.JSON(http.StatusAccepted, gin.H{"message": "order record updated"})
+		responseDto := ResponseDTO{
+			Status:  http.StatusOK,
+			Message: "Order Status Updated",
+		}
+		ctx.JSON(responseDto.Status, responseDto)
 	}
 }
 
@@ -272,27 +321,29 @@ func (oh OrderHandler) handleUpdateOrderStatus() gin.HandlerFunc {
 // @Produce      json
 // @Param        id   path      int  true  "order id"
 // @Success      200  {number}  http.StatusAccepted
-// @Failure      400  {number} 	http.StatusBadRequest
+// @Failure      500  {number} 	http.StatusInternalServerError
 // @Router       /order/:id   [delete]
 func (oh OrderHandler) HandleDeleteOrderById() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("id")
-		if id == "" {
-			log.WithFields(logrus.Fields{"message": "Invalid ID", "status": http.StatusBadRequest}).
-				Error("Invalid ID")
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Invalid ID"})
-			return
-		}
 		_, err := oh.OrderService.DeleteOrderById(id)
 
 		if err != nil {
-			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadGateway}).
-				Error(err.Error())
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: err.Message,
+			}
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
+				Error("Error Deleting Order")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
-
-		ctx.JSON(http.StatusAccepted, gin.H{"message": "Deleted Succesfully"})
+		responseDto := ResponseDTO{
+			Status:  http.StatusOK,
+			Message: "Order Deleted Succesfully",
+		}
+		ctx.JSON(responseDto.Status, responseDto)
 	}
 }
 
@@ -303,29 +354,35 @@ func (oh OrderHandler) HandleDeleteOrderById() gin.HandlerFunc {
 // @Produce      json
 // @Param        userid   path      int  true  "user id"
 // @Success      200  {object}  OrderConfirmResponseDTO
-// @Failure      400  {number} 	http.StatusBadRequest
+// @Failure      500  {number} 	http.StatusInternalServerError
 // @Router       /confirm/:userid   [post]
 func (oh OrderHandler) HandleAddOrderFromCheckout() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("user_id")
-		if id == "" {
-			log.WithFields(logrus.Fields{"message": "Invalid ID", "status": http.StatusBadRequest}).
-				Error("Invalid ID")
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Invalid ID"})
-			return
-		}
 
 		err := godotenv.Load(".env")
 		if err != nil {
-			log.Fatal(err, "handler")
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: err.Error(),
+			}
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
+				Error("Internal env file failed to load")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
 		PORT := os.Getenv("CHECKOUT_SERVICE_PORT")
-		conn, err := grpc.Dial("localhost:"+PORT, grpc.WithInsecure())
+		conn, err := grpc.Dial("0.0.0.0:"+PORT, grpc.WithInsecure())
 		if err != nil {
-			log.WithFields(logrus.Fields{"message": "Error while making connection", "status": http.StatusBadGateway}).
-				Error("Error while making connection")
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error while making connection"})
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: err.Error(),
+			}
+			log.WithFields(logrus.Fields{"message": "Error while making connection", "status": http.StatusInternalServerError}).
+				Error("Error while making grpc connection")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
 
@@ -335,9 +392,14 @@ func (oh OrderHandler) HandleAddOrderFromCheckout() gin.HandlerFunc {
 			UserID: id,
 		})
 		if err != nil {
-			log.WithFields(logrus.Fields{"message": "Error while getting grpc response", "status": http.StatusBadGateway}).
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: err.Error(),
+			}
+			log.WithFields(logrus.Fields{"message": "Error while getting grpc response", "status": http.StatusInternalServerError}).
 				Error("Error while getting grpc response")
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error while getting grpc response"})
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
 		var newpdto []ProductRecordDTO
@@ -357,9 +419,14 @@ func (oh OrderHandler) HandleAddOrderFromCheckout() gin.HandlerFunc {
 			int(resp.TotalPrice),
 		)
 		if result != nil {
-			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadGateway}).
-				Error("Error while creating order")
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error while creating order"})
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: err.Error(),
+			}
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
+				Error("Error while creating order record")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
 
@@ -376,20 +443,29 @@ func (oh OrderHandler) HandleAddOrderFromCheckout() gin.HandlerFunc {
 
 		_, err1 := oh.OrderOverviewService.CreateOrderOverview(neworder)
 		if err1 != nil {
-			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadGateway}).
-				Error("Error while creating order")
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error while creating order"})
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: err.Error(),
+			}
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
+				Error("Error while creating order overview record")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
 
-		ctx.JSON(http.StatusAccepted, gin.H{"record": OrderConfirmResponseDTO{
-			UserID:                resp.UserID,
-			OrderID:               res,
-			Status:                "Pending",
-			TotalCost:             int16(resp.TotalPrice),
-			ShippingPrice:         int16(resp.ShippingPrice),
-			RewardspointsConsumed: int16(resp.RewardPointsConsumed),
-		}})
+		responseDto := ResponseDTO{
+			Status: http.StatusOK,
+			Data: OrderConfirmResponseDTO{
+				UserID:                resp.UserID,
+				OrderID:               res,
+				Status:                "Pending",
+				TotalCost:             int16(resp.TotalPrice),
+				ShippingPrice:         int16(resp.ShippingPrice),
+				RewardspointsConsumed: int16(resp.RewardPointsConsumed),
+			},
+		}
+		ctx.JSON(responseDto.Status, responseDto)
 	}
 }
 
@@ -400,38 +476,49 @@ func (oh OrderHandler) HandleAddOrderFromCheckout() gin.HandlerFunc {
 // @Produce      json
 // @Param        orderid   path      int  true  "order id"
 // @Success      200  {object}  InvoiceDTO
-// @Failure      400  {number} 	http.StatusBadRequest
+// @Failure      500  {number} 	http.StatusInternalServerError
 // @Router       /order/invoice/:orderid   [get]
 func (oh OrderHandler) HandleGetOrderInvoice() gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
 		id := ctx.Param("order_id")
-		if id == "" {
-			log.WithFields(logrus.Fields{"message": "Invalid ID", "status": http.StatusBadRequest}).
-				Error("Invalid ID")
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Invalid ID"})
-			return
-		}
 
 		order, err := oh.OrderService.GetOrderById(id)
 		if err != nil {
-			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadGateway}).
-				Error("Error while creating order")
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error while retriving order info"})
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: err.Message,
+			}
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
+				Error("Error while retriving order record for invoice")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
 
 		err1 := godotenv.Load(".env")
 		if err1 != nil {
-			log.Fatal(err, "handler")
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: err.Message,
+			}
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
+				Error("Error while retriving order record for invoice, .env file unable to load")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
 		PORT := os.Getenv("CHECKOUT_SERVICE_PORT")
 		conn, err2 := grpc.Dial("localhost:"+PORT, grpc.WithInsecure())
 		if err2 != nil {
-			log.WithFields(logrus.Fields{"message": "Error while making connection", "status": http.StatusBadGateway}).
-				Error("Error while making connection")
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error while making connection"})
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: err.Message,
+			}
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
+				Error("Error while making grpc connection to checkout")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
 
@@ -441,9 +528,14 @@ func (oh OrderHandler) HandleGetOrderInvoice() gin.HandlerFunc {
 			UserID: order.UserID,
 		})
 		if err3 != nil {
-			log.WithFields(logrus.Fields{"message": "Error while getting grpc response", "status": http.StatusBadGateway}).
-				Error("Error while getting grpc response")
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error while getting grpc response"})
+			responseDto := ResponseDTO{
+				Status:  http.StatusInternalServerError,
+				Message: err.Message,
+			}
+			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusInternalServerError}).
+				Error("Error while making grpc getting grpc response from checkout")
+			ctx.JSON(responseDto.Status, responseDto)
+			ctx.Abort()
 			return
 		}
 		var products []ProductRecordDTO
@@ -465,6 +557,20 @@ func (oh OrderHandler) HandleGetOrderInvoice() gin.HandlerFunc {
 				ShippingPrice:         int16(resp.ShippingPrice),
 			},
 		})
+
+		responseDto := ResponseDTO{
+			Status: http.StatusOK,
+			Data: InvoiceDTO{
+				Products:              products,
+				UserID:                order.UserID,
+				Status:                order.Status,
+				TotalCost:             int16(order.TotalCost),
+				RewardspointsConsumed: int16(resp.RewardPointsConsumed),
+				ShippingPrice:         int16(resp.ShippingPrice),
+			},
+			Message: "Invoice",
+		}
+		ctx.JSON(responseDto.Status, responseDto)
 	}
 
 }
@@ -496,6 +602,7 @@ func convertOrderModeltoOrderDTO(order domain.Order) OrderRecordDTO {
 		TotalCost: int16(order.TotalCost),
 	}
 }
+
 func NewOrderHandler(orderService domain.OrderService, orderOverviewService domain.OrderOverviewService) OrderHandler {
 	return OrderHandler{
 		OrderService:         orderService,

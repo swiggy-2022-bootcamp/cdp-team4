@@ -77,8 +77,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/app.OrderConfirmResponseDTO"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -114,8 +114,8 @@ const docTemplate = `{
                             "type": "number"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -149,8 +149,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/app.OrderRecordDTO"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -182,8 +182,8 @@ const docTemplate = `{
                             "type": "number"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -217,8 +217,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/app.InvoiceDTO"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -254,8 +254,8 @@ const docTemplate = `{
                             "type": "number"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -292,8 +292,8 @@ const docTemplate = `{
                             }
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -330,8 +330,8 @@ const docTemplate = `{
                             }
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -368,8 +368,8 @@ const docTemplate = `{
                             }
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }

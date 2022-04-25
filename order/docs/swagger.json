@@ -73,8 +73,8 @@
                             "$ref": "#/definitions/app.OrderConfirmResponseDTO"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -110,8 +110,8 @@
                             "type": "number"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -145,8 +145,8 @@
                             "$ref": "#/definitions/app.OrderRecordDTO"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -178,8 +178,8 @@
                             "type": "number"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -213,8 +213,8 @@
                             "$ref": "#/definitions/app.InvoiceDTO"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -250,8 +250,8 @@
                             "type": "number"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -288,8 +288,8 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -326,8 +326,8 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -364,8 +364,8 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }

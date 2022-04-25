@@ -110,8 +110,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/app.OrderConfirmResponseDTO'
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
           schema:
             type: number
       summary: Confirm Order
@@ -134,8 +134,8 @@ paths:
           description: OK
           schema:
             type: number
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
           schema:
             type: number
       summary: Create Order
@@ -157,8 +157,8 @@ paths:
           description: OK
           schema:
             type: number
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
           schema:
             type: number
       summary: Delete order
@@ -179,8 +179,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/app.OrderRecordDTO'
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
           schema:
             type: number
       summary: Get Order by id
@@ -202,8 +202,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/app.InvoiceDTO'
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
           schema:
             type: number
       summary: Get Order Invoice given order id
@@ -226,8 +226,8 @@ paths:
           description: OK
           schema:
             type: number
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
           schema:
             type: number
       summary: Update order status
@@ -251,8 +251,8 @@ paths:
             items:
               $ref: '#/definitions/app.OrderRecordDTO'
             type: array
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
           schema:
             type: number
       summary: Get Order by status
@@ -276,8 +276,8 @@ paths:
             items:
               $ref: '#/definitions/app.OrderRecordDTO'
             type: array
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
           schema:
             type: number
       summary: Get Order by user id
@@ -301,8 +301,8 @@ paths:
             items:
               $ref: '#/definitions/app.OrderRecordDTO'
             type: array
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
           schema:
             type: number
       summary: Get All Order records

@@ -48,7 +48,7 @@ func TestHandleOrder(t *testing.T) {
 					CreateOrder(gomock.Any(), requestData.Status, prod_qt, prod_ct, int(requestData.TotalCost)).
 					Return(response, nil)
 			},
-			expected: 202,
+			expected: 200,
 		},
 		{
 			name: "ErrorCreateOrderRecord",
@@ -57,7 +57,7 @@ func TestHandleOrder(t *testing.T) {
 					CreateOrder(gomock.Any(), requestData.Status, prod_qt, prod_ct, int(requestData.TotalCost)).
 					Return("", &errs.AppError{Message: "Unable to insert record"})
 			},
-			expected: 400,
+			expected: 500,
 		},
 		{
 			name: "ErrorNothingReturnFromCreateOrderRecord",
@@ -66,7 +66,7 @@ func TestHandleOrder(t *testing.T) {
 					CreateOrder(gomock.Any(), requestData.Status, prod_qt, prod_ct, int(requestData.TotalCost)).
 					Return("", &errs.AppError{Message: "Unable to insert record"})
 			},
-			expected: 400,
+			expected: 500,
 		},
 	}
 
@@ -123,14 +123,14 @@ func TestHandleGetOrderRecordByID(t *testing.T) {
 			createStub: func(mps *mocks.MockOrderService) {
 				mps.EXPECT().GetOrderById("xyx" /* id */).Return(&domain.Order{}, nil)
 			},
-			expected: 202,
+			expected: 200,
 		},
 		{
 			name: "FailGetOrderRecordByID",
 			createStub: func(mps *mocks.MockOrderService) {
 				mps.EXPECT().GetOrderById("xyx" /* id */).Return(nil, &errs.AppError{Message: "errstring"})
 			},
-			expected: 400,
+			expected: 500,
 		},
 	}
 
@@ -167,14 +167,14 @@ func TestHandleGetOrderRecordByUserID(t *testing.T) {
 			createStub: func(mps *mocks.MockOrderService) {
 				mps.EXPECT().GetOrderByUserId("xyx" /* id */).Return([]domain.Order{}, nil)
 			},
-			expected: 202,
+			expected: 200,
 		},
 		{
 			name: "FailGetOrderRecordByUserID",
 			createStub: func(mps *mocks.MockOrderService) {
 				mps.EXPECT().GetOrderByUserId("xyx" /* id */).Return(nil, &errs.AppError{Message: "errstring"})
 			},
-			expected: 400,
+			expected: 500,
 		},
 	}
 
@@ -211,14 +211,14 @@ func TestHandleGetOrderRecordByStatus(t *testing.T) {
 			createStub: func(mps *mocks.MockOrderService) {
 				mps.EXPECT().GetOrderByStatus("xyx" /* id */).Return([]domain.Order{}, nil)
 			},
-			expected: 202,
+			expected: 200,
 		},
 		{
 			name: "FailGetOrderRecordByUserID",
 			createStub: func(mps *mocks.MockOrderService) {
 				mps.EXPECT().GetOrderByStatus("xyx" /* id */).Return(nil, &errs.AppError{Message: "errstring"})
 			},
-			expected: 400,
+			expected: 500,
 		},
 	}
 
@@ -255,14 +255,14 @@ func TestHandleGetAllRecords(t *testing.T) {
 			createStub: func(mps *mocks.MockOrderService) {
 				mps.EXPECT().GetAllOrders().Return([]domain.Order{}, nil)
 			},
-			expected: 202,
+			expected: 200,
 		},
 		{
 			name: "FailGetOrderRecordByUserID",
 			createStub: func(mps *mocks.MockOrderService) {
 				mps.EXPECT().GetAllOrders().Return(nil, &errs.AppError{Message: "errstring"})
 			},
-			expected: 400,
+			expected: 500,
 		},
 	}
 
@@ -298,14 +298,14 @@ func TestHandleUpdateOrderStatus(t *testing.T) {
 			createStub: func(mps mocks.MockOrderService) {
 				mps.EXPECT().UpdateOrderStatus("xyx" /* Id */, "confirmed" /* Status */).Return(true, nil)
 			},
-			expected: 202,
+			expected: 200,
 		},
 		{
 			name: "FailurehandleUpdateOrderStatus",
 			createStub: func(mps mocks.MockOrderService) {
 				mps.EXPECT().UpdateOrderStatus("xyx" /* Id */, "confirmed" /* Status */).Return(false, &errs.AppError{Message: "error"})
 			},
-			expected: 400,
+			expected: 500,
 		},
 	}
 
@@ -352,7 +352,7 @@ func TestHandleUpdateOrderStatus(t *testing.T) {
 	assert.Equal(t, 400, recorder.Code)
 }
 
-func TestHandleUpdateDeleteOrderByID(t *testing.T) {
+func TestHandleDeleteOrderByID(t *testing.T) {
 	testcases := []struct {
 		name       string
 		createStub func(mocks.MockOrderService)
@@ -363,14 +363,14 @@ func TestHandleUpdateDeleteOrderByID(t *testing.T) {
 			createStub: func(mps mocks.MockOrderService) {
 				mps.EXPECT().DeleteOrderById("xyx" /* Id */).Return(true, nil)
 			},
-			expected: 202,
+			expected: 200,
 		},
 		{
 			name: "FailurehandleDeleteOrderByID",
 			createStub: func(mps mocks.MockOrderService) {
 				mps.EXPECT().DeleteOrderById("xyx" /* Id */).Return(false, &errs.AppError{Message: "errstring"})
 			},
-			expected: 400,
+			expected: 500,
 		},
 	}
 

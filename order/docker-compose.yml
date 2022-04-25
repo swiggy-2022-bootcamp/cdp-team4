@@ -1,10 +1,12 @@
 version: "3.9"
 services:
-  app:
-    build:
-      dockerfile: Dockerfile
-      context: .
+  order:
+    build: .
+      container-name: order
+      restart: always
     ports:
-      - "127.0.0.1:8007:8007"
+      - "8007:8007"
+      - "7011:7011"
+      - "9091:9091"
     volumes:
-      - c:/.aws:/root/.aws:ro
+      - /home/ubuntu/.aws:/root/.aws:ro

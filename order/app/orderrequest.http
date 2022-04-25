@@ -26,7 +26,7 @@ content-type: application/json
 
 ###
 
-GET http://localhost:8007/order/fc2e08ca-1e6f-4e10-bedb-8c5e4ff3a98d
+GET http://localhost:8007/order/81e5c913-cb74-4d62-a4da-412cc740a506
 
 
 ###
@@ -42,12 +42,12 @@ PUT http://localhost:8007/order/status
 Content-Type: application/json
 
 {
-    "id":"b072ad81-2d45-43e0-b4a9-5a376aba9e08",
+    "id":"81e5c913-cb74-4d62-a4da-412cc740a506",
     "status":"pending"
 }
 
 ####
-DELETE http://localhost:8007/order/b072ad81-2d45-43e0-b4a9-5a376aba9e08
+DELETE http://localhost:8007/order/81e5c913-cb74-4d62-a4da-412cc740a506
 
 ####
 POST http://localhost:8007/confirm/1576570
