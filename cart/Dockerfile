@@ -26,7 +26,7 @@ COPY --from=build /app/cart-app /cart-app
 
 COPY .env /cart-app
 
-EXPOSE 8005
+EXPOSE 8006
 
 ENTRYPOINT ["/cart-app"]
 

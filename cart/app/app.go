@@ -1,7 +1,9 @@
 package app
 
 import (
+	"fmt"
 	"log"
+	"net"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -10,6 +12,9 @@ import (
 	"github.com/swiggy-2022-bootcamp/cdp-team4/cart/docs"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/cart/domain"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/cart/infra"
+	pb "github.com/swiggy-2022-bootcamp/cdp-team4/cart/app/protos"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
@@ -26,6 +31,28 @@ func setupRouter(cartHandler CartHandler) *gin.Engine {
 	return router
 }
 
+func startGrpcCartServer(ch CartHandler) {
+	grpcServer := grpc.NewServer()
+	cartServer := NewCartGrpcServer()
+	pb.RegisterCartServer(grpcServer, cartServer)
+	fmt.Println("register server")
+	reflection.Register(grpcServer)
+	err := godotenv.Load(".env")
+	if err != nil {
+		// logrus.Error(err)
+		return
+	}
+	GRPC_REWARD_PORT := os.Getenv("GRPC_PORT")
+	fmt.Println(GRPC_REWARD_PORT)
+	l, err := net.Listen("tcp", ":"+GRPC_REWARD_PORT)
+	if err != nil {
+		fmt.Print(err)
+		os.Exit(1)
+	}
+	fmt.Print("grpc server started")
+	grpcServer.Serve(l)
+}
+
 func configureSwaggerDoc() {
 	docs.SwaggerInfo.Title = "Swagger Payment API"
 }
@@ -33,6 +60,8 @@ func configureSwaggerDoc() {
 func Start() {
 	dynamoRepository := infra.NewDynamoRepository()
 	cartHandler = CartHandler{CartService: domain.NewCartService(dynamoRepository)}
+
+	go startGrpcCartServer(cartHandler)
 
 	err := godotenv.Load(".env")
 	if err != nil {
@@ -44,7 +73,6 @@ func Start() {
 	configureSwaggerDoc()
 	router := setupRouter(cartHandler)
 
-	
 	if err := router.Run(":" + PORT); err != nil {
 		log.Fatal(err)
 	}
