@@ -93,3 +93,91 @@ func GetUserCity(
 
 	return response, nil
 }
+
+// function that gets city by grpc call to user service and then gets the
+// shipping cost value
+func GetShippingCostValue(ctx context.Context, UserID string) (*protos.ShippingCostResponse, error) {
+	// Get the User address city by ID 		[grpc call to User service]
+	userCity, err := GetUserCity(
+		ctx,
+		&protos.UserCityRequest{UserID: UserID},
+	)
+	if err != nil {
+		log.WithFields(logrus.Fields{"response": userCity, "error": err}).
+			Debug("user gRPC response")
+		return nil, err
+	}
+
+	// Get the Shipping details by ID 		[grpc call to Shipping service]
+	shippingCost, err := GetShippingCost(
+		ctx,
+		&protos.ShippingCostRequest{City: userCity.City},
+	)
+	if err != nil {
+		log.WithFields(logrus.Fields{"response": shippingCost, "error": err}).
+			Debug("shipping cost gRPC response")
+		return nil, err
+	}
+
+	return shippingCost, err
+}
+
+// function that returns the list of the items present in the cart along with
+// the total price of the cart
+func GetItemListAndCartPrice(
+	ctx context.Context,
+	UserID string,
+) ([]*protos.OverviewResponse_Item, int, error) {
+	// Get the User Cart details by ID 		[grpc call to Cart service]
+	cartDetails, err := GetCartDetails(
+		ctx,
+		&protos.GetCartByUserIDRequest{UserId: UserID},
+	)
+	if err != nil {
+		log.WithFields(logrus.Fields{"response": cartDetails, "error": err}).
+			Debug("shipping cost gRPC response")
+		return nil, 0, err
+	}
+
+	// make Item list from cart products and find total price
+	// by adding price of all the products
+	var ItemList []*protos.OverviewResponse_Item
+	var TotalItemPrice int
+	for _, ele := range cartDetails.Items {
+		ItemList = append(ItemList, &protos.OverviewResponse_Item{
+			Id:    ele.ProductId,
+			Name:  ele.ProductName,
+			Price: ele.Price,
+			Qty:   ele.Qty,
+		})
+		TotalItemPrice += int(ele.Price)
+	}
+
+	return ItemList, TotalItemPrice, nil
+}
+
+// function that calculates the total price by adding cart price and shipping cost
+// and subtracting the rewards points if user have
+// rewards are only applicable on 10% price of total order price that is sum of
+// shipping price and cart price.
+func GetTotalOrderPrice(cartPrice, shippingPrice, rewardPoints int) (int, int) {
+	totalOrderPrice := cartPrice + shippingPrice
+
+	// 1 amount of cash = 10 points
+	rewardPointsToCash := int(float32(rewardPoints) * 0.1)
+	tenPercentOfOrderPrice := int(float32(totalOrderPrice) * 0.1)
+
+	rewardConsumed := 0
+
+	// if user have more cash rewards  then order price then
+	if tenPercentOfOrderPrice <= rewardPointsToCash {
+		rewardPointsToCash -= tenPercentOfOrderPrice
+		rewardConsumed = tenPercentOfOrderPrice
+		tenPercentOfOrderPrice = 0
+	} else {
+		tenPercentOfOrderPrice -= rewardPointsToCash
+		rewardConsumed = rewardPointsToCash
+	}
+
+	return tenPercentOfOrderPrice + int(float32(rewardPoints)*0.1), rewardConsumed
+}
