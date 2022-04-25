@@ -1,11 +1,11 @@
 package infra_test
 
 import (
-	"fmt"
-	"testing"
+	// "fmt"
+	// "testing"
 
 	//"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
+	//"github.com/stretchr/testify/assert"
 	//"github.com/swiggy-2022-bootcamp/cdp-team4/cart/domain"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/cart/infra"
 )
@@ -29,15 +29,15 @@ var inserteduserid string
 // 	assert.Nil(t, err)
 // }
 
-func TestShouldGetAllCartDynamoDB2(t *testing.T) {
-	t.Logf("Inserted Id is %s Reading\n", insertedid)
-	res, err := testCartService.FindAllCarts()
-	fmt.Println(res)
-	t.Logf("Read %v", res)
-	assert.NotNil(t, res)
-	assert.Nil(t, err)
+// func TestShouldGetAllCartDynamoDB2(t *testing.T) {
+// 	t.Logf("Inserted Id is %s Reading\n", insertedid)
+// 	res, err := testCartService.FindAllCarts()
+// 	fmt.Println(res)
+// 	t.Logf("Read %v", res)
+// 	assert.NotNil(t, res)
+// 	assert.Nil(t, err)
 
-}
+// }
 
 // func TestShouldDeleteCartitemByUserIdDynamoDB(t *testing.T) {
 	
@@ -48,12 +48,12 @@ func TestShouldGetAllCartDynamoDB2(t *testing.T) {
 // 	assert.Nil(t, err)
 // }
 
-func TestShouldDeleteCartByUserIdDynamoDB(t *testing.T) {
-	res , err := testCartService.DeleteCartByUserId("P")
-	assert.NotNil(t, res)
-	assert.Equal(t,res,true)
-	assert.Nil(t, err)
-}
+// func TestShouldDeleteCartByUserIdDynamoDB(t *testing.T) {
+// 	res , err := testCartService.DeleteCartByUserId("P")
+// 	assert.NotNil(t, res)
+// 	assert.Equal(t,res,true)
+// 	assert.Nil(t, err)
+// }
 
 // func TestShouldUpdateCartByUserIdDynamoDB(t *testing.T) {
 	
@@ -69,15 +69,15 @@ func TestShouldDeleteCartByUserIdDynamoDB(t *testing.T) {
 // 	assert.Nil(t, err)
 // }
 
-func TestShouldGetAllCartDynamoDB(t *testing.T) {
-	t.Logf("Inserted Id is %s Reading\n", insertedid)
-	res, err := testCartService.FindAllCarts()
-	fmt.Println(res)
-	t.Logf("Read %v", res)
-	assert.NotNil(t, res)
-	assert.Nil(t, err)
+// func TestShouldGetAllCartDynamoDB(t *testing.T) {
+// 	t.Logf("Inserted Id is %s Reading\n", insertedid)
+// 	res, err := testCartService.FindAllCarts()
+// 	fmt.Println(res)
+// 	t.Logf("Read %v", res)
+// 	assert.NotNil(t, res)
+// 	assert.Nil(t, err)
 
-}
+// }
 
 // func TestShouldGetCartByCartIdDynamoDB(t *testing.T) {
 // 	products :=(map[string]domain.Item{})
