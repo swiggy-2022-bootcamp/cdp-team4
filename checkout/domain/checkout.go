@@ -72,3 +72,24 @@ func GetCartDetails(
 
 	return response, nil
 }
+
+// function that makes gprc call to user service and gets back the city
+//  for particular user on the basis of user id as given input
+func GetUserCity(
+	ctx context.Context,
+	request *protos.UserCityRequest,
+) (*protos.UserCityResponse, error) {
+	client, err := infra.GetUserGrpcClient()
+	if err != nil {
+		log.WithFields(logrus.Fields{"error": err}).Error("get cart details gRPC client")
+		return nil, err
+	}
+
+	response, err := client.GetUserCity(ctx, request)
+	if err != nil {
+		log.WithFields(logrus.Fields{"error": err}).Error("get cart details gRPC call")
+		return nil, err
+	}
+
+	return response, nil
+}

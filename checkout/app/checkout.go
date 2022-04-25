@@ -27,6 +27,17 @@ func (ch *Checkout) OrderOverview(
 	ctx context.Context,
 	rq *protos.OverviewRequest,
 ) (*protos.OverviewResponse, error) {
+	// Get the User address city by ID 		[grpc call to User service]
+	userCity, err := domain.GetUserCity(
+		ctx,
+		&protos.UserCityRequest{UserID: rq.GetUserID()},
+	)
+	if err != nil {
+		log.WithFields(logrus.Fields{"response": userCity, "error": err}).
+			Debug("user gRPC response")
+		return nil, err
+	}
+
 	// Get the User Cart details by ID 		[grpc call to Cart service]
 	cartDetails, err := domain.GetCartDetails(
 		ctx,
@@ -41,7 +52,7 @@ func (ch *Checkout) OrderOverview(
 	// Get the Shipping details by ID 		[grpc call to Shipping service]
 	shippingCost, err := domain.GetShippingCost(
 		ctx,
-		&protos.ShippingCostRequest{City: "chennai"},
+		&protos.ShippingCostRequest{City: userCity.City},
 	)
 	if err != nil {
 		log.WithFields(logrus.Fields{"response": shippingCost, "error": err}).
@@ -49,7 +60,7 @@ func (ch *Checkout) OrderOverview(
 		return nil, err
 	}
 
-	// Get the Reward points details by ID 	[grpc call to Reward service]
+	// Get the Reward points details by ID 	  [grpc call to Reward service]
 	rewardPoints, err := domain.GetRewardPoints(
 		ctx,
 		&protos.GetRewardPointsRequest{UserId: rq.GetUserID()},
