@@ -19,7 +19,7 @@ type RewardRecordDTO struct {
 
 // Get Reward by userID
 // @Summary      Get Reward by userId
-// @Description  This Handle returns Reward given userid
+// @Description  This Handle returns Reward given userId
 // @Tags         Reward
 // @Produce      json
 // @Success      200  {object}  map[string]interface{}
@@ -51,6 +51,8 @@ func (rh RewardHandler) HandleGetRewardRecordByUserID() gin.HandlerFunc {
 // @Summary      Update reward points for a userId
 // @Description  This Handle Update reward given user id
 // @Tags         Reward
+// @Schemes
+// @Accept json
 // @Produce      json
 // @Success      200  {object}  map[string]interface{}
 // @Failure      400  {number} 	http.StatusBadRequest

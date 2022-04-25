@@ -16,6 +16,7 @@ import (
 // @Router       /    [get]
 func HealthCheck() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		log.Info("Log working")
 		c.JSON(http.StatusOK, gin.H{"message": "Service is running"})
 	}
 }

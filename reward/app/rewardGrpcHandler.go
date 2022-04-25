@@ -20,6 +20,6 @@ func (server *GrpcServer) GetRewardPoints(ctx context.Context, req *pb.GetReward
 	}, nil
 }
 
-func NewProductGrpcServer() *GrpcServer {
+func NewRewardGrpcServer() *GrpcServer {
 	return &GrpcServer{}
 }

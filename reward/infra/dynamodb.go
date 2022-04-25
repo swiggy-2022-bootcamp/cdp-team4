@@ -10,7 +10,6 @@ import (
 	"github.com/swiggy-2022-bootcamp/cdp-team4/reward/utils/errs"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
@@ -50,24 +49,17 @@ func createTable(svc *dynamodb.DynamoDB) {
 		fmt.Println("Got error calling CreateTable:")
 		fmt.Println(tableErr.Error())
 	}
-	fmt.Println("Table Creatad")
 }
 
 func connect() *dynamodb.DynamoDB {
-	sess, err := session.NewSession(&aws.Config{
-		Region:      aws.String("us-east-1"),
-		Endpoint:    aws.String("http://localhost:8000"),
-		Credentials: credentials.NewStaticCredentials("AKID", "SECRET_KEY", "TOKEN"),
-	})
-
-	if err != nil {
-		panic(err.Error())
-	}
+	sess := session.Must(session.NewSessionWithOptions(session.Options{
+		SharedConfigState: session.SharedConfigEnable,
+	}))
 
 	// create dynamo client
 	svc := dynamodb.New(sess)
 
-	//createTable(svc)
+	createTable(svc)
 	
 	return svc
 }

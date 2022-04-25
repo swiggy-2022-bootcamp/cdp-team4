@@ -51,6 +51,61 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/reward/:userId": {
+            "get": {
+                "description": "This Handle returns Reward given userId",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reward"
+                ],
+                "summary": "Get Reward by userId",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "This Handle Update reward given user id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reward"
+                ],
+                "summary": "Update reward points for a userId",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                }
+            }
         }
     }
 }`
@@ -58,7 +113,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "2.0",
-	Host:             "localhost:8006",
+	Host:             "localhost:8010",
 	BasePath:         "/",
 	Schemes:          []string{"http"},
 	Title:            "Gin Swagger Example API",

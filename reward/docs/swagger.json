@@ -18,7 +18,7 @@
         },
         "version": "2.0"
     },
-    "host": "localhost:8006",
+    "host": "localhost:8010",
     "basePath": "/",
     "paths": {
         "/": {
@@ -31,6 +31,61 @@
                     "Health"
                 ],
                 "summary": "Health of Reward service",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                }
+            }
+        },
+        "/reward/:userId": {
+            "get": {
+                "description": "This Handle returns Reward given userId",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reward"
+                ],
+                "summary": "Get Reward by userId",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "This Handle Update reward given user id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reward"
+                ],
+                "summary": "Update reward points for a userId",
                 "responses": {
                     "200": {
                         "description": "OK",

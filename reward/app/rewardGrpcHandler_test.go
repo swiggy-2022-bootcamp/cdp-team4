@@ -10,10 +10,10 @@ import (
 	"google.golang.org/grpc"
 )
 
-func TestGrpcProductClient(t *testing.T) {
+func TestGrpcRewardClient(t *testing.T) {
 	// Set up connection with the grpc server
 
-	conn, err := grpc.Dial("localhost:8001", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:7010", grpc.WithInsecure())
 	if err != nil {
 		fmt.Printf("Error while making connection, %v\n", err)
 	}
@@ -25,9 +25,9 @@ func TestGrpcProductClient(t *testing.T) {
 	resp, err := client.GetRewardPoints(
 		context.Background(),
 		&pb.GetRewardPointsRequest{
-			UserId:"1",
+			UserId: "1",
 		},
 	)
 	assert.Nil(t, err)
-	assert.Equal(t, uint32(10),resp.RewardPoints)
+	assert.Equal(t, uint32(10), resp.RewardPoints)
 }

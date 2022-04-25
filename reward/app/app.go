@@ -38,9 +38,9 @@ func configureSwaggerDoc() {
 	docs.SwaggerInfo.Title = "Swagger Reward API"
 }
 
-func startGrpcProductServer(rh RewardHandler) {
+func startGrpcRewardServer(rh RewardHandler) {
 	grpcServer := grpc.NewServer()
-	rewardServer := NewProductGrpcServer()
+	rewardServer := NewRewardGrpcServer()
 	pb.RegisterRewardServer(grpcServer, rewardServer)
 	fmt.Println("register server")
 	reflection.Register(grpcServer)
@@ -69,7 +69,7 @@ func Start() {
 	dynamoRepository := infra.NewDynamoRepository()
 	rewardHandler = RewardHandler{RewardService: domain.NewRewardService(dynamoRepository)}
 
-	go startGrpcProductServer(rewardHandler)
+	go startGrpcRewardServer(rewardHandler)
 	startKafkaConsumer(dynamoRepository)
 	err := godotenv.Load(".env")
 	if err != nil {

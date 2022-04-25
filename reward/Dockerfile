@@ -26,6 +26,6 @@ COPY --from=build /app/reward-app /reward-app
 
 COPY .env /.env
 
-EXPOSE 8006
+EXPOSE 8010
 
 ENTRYPOINT ["/reward-app"]

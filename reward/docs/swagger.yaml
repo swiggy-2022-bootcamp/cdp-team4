@@ -1,5 +1,5 @@
 basePath: /
-host: localhost:8006
+host: localhost:8010
 info:
   contact:
     email: support@swagger.io
@@ -31,6 +31,43 @@ paths:
       summary: Health of Reward service
       tags:
       - Health
+  /reward/:userId:
+    get:
+      description: This Handle returns Reward given userId
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Get Reward by userId
+      tags:
+      - Reward
+    put:
+      consumes:
+      - application/json
+      description: This Handle Update reward given user id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Update reward points for a userId
+      tags:
+      - Reward
 schemes:
 - http
 swagger: "2.0"
