@@ -8,15 +8,20 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/cart/docs"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/cart/domain"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/cart/infra"
 
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
 )
 
-func setupRouter() *gin.Engine {
+var cartHandler CartHandler
+
+func setupRouter(cartHandler CartHandler) *gin.Engine {
 	router := gin.Default()
 	// health check route
 	HealthCheckRouter(router)
+	CartRouter(router, cartHandler)
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	return router
 }
@@ -26,6 +31,9 @@ func configureSwaggerDoc() {
 }
 
 func Start() {
+	dynamoRepository := infra.NewDynamoRepository()
+	cartHandler = CartHandler{CartService: domain.NewCartService(dynamoRepository)}
+
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal(err)
@@ -34,10 +42,10 @@ func Start() {
 	PORT := os.Getenv("PORT")
 
 	configureSwaggerDoc()
-	router := setupRouter()
+	router := setupRouter(cartHandler)
 
-	router.Run(":" + PORT)
-	// if err := r.Run(":3000"); err != nil {
-	// 	log.Fatal(err)
-	// }
+	
+	if err := router.Run(":" + PORT); err != nil {
+		log.Fatal(err)
+	}
 }

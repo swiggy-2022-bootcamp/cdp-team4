@@ -13,8 +13,9 @@ type CartHandler struct {
 }
 
 type ProductRecordDTO struct {
-	Product  string `json:"name"`
-	Cost     int16  `json:"cost"`
+	Id       string `json:"id"`
+	Name     string `json:"name"`
+	Cost     int    `json:"cost"`
 	Quantity int    `json:"quantity"`
 }
 
@@ -31,7 +32,7 @@ type CartRecordDTO struct {
 // @Success      200  {object}  map[string]interface{}
 // @Failure      400  {number} 	http.StatusBadRequest
 // @Router       /cart    [post]
-func (ch CartHandler) HandleCart() gin.HandlerFunc {
+func (ch CartHandler) HandleCreateCart() gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
 		var cartDto CartRecordDTO
@@ -40,11 +41,11 @@ func (ch CartHandler) HandleCart() gin.HandlerFunc {
 			return
 		}
 
-		product_quantity := convertProductsDTOtoMaps(cartDto.Products)
+		domainItemMap := convertProductsDTOtoMaps(cartDto.Products)
 
 		res, err := ch.CartService.CreateCart(
 			cartDto.UserID,
-			product_quantity,
+			domainItemMap,
 		)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
@@ -54,19 +55,67 @@ func (ch CartHandler) HandleCart() gin.HandlerFunc {
 	}
 }
 
-// Get Cart by ID
-// @Summary      Get Cart by id
-// @Description  This Handle returns Cart given cart id
+func (ch CartHandler) HandleUpdateCartItemByUserId() gin.HandlerFunc {
+
+	return func(ctx *gin.Context) {
+		id := ctx.Param("userId")
+		fmt.Println(id)
+		var cartDto CartRecordDTO
+		if err := ctx.BindJSON(&cartDto); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			return
+		}
+
+		domainItemMap := convertProductsDTOtoMaps(cartDto.Products)
+
+		res, err := ch.CartService.UpdateCartItemsByUserId(
+			cartDto.UserID,
+			domainItemMap,
+		)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			return
+		}
+		ctx.JSON(http.StatusAccepted, gin.H{"message": "Cart Record Update", "Success Status": res})
+	}
+}
+
+// // Get Cart by ID
+// // @Summary      Get Cart by id
+// // @Description  This Handle returns Cart given cart id
+// // @Tags         Cart
+// // @Produce      json
+// // @Success      200  {object}  map[string]interface{}
+// // @Failure      400  {number} 	http.StatusBadRequest
+// // @Router       /cart/:id    [get]
+// func (ch CartHandler) HandleGetCartRecordByID() gin.HandlerFunc {
+// 	return func(ctx *gin.Context) {
+// 		id := ctx.Param("id")
+// 		fmt.Println(id)
+// 		res, err := ch.CartService.GetCartById(id)
+//
+// 		if err != nil {
+// 			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Record not found"})
+// 			return
+// 		}
+// 		cartdto := convertCartModeltoCartDTO(*res)
+// 		ctx.JSON(http.StatusAccepted, gin.H{"record": cartdto})
+// 	}
+// }
+
+// Get Cart by UserId
+// @Summary      Get Cart by UserId
+// @Description  This Handle returns Cart given cart UserId
 // @Tags         Cart
 // @Produce      json
 // @Success      200  {object}  map[string]interface{}
 // @Failure      400  {number} 	http.StatusBadRequest
-// @Router       /cart/:id    [get]
-func (ch CartHandler) HandleGetCartRecordByID() gin.HandlerFunc {
+// @Router       /cart/:userId    [get]
+func (ch CartHandler) HandleGetCartRecordByUserID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		id := ctx.Param("id")
-		fmt.Println(id)
-		res, err := ch.CartService.GetCartById(id)
+		userId := ctx.Param("userId")
+		fmt.Println(userId)
+		res, err := ch.CartService.GetCartByUserId(userId)
 
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Record not found"})
@@ -103,19 +152,42 @@ func (ch CartHandler) HandleGetAllRecords() gin.HandlerFunc {
 	}
 }
 
-// Delete cart
-// @Summary      Delete cart
-// @Description  This Handle deletes cart given cart id
+// // Delete cart by cart ID
+// // @Summary      Delete cart
+// // @Description  This Handle deletes cart given cart id
+// // @Tags         Cart
+// // @Produce      json
+// // @Success      200  {object}  map[string]interface{}
+// // @Failure      400  {number} 	http.StatusBadRequest
+// // @Router       /cart/:id   [delete]
+// func (ch CartHandler) HandleDeleteCartById() gin.HandlerFunc {
+// 	return func(ctx *gin.Context) {
+// 		id := ctx.Param("id")
+// 		fmt.Println(id)
+// 		_, err := ch.CartService.DeleteCartById(id)
+
+// 		if err != nil {
+// 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+// 			return
+// 		}
+
+// 		ctx.JSON(http.StatusAccepted, gin.H{"message": "Deleted Succesfully"})
+// 	}
+// }
+
+// Delete cart By User Id
+// @Summary      Delete cart By User Id
+// @Description  This Handle deletes cart given User ID
 // @Tags         Cart
 // @Produce      json
 // @Success      200  {object}  map[string]interface{}
 // @Failure      400  {number} 	http.StatusBadRequest
-// @Router       /cart/:id   [delete]
-func (ch CartHandler) HandleDeleteCartById() gin.HandlerFunc {
+// @Router       /cart/:userId   [delete]
+func (ch CartHandler) HandleDeleteCartByUserId() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		id := ctx.Param("id")
+		id := ctx.Param("userId")
 		fmt.Println(id)
-		_, err := ch.CartService.DeleteCartById(id)
+		_, err := ch.CartService.DeleteCartByUserId(id)
 
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
@@ -126,18 +198,22 @@ func (ch CartHandler) HandleDeleteCartById() gin.HandlerFunc {
 	}
 }
 
-func convertProductsDTOtoMaps(products []ProductRecordDTO) map[string]int {
-	var product_quantity map[string]int = make(map[string]int)
+func convertProductsDTOtoMaps(products []ProductRecordDTO) map[string]domain.Item {
+	var domainItemMap map[string]domain.Item = make(map[string]domain.Item)
 	for _, product := range products {
-		product_quantity[product.Product] = product.Quantity
+		var singleItem domain.Item
+		singleItem.Cost=product.Cost
+		singleItem.Quantity=product.Quantity
+		singleItem.Name=product.Name	
+		domainItemMap[product.Id] = singleItem
 	}
-	return product_quantity
+	return domainItemMap
 }
 
 func convertCartModeltoCartDTO(cart domain.Cart) CartRecordDTO {
 	var products []ProductRecordDTO
-	for k, v := range cart.ProductsQuantity {
-		products = append(products, ProductRecordDTO{Product: k, Quantity: v})
+	for k, v := range cart.Items {
+		products = append(products, ProductRecordDTO{Id:k,Name:v.Name,Cost:v.Cost,Quantity:v.Quantity})
 	}
 	return CartRecordDTO{
 		UserID:   cart.UserID,
