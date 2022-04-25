@@ -7,7 +7,7 @@ message OverviewResponse {
     message Item {
         string name = 1;
         string id = 2;
-        string qty = 3;
+        int32 qty = 3;
         int32 price = 4;
     }
     repeated Item item = 2;
