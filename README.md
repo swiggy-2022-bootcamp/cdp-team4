@@ -1,7 +1,7 @@
 # User Service
 
-HTTP PORT = 8002
-GRPC PORT = 7002
+- HTTP PORT = 8002
+- GRPC PORT = 7002
 
 ![user service](https://user-images.githubusercontent.com/53436195/165159945-f9100c43-497e-465f-a34a-250f4ea43397.png)
 
