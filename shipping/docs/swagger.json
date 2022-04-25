@@ -60,7 +60,7 @@
                 "summary": "Get Shipping Address by id",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "shipping address id",
                         "name": "id",
                         "in": "path",
@@ -74,8 +74,8 @@
                             "$ref": "#/definitions/app.ShippingAddressRecordDTO"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -93,7 +93,7 @@
                 "summary": "Update Shipping Address",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "shipping address id",
                         "name": "id",
                         "in": "path",
@@ -116,8 +116,8 @@
                             "type": "number"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -135,7 +135,7 @@
                 "summary": "Delete Shipping Address",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "shipping address id",
                         "name": "id",
                         "in": "path",
@@ -149,8 +149,8 @@
                             "type": "number"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -186,8 +186,8 @@
                             "type": "string"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -217,14 +217,14 @@
                     }
                 ],
                 "responses": {
-                    "202": {
-                        "description": "Accepted",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "type": "string"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -252,14 +252,14 @@
                     }
                 ],
                 "responses": {
-                    "202": {
-                        "description": "Accepted",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "type": "string"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -277,7 +277,7 @@
                 "summary": "Delete Shipping Cost",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "shipping cost city",
                         "name": "city",
                         "in": "path",
@@ -292,8 +292,8 @@
                             "additionalProperties": true
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -313,7 +313,7 @@
                 "summary": "Get Shipping Cost given city",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "shipping cost city",
                         "name": "city",
                         "in": "path",
@@ -321,14 +321,14 @@
                     }
                 ],
                 "responses": {
-                    "202": {
-                        "description": "Accepted",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/app.ShippingCostRecordDTO"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }

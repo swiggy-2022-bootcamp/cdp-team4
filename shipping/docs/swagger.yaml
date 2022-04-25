@@ -64,7 +64,7 @@ paths:
         in: path
         name: id
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
@@ -72,8 +72,8 @@ paths:
           description: Accepted
           schema:
             type: number
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
           schema:
             type: number
       summary: Delete Shipping Address
@@ -86,7 +86,7 @@ paths:
         in: path
         name: id
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
@@ -94,8 +94,8 @@ paths:
           description: Accepted
           schema:
             $ref: '#/definitions/app.ShippingAddressRecordDTO'
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
           schema:
             type: number
       summary: Get Shipping Address by id
@@ -108,7 +108,7 @@ paths:
         in: path
         name: id
         required: true
-        type: integer
+        type: string
       - description: Update Shipping Address
         in: body
         name: shippingAddress
@@ -122,8 +122,8 @@ paths:
           description: Accepted
           schema:
             type: number
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
           schema:
             type: number
       summary: Update Shipping Address
@@ -146,8 +146,8 @@ paths:
           description: Accepted
           schema:
             type: string
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
           schema:
             type: number
       summary: Create Shipping Address
@@ -161,7 +161,7 @@ paths:
         in: path
         name: city
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
@@ -170,8 +170,8 @@ paths:
           schema:
             additionalProperties: true
             type: object
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
           schema:
             type: number
       summary: Delete Shipping Cost
@@ -189,12 +189,12 @@ paths:
       produces:
       - application/json
       responses:
-        "202":
-          description: Accepted
+        "200":
+          description: OK
           schema:
             type: string
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
           schema:
             type: number
       summary: Create Shipping Cost
@@ -212,12 +212,12 @@ paths:
       produces:
       - application/json
       responses:
-        "202":
-          description: Accepted
+        "200":
+          description: OK
           schema:
             type: string
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
           schema:
             type: number
       summary: Update Shipping Cost
@@ -231,16 +231,16 @@ paths:
         in: path
         name: city
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
-        "202":
-          description: Accepted
+        "200":
+          description: OK
           schema:
             $ref: '#/definitions/app.ShippingCostRecordDTO'
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
           schema:
             type: number
       summary: Get Shipping Cost given city

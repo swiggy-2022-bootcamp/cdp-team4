@@ -64,7 +64,7 @@ const docTemplate = `{
                 "summary": "Get Shipping Address by id",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "shipping address id",
                         "name": "id",
                         "in": "path",
@@ -78,8 +78,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/app.ShippingAddressRecordDTO"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -97,7 +97,7 @@ const docTemplate = `{
                 "summary": "Update Shipping Address",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "shipping address id",
                         "name": "id",
                         "in": "path",
@@ -120,8 +120,8 @@ const docTemplate = `{
                             "type": "number"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -139,7 +139,7 @@ const docTemplate = `{
                 "summary": "Delete Shipping Address",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "shipping address id",
                         "name": "id",
                         "in": "path",
@@ -153,8 +153,8 @@ const docTemplate = `{
                             "type": "number"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -190,8 +190,8 @@ const docTemplate = `{
                             "type": "string"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -221,14 +221,14 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "202": {
-                        "description": "Accepted",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "type": "string"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -256,14 +256,14 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "202": {
-                        "description": "Accepted",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "type": "string"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -281,7 +281,7 @@ const docTemplate = `{
                 "summary": "Delete Shipping Cost",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "shipping cost city",
                         "name": "city",
                         "in": "path",
@@ -296,8 +296,8 @@ const docTemplate = `{
                             "additionalProperties": true
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }
@@ -317,7 +317,7 @@ const docTemplate = `{
                 "summary": "Get Shipping Cost given city",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "shipping cost city",
                         "name": "city",
                         "in": "path",
@@ -325,14 +325,14 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "202": {
-                        "description": "Accepted",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/app.ShippingCostRecordDTO"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "number"
                         }

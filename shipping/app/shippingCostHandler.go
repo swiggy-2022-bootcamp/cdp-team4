@@ -66,7 +66,7 @@ func (sh ShippingHandler) handleShippingCost() gin.HandlerFunc {
 // @Description  This Handle returns Shipping Cost given city
 // @Tags         Shipping Cost
 // @Produce      json
-// @Param        city   path    int  true  "shipping cost city"
+// @Param        city   path    string  true  "shipping cost city"
 // @Success      200  {object}  ShippingCostRecordDTO
 // @Failure      500  {number} 	http.StatusBadRequest
 // @Router       /shippingcost/:city    [get]
@@ -147,7 +147,7 @@ func (sh ShippingHandler) HandleUpdateShippingCostByCity() gin.HandlerFunc {
 // @Description  This Handle deletes Shipping Cost of a city
 // @Tags         Shipping Cost
 // @Produce      json
-// @Param        city   path    int  true  "shipping cost city"
+// @Param        city   path    string  true  "shipping cost city"
 // @Success      200  {object}  map[string]interface{}
 // @Failure      500  {number} 	http.StatusBadRequest
 // @Router       /shippingcost    [delete]

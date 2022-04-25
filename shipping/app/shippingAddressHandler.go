@@ -74,8 +74,7 @@ func (sh ShippingHandler) handleShippingAddress() gin.HandlerFunc {
 			Data:    res,
 			Message: "Shipping Address ID",
 		}
-		log.WithFields(logrus.Fields{"data": res, "status": http.StatusCreated}).
-			Info("Shipping Address Added")
+		log.WithFields(logrus.Fields{"data": res, "status": http.StatusCreated}).Info("Shipping Address Added")
 		ctx.JSON(responseDto.Status, responseDto)
 	}
 }
@@ -85,7 +84,7 @@ func (sh ShippingHandler) handleShippingAddress() gin.HandlerFunc {
 // @Description  This Handle returns shippingAddress given id
 // @Tags         Shipping Address
 // @Produce      json
-// @Param        id   path      int  true  "shipping address id"
+// @Param        id   path      string  true  "shipping address id"
 // @Success      202  {object}  ShippingAddressRecordDTO
 // @Failure      500  {number} 	http.StatusBadRequest
 // @Router       /shippingaddress/:id    [get]
@@ -119,7 +118,7 @@ func (sh ShippingHandler) HandleGetShippingAddrssByID() gin.HandlerFunc {
 // @Description  This Handle Update shippingAddress given id
 // @Tags         Shipping Address
 // @Produce      json
-// @Param        id   path      int  true  "shipping address id"
+// @Param        id   path      string  true  "shipping address id"
 // @Param 		 shippingAddress body ShippingAddressRecordDTO true "Update Shipping Address"
 // @Success      202  {number}  http.StatusAccepted
 // @Failure      500  {number} 	http.StatusBadRequest
@@ -166,7 +165,7 @@ func (sh ShippingHandler) HandleUpdateShippingAddressByID() gin.HandlerFunc {
 // @Description  This Handle deletes Delete Shipping Address given sid
 // @Tags         Shipping Address
 // @Produce      json
-// @Param        id   path      int  true  "shipping address id"
+// @Param        id   path      string  true  "shipping address id"
 // @Success      202  {number}  http.StatusAccepted
 // @Failure      500  {number} 	http.StatusBadRequest
 // @Router       /shippingaddress/:id   [delete]
