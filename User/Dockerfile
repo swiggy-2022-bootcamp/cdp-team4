@@ -10,8 +10,9 @@ COPY . /go/github.com/swiggy-2022-bootcamp/cdp-team4/User
 RUN go get ./... 
 
 # build
-RUN go build -o /UserService
+RUN go build -o /userService
 
-EXPOSE 8001
+EXPOSE 8002
+EXPOSE 7002
 
-CMD [ "/UserService" ]
+CMD [ "/userService" ]
