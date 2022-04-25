@@ -8,6 +8,5 @@ services:
       ports:
        - "8007:8007"
        - "7011:7011"
-       - "9091:9091"
       volumes:
        - /home/ubuntu/.aws:/root/.aws:ro                                               
