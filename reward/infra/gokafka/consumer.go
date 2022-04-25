@@ -10,7 +10,7 @@ import (
 )
 
 var brokers = []string{
-	"localhost:9092",
+	"localhost:9090",
 }
 
 func getKafkaReader(ctx context.Context, topic, groupID string, brokers []string) *kafka.Reader {
