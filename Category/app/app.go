@@ -16,14 +16,13 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
 )
 
-var categoryHandler CategoryHandler
 var log logrus.Logger = *logger.GetLogger()
 
-func setupRouter() *gin.Engine {
+func SetupRouter(categoryHandler CategoryHandler) *gin.Engine {
 	router := gin.Default()
 	// health check route
 	HealthCheckRouter(router)
-	CategoryRouter(router)
+	CategoryRouter(router, categoryHandler)
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	return router
 }
@@ -34,7 +33,8 @@ func ConfigureSwaggerDoc() {
 
 func Start() {
 	dynamoRepository := infra.NewDynamoRepository()
-	categoryHandler = CategoryHandler{CategoryService: domain.NewCategoryService(dynamoRepository)}
+	categoryService := domain.NewCategoryService(dynamoRepository)
+	categoryHandler := NewCategoryHandler(categoryService)
 
 	err := godotenv.Load(".env")
 	if err != nil {
@@ -45,7 +45,7 @@ func Start() {
 	ConfigureSwaggerDoc()
 
 	PORT := os.Getenv("PORT")
-	router := setupRouter()
+	router := SetupRouter(categoryHandler)
 	router.Run(":" + PORT)
 	log.WithFields(logrus.Fields{"PORT": PORT}).Info("Running on PORT")
 }

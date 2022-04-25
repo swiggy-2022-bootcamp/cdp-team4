@@ -1,4 +1,4 @@
-package app
+package app_test
 
 import (
 	"net/http"
@@ -6,6 +6,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/Category/app"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/Category/domain"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/Category/infra"
 )
 
 func TestHeathCheck(t *testing.T) {
@@ -13,7 +16,11 @@ func TestHeathCheck(t *testing.T) {
 }
 
 func TestPingRoute(t *testing.T) {
-	router := setupRouter()
+	dynamoRepository := infra.NewDynamoRepository()
+	categoryService := domain.NewCategoryService(dynamoRepository)
+	categoryHandler := app.NewCategoryHandler(categoryService)
+
+	router := app.SetupRouter(categoryHandler)
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/", nil)

@@ -12,6 +12,6 @@ RUN go get ./...
 # build
 RUN go build -o /CategoryService
 
-EXPOSE 8081
+EXPOSE 8005
 
 CMD [ "/CategoryService" ]

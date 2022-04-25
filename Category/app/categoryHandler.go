@@ -173,3 +173,9 @@ func (categoryHandler CategoryHandler) HandleDeleteCategories() gin.HandlerFunc 
 		log.WithFields(logrus.Fields{"status": http.StatusAccepted}).Info("categories deleted successfully")
 	}
 }
+
+func NewCategoryHandler(categoryService domain.CategoryService) CategoryHandler {
+	return CategoryHandler{
+		CategoryService: categoryService,
+	}
+}
