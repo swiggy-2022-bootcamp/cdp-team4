@@ -9,16 +9,12 @@ import (
 func TestToReturnNewCart(t *testing.T) {
 
 	userid := "12345678"
-	prodquant := map[string]int{
-		"Alchemist":  1,
-		"Sapiens": 2,
-	}
-	prodcost := map[string]int{
-		"Alchemist": 399,
-		"Sapiens": 500,
-	}
-	newCart := NewCart(userid, prodquant,prodcost)
+	products := (map[string]Item{})
+	products["1"] = Item{Name: "pen", Cost: 10, Quantity: 1}
+	products["2"] = Item{Name: "pencil", Cost: 5, Quantity: 2}
+	newCart := NewCart(userid, products)
 
 	assert.Equal(t, userid, newCart.UserID)
-	assert.Equal(t, prodquant, newCart.ProductsQuantity)
+	assert.Equal(t, products, newCart.Items)
+	assert.Equal(t, products["1"], newCart.Items["1"])
 }

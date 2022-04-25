@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"github.com/aws/aws-sdk-go/service/dynamodb/expression"
 
 	// "github.com/aws/aws-sdk-go/service/dynamodb/expression"
 	"github.com/google/uuid"
@@ -80,13 +81,13 @@ func (crt CartDynamoRepository) InsertCart(p domain.Cart) (string, *errs.AppErro
 		errstring := fmt.Sprintf("unable to marshal - %s", err.Error())
 		return "", &errs.AppError{Message: errstring}
 	}
-
+    
 	input := &dynamodb.PutItemInput{
 		Item:      av,
 		TableName: aws.String("Cart"),
 	}
 
-	_, err = crt.Session.PutItemWithContext(ctx, input)
+	_ , err = crt.Session.PutItemWithContext(ctx, input)
 
 	if err != nil {
 		errstring := fmt.Sprintf("unable to put item - %s", err.Error())
@@ -94,6 +95,85 @@ func (crt CartDynamoRepository) InsertCart(p domain.Cart) (string, *errs.AppErro
 	}
 
 	return cartRecord.Id, nil
+}
+
+func (crt CartDynamoRepository) UpdateCartByUserId(userId string,productList map[string]domain.Item) (bool, *errs.AppError) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	//find the current record
+	currentCart, err := crt.FindCartByUserId(userId)
+	if err!=nil{
+		newDomainRecord := domain.NewCart(userId,productList)
+		_,err=crt.InsertCart(*newDomainRecord)
+		if err != nil {
+			return false,&errs.AppError{Message: "Unable to update"}
+		}
+		return true,nil
+	}
+
+	for key,value :=range productList{
+		currentCart.Items[key]=value
+	}
+
+	cartRecord := toPersistedDynamodbEntity(*currentCart)
+	cartRecord.Id = currentCart.Id
+	av, errMarshal := dynamodbattribute.MarshalMap(cartRecord)
+	if errMarshal != nil {
+		errstring := fmt.Sprintf("unable to marshal - %s", errMarshal.Error())
+		return false, &errs.AppError{Message: errstring}
+	}
+    
+	input := &dynamodb.PutItemInput{
+		Item:      av,
+		TableName: aws.String("Cart"),
+	}
+
+	_ , putErr := crt.Session.PutItemWithContext(ctx, input)
+
+	if putErr != nil {
+		errstring := fmt.Sprintf("unable to put item - %s", putErr.Error())
+		return false, &errs.AppError{Message: errstring}
+	}
+
+	return true, nil
+}
+
+func (crt CartDynamoRepository) DeleteCartItemByUserId(userId string,productIds[]string) (bool, *errs.AppError) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	//find the current record
+	currentCart, err := crt.FindCartByUserId(userId)
+	if err!=nil{
+		return false,&errs.AppError{Message: "Cart for UserID Doesnt exist"}
+	}
+
+	for _,key :=range productIds{
+		if _, ok := currentCart.Items[key]; ok {
+			delete(currentCart.Items, key)
+		}
+	}
+
+	cartRecord := toPersistedDynamodbEntity(*currentCart)
+	cartRecord.Id = currentCart.Id
+	av, errMarshal := dynamodbattribute.MarshalMap(cartRecord)
+	if errMarshal != nil {
+		errstring := fmt.Sprintf("unable to marshal - %s", errMarshal.Error())
+		return false, &errs.AppError{Message: errstring}
+	}
+    
+	input := &dynamodb.PutItemInput{
+		Item:      av,
+		TableName: aws.String("Cart"),
+	}
+
+	_ , putErr := crt.Session.PutItemWithContext(ctx, input)
+
+	if putErr != nil {
+		errstring := fmt.Sprintf("unable to put item - %s", putErr.Error())
+		return false, &errs.AppError{Message: errstring}
+	}
+
+	return true, nil
 }
 
 func (crt CartDynamoRepository) FindAllCarts() ([]domain.Cart, *errs.AppError) {
@@ -124,7 +204,7 @@ func (crt CartDynamoRepository) FindAllCarts() ([]domain.Cart, *errs.AppError) {
 	return cartRecords, nil
 }
 
-func (odr CartDynamoRepository) FindCartById(cartID string) (*domain.Cart, *errs.AppError) {
+func (crt CartDynamoRepository) FindCartById(cartId string) (*domain.Cart, *errs.AppError) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -132,12 +212,12 @@ func (odr CartDynamoRepository) FindCartById(cartID string) (*domain.Cart, *errs
 		TableName: aws.String("Cart"),
 		Key: map[string]*dynamodb.AttributeValue{
 			"id": {
-				S: aws.String(cartID),
+				S: aws.String(cartId),
 			},
 		},
 	}
 
-	result, err := odr.Session.GetItemWithContext(ctx, input)
+	result, err := crt.Session.GetItemWithContext(ctx, input)
 	if err != nil {
 		return nil, &errs.AppError{Message: "Failed to read"}
 	}
@@ -148,22 +228,74 @@ func (odr CartDynamoRepository) FindCartById(cartID string) (*domain.Cart, *errs
 
 	cartModel := CartModel{}
 	err = dynamodbattribute.UnmarshalMap(result.Item, &cartModel)
-
 	if err != nil {
 		errstring := fmt.Sprintf("unmarshal map - %s", err.Error())
 		return nil, &errs.AppError{Message: errstring}
 	}
-	ordModel := toModelfromDynamodbEntity(cartModel)
-	return ordModel, nil
+	crtModel := toModelfromDynamodbEntity(cartModel)
+	return crtModel, nil
 }
 
-func (crt CartDynamoRepository) DeleteCartById(id string) (bool, *errs.AppError) {
+func (crt CartDynamoRepository) FindCartByUserId(userId string) (*domain.Cart, *errs.AppError) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	filt := expression.Name("user_id").Equal(expression.Value(userId))
+
+	expr, err := expression.NewBuilder().WithFilter(filt).Build()
+
+	if err != nil {
+		errstring := fmt.Sprintf("expression new builder - %s", err.Error())
+		return nil, &errs.AppError{Message: errstring}
+	}
+
+	input := &dynamodb.ScanInput{
+		ExpressionAttributeNames:  expr.Names(),
+		FilterExpression:          expr.Filter(),
+		ExpressionAttributeValues: expr.Values(),
+		TableName:                 aws.String("Cart"),
+	}
+
+	result, err := crt.Session.ScanWithContext(ctx, input)
+	if err != nil {
+		errstring := fmt.Sprintf("scan with filter - %s", err.Error())
+		return nil, &errs.AppError{Message: errstring}
+	}
+
+	if len(result.Items) == 0 {
+		return nil, &errs.AppError{Message: "Item not found"}
+	}
+
+	record := CartModel{}
+	err = dynamodbattribute.UnmarshalMap(result.Items[0], &record)
+	if err != nil {
+		fmt.Println("Stray records inside db")
+	}
+
+	crtModel := toModelfromDynamodbEntity(record)
+
+	return crtModel, nil
+}
+
+func (crt CartDynamoRepository) DeleteCartByUserId(userId string) (bool, *errs.AppError) {
+	currentCart,err := crt.FindCartByUserId(userId)
+	if err != nil {
+		return false,&errs.AppError{Message: "Unable to Find cart with given UserId"}
+	}
+	_ , err = crt.DeleteCartById(currentCart.Id)
+	if err != nil {
+		return false,&errs.AppError{Message: "Unable to delete cart with Given userId"}
+	}
+	return true ,nil
+}
+
+func (crt CartDynamoRepository) DeleteCartById(cartId string) (bool, *errs.AppError) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	input := &dynamodb.DeleteItemInput{
 		Key: map[string]*dynamodb.AttributeValue{
 			"id": {
-				S: aws.String(id),
+				S: aws.String(cartId),
 			},
 		},
 		TableName: aws.String("Cart"),
@@ -178,22 +310,38 @@ func (crt CartDynamoRepository) DeleteCartById(id string) (bool, *errs.AppError)
 }
 
 func toPersistedDynamodbEntity(c domain.Cart) *CartModel {
+	ItemMap:=map[string]Item{}
+	for key, DomainItem := range c.Items {
+		var singleItem Item
+		singleItem.Cost = DomainItem.Cost
+		singleItem.Name = DomainItem.Name
+		singleItem.Quantity = DomainItem.Quantity
+		ItemMap[key] = singleItem
+	}
+
 	return &CartModel{
-		Id:               uuid.New().String(),
-		UserID:           c.UserID,
-		ProductsQuantity: c.ProductsQuantity,
-		ProductsCost:     c.ProductsCost,
-		CreatedAt:        time.Now(),
-		UpdatedAt:        time.Now(),
+		Id:        uuid.New().String(),
+		UserID:    c.UserID,
+		Items:     ItemMap,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 }
 
 func toModelfromDynamodbEntity(c CartModel) *domain.Cart {
+	DomainItemMap:= map[string]domain.Item{}
+	for key, ModelItem := range c.Items {
+		var singleItem domain.Item
+		singleItem.Cost = ModelItem.Cost
+		singleItem.Name = ModelItem.Name
+		singleItem.Quantity = ModelItem.Quantity
+		DomainItemMap[key] = singleItem
+	}
+
 	return &domain.Cart{
-		Id:               c.Id,
-		UserID:           c.UserID,
-		ProductsQuantity: c.ProductsQuantity,
-		ProductsCost:     c.ProductsCost,
+		Id:     c.Id,
+		UserID: c.UserID,
+		Items:  DomainItemMap,
 	}
 }
 
