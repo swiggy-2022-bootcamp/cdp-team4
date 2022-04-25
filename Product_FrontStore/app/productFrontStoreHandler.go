@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -22,11 +23,12 @@ type ProductFrontStoreHandler struct {
 // @Router       /products/    [get]
 func (prodHandler ProductFrontStoreHandler) HandleGetAllProducts() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		fmt.Println("=========get all products")
 		products, err := prodHandler.ProductFrontStoreService.GetProducts()
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			log.WithFields(logrus.Fields{"message": err.Error(), "status": http.StatusBadRequest}).
-				Error("unable to fetch categories")
+				Error("unable to fetch products")
 			return
 		}
 		ctx.JSON(http.StatusAccepted, gin.H{"products": products})
@@ -34,8 +36,9 @@ func (prodHandler ProductFrontStoreHandler) HandleGetAllProducts() gin.HandlerFu
 			Info("fetch product records")
 	}
 }
+
 // Get product details by category
-// @Summary      Get product by id 
+// @Summary      Get product by id
 // @Description  This Handle allows front store to fetch the product by id in the datastore
 // @Tags         Product Front Store
 // @Produce      json
@@ -57,14 +60,15 @@ func (prodHandler ProductFrontStoreHandler) HandleGetProductByID() gin.HandlerFu
 			Info("fetch product record")
 	}
 }
+
 // Get all products
 // @Summary      Get products by category id
-// @Description  This Handle allows front store to fetch all the products in the datastore based category id 
+// @Description  This Handle allows front store to fetch all the products in the datastore based category id
 // @Tags         Product Front Store
 // @Produce      json
 // @Success      200  {object}  map[string]interface{}
 // @Failure      400  {number} 	http.StatusBadRequest
-// @Router       /products/    [get]
+// @Router       /products/category/{id}    [get]
 func (prodHandler ProductFrontStoreHandler) HandleProductsByCategory() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		categoryId := ctx.Param("id")
@@ -78,5 +82,11 @@ func (prodHandler ProductFrontStoreHandler) HandleProductsByCategory() gin.Handl
 		ctx.JSON(http.StatusAccepted, gin.H{"products": products})
 		log.WithFields(logrus.Fields{"product": products, "status": http.StatusOK}).
 			Info("fetch product by category id")
+	}
+}
+
+func NewProductFrontStoreHandler(productFrontStoreService domain.ProductFrontStoreService) ProductFrontStoreHandler {
+	return ProductFrontStoreHandler{
+		ProductFrontStoreService: productFrontStoreService,
 	}
 }

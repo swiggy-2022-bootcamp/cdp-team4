@@ -12,6 +12,6 @@ RUN go get ./...
 # build
 RUN go build -o /ProductFrontStoreService
 
-EXPOSE 8081
+EXPOSE 8003
 
 CMD [ "/ProductFrontStoreService" ]

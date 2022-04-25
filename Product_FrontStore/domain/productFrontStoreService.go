@@ -6,6 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+//go:generate mockgen -source=ProductFrontStoreService
 type ProductFrontStoreService interface {
 	GetProducts() ([]Product, error)
 	GetProductById(string) (Product, error)
@@ -49,5 +50,32 @@ func (service productFrontStoreService) GetProductsByCategoryId(categoryId strin
 func NewProductFrontStoreService(productFrontStoreDynamoRepository ProductFrontStoreDynamoRepository) ProductFrontStoreService {
 	return &productFrontStoreService{
 		ProductFrontStoreDynamoRepository: productFrontStoreDynamoRepository,
+	}
+}
+
+func NewProductObject(model string, quantity int64, price float64, manufacturerID string, sku string,
+	productSEOURLs []ProductSEOURL, points int64, reward int64, imageURL string, isShippable bool,
+	weight float64, length float64, width float64, height float64, minimumQuantity int64,
+	relatedProducts []string, productDescription []ProductDescription, productCategories []string) *Product {
+	return &Product{
+		Id:                  _generateUniqueId(),
+		Model:               model,
+		Quantity:            quantity,
+		Price:               price,
+		ManufacturerID:      manufacturerID,
+		SKU:                 sku,
+		ProductSEOURLs:      productSEOURLs,
+		Points:              points,
+		Reward:              reward,
+		ImageURL:            imageURL,
+		IsShippable:         isShippable,
+		Weight:              weight,
+		Length:              length,
+		Width:               width,
+		Height:              height,
+		MinimumQuantity:     minimumQuantity,
+		RelatedProducts:     relatedProducts,
+		ProductDescriptions: productDescription,
+		ProductCategories:   productCategories,
 	}
 }
