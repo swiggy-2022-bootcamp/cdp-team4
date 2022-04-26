@@ -28,9 +28,12 @@ type CartRecordDTO struct {
 // @Summary      Create Cart
 // @Description  This Handle allows admin to create new Cart
 // @Tags         Cart
+// @Schemes
+// @Accept json
 // @Produce      json
-// @Success      200  {object}  map[string]interface{}
-// @Failure      400  {number} 	http.StatusBadRequest
+// @Param   req  body CartRecordDTO true "Cart details"
+// @Success      200  string    Cart record Added
+// @Failure      400  string   	Bad request
 // @Router       /cart    [post]
 func (ch CartHandler) HandleCreateCart() gin.HandlerFunc {
 
@@ -55,6 +58,18 @@ func (ch CartHandler) HandleCreateCart() gin.HandlerFunc {
 	}
 }
 
+// Update Cart
+// @Summary      Update Cart items
+// @Description  This Handle allows to add new items/update items to cart
+// @Tags         Cart
+// @Schemes
+// @Accept json
+// @Produce      json
+// @Param   req  query int true "User id"
+// @Param   req  body CartRecordDTO true "Cart details"
+// @Success      200 string  Cart Record Update
+// @Failure      400  string   	Bad request
+// @Router       /cart/:userId     [put]
 func (ch CartHandler) HandleUpdateCartItemByUserId() gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
@@ -80,6 +95,18 @@ func (ch CartHandler) HandleUpdateCartItemByUserId() gin.HandlerFunc {
 	}
 }
 
+// Delete Cart items
+// @Summary      Delete Cart items
+// @Description  This Handle allows to Delete items to cart
+// @Tags         Cart
+// @Schemes
+// @Accept json
+// @Produce      json
+// @Param   req  query int true "User id"
+// @Param   req  body CartRecordDTO true "Cart details"
+// @Success      200 string  Cart Record Update
+// @Failure      400  string   	Bad request
+// @Router       /cart/:userId    [delete]
 func (ch CartHandler) HandleDeleteCartItemByUserId() gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
@@ -130,13 +157,15 @@ func (ch CartHandler) HandleDeleteCartItemByUserId() gin.HandlerFunc {
 // 	}
 // }
 
+
 // Get Cart by UserId
 // @Summary      Get Cart by UserId
 // @Description  This Handle returns Cart given cart UserId
 // @Tags         Cart
 // @Produce      json
-// @Success      200  {object}  map[string]interface{}
-// @Failure      400  {number} 	http.StatusBadRequest
+// @Param   req  query int true "User id"
+// @Success      200  {object}  domain.Cart
+// @Failure      400  string   	Bad request
 // @Router       /cart/:userId    [get]
 func (ch CartHandler) HandleGetCartRecordByUserID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -158,8 +187,8 @@ func (ch CartHandler) HandleGetCartRecordByUserID() gin.HandlerFunc {
 // @Description  This Handle returns all of the carts
 // @Tags         Cart
 // @Produce      json
-// @Success      200  {object}  map[string]interface{}
-// @Failure      400  {number} 	http.StatusBadRequest
+// @Success      200  {object}  []domain.Cart
+// @Failure      400  string    Record not found
 // @Router       /carts    [get]
 func (ch CartHandler) HandleGetAllRecords() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -185,7 +214,7 @@ func (ch CartHandler) HandleGetAllRecords() gin.HandlerFunc {
 // // @Tags         Cart
 // // @Produce      json
 // // @Success      200  {object}  map[string]interface{}
-// // @Failure      400  {number} 	http.StatusBadRequest
+// // @Failure      400  string   	Bad request
 // // @Router       /cart/:id   [delete]
 // func (ch CartHandler) HandleDeleteCartById() gin.HandlerFunc {
 // 	return func(ctx *gin.Context) {
@@ -202,13 +231,16 @@ func (ch CartHandler) HandleGetAllRecords() gin.HandlerFunc {
 // 	}
 // }
 
+
+
 // Delete cart By User Id
 // @Summary      Delete cart By User Id
 // @Description  This Handle deletes cart given User ID
 // @Tags         Cart
 // @Produce      json
-// @Success      200  {object}  map[string]interface{}
-// @Failure      400  {number} 	http.StatusBadRequest
+// @Param   req  query int true "User id"
+// @Success      200  string Deleted Succesfully
+// @Failure      400  string   	Bad request
 // @Router       /cart/:userId   [delete]
 func (ch CartHandler) HandleDeleteCartByUserId() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
