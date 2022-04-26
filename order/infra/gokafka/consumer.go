@@ -11,7 +11,7 @@ import (
 )
 
 var KafkaBrokers = []string{
-	"localhost:9092",
+	"localhost:9091",
 }
 
 var log logrus.Logger = *logger.GetLogger()
