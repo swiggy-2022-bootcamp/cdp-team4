@@ -10,8 +10,8 @@ func TestToReturnNewReward(t *testing.T) {
 
 	userId := "12345678"
 	rewardPoints:=10
-	newCart := NewReward(userId, rewardPoints)
+	newReward := NewReward(userId, rewardPoints)
 
-	assert.Equal(t, userId, newCart.UserID)
-	assert.Equal(t, rewardPoints, newCart.RewardPoints)
+	assert.Equal(t, userId, newReward.UserID)
+	assert.Equal(t, rewardPoints, newReward.RewardPoints)
 }

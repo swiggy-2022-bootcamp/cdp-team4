@@ -8,16 +8,8 @@ import (
 	"github.com/swiggy-2022-bootcamp/cdp-team4/reward/domain"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/reward/mocks"
 
-	//"go.mongodb.org/mongo-driver/bson/primitive"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/reward/utils/errs"
 )
-
-// func TestGetRazorpayRewardLink(t *testing.T) {
-// 	mockCtrl := gomock.NewController(t)
-// 	mockDynamoRepo := mocks.NewMockRewardRepository(mockCtrl)
-
-// 	service := domain.NewRewardService(mockDynamoRepo)
-// }
 
 func TestShouldReturnNewService(t *testing.T) {
 	newService := domain.NewRewardService(nil)
