@@ -1,4 +1,4 @@
-# Reward Service 
+# Cart Service 
 
 With this service, the User can perform the following operations on the cart
    - Get all cart items and information for their own cart
@@ -7,7 +7,7 @@ With this service, the User can perform the following operations on the cart
    - Delete a list of item from the cart
    - Delete the cart entirely
 
-![Design Diagram](https://github.com/swiggy-2022-bootcamp/cdp-team4/blob/reward/reward/Cart-Design.png)
+![Design Diagram](https://github.com/swiggy-2022-bootcamp/cdp-team4/blob/cart/cart/Cart-Design.png)
 
 ## Steps to run the service locally 
 #### Using Docker
