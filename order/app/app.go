@@ -45,7 +45,7 @@ func Start(testMode bool) {
 	orderHandler := NewOrderHandler(domain.NewOrderService(dynamoRepository), domain.NewOrderOverviewService(dynamoRepositoryOrderOverview))
 	startKafkaConsumer(dynamoRepository, dynamoRepositoryOrderOverview)
 	// grpcserver for testing
-	//go testGrpcServer()
+	go testGrpcServer()
 	ConfigureSwaggerDoc()
 	router := SetupRouter(orderHandler)
 
@@ -76,7 +76,7 @@ func startKafkaConsumer(repo infra.OrderDynamoRepository, repo1 infra.OrderDynam
 // 		log.Fatal(err)
 // 		return
 // 	}
-// 	l, err := net.Listen("tcp", ":"+"7899")
+// 	l, err := net.Listen("tcp", ":"+"7011")
 // 	if err != nil {
 // 		log.Fatal(err)
 // 		os.Exit(1)

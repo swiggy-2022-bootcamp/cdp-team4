@@ -58,9 +58,12 @@ func WriteMsgToKafka(topic string, msg interface{}) (bool, error) {
 	return true, nil
 }
 
-func UpdateProductService(topic string, orderid string, db infra.OrderDynamoRepository, status string) {
+func UpdateProductService(topic string, userid string, db infra.OrderDynamoRepository, status string) {
+	fmt.Println(userid, "new sdfofian")
 
-	res, err := db.GetOrderOverview(orderid)
+	res, err := db.GetOrderOverview(userid)
+
+	fmt.Printf("%v %v", res, err)
 	if err != nil {
 		log.WithFields(logrus.Fields{"error": err.Error(), "msg": "Error reading Order Overview Table"}).
 			Error("could not Read order id ")

@@ -11,7 +11,7 @@ import (
 )
 
 var KafkaBrokers = []string{
-	"localhost:9090",
+	"localhost:9092",
 }
 
 var log logrus.Logger = *logger.GetLogger()
@@ -48,11 +48,11 @@ func StatusConsumer(ctx context.Context, topic string, db infra.OrderDynamoRepos
 		if err == nil {
 			//fmt.Println(statusMsg, string(msg.Value))
 			if topic == "payment" {
-				orderid := statusMsg.OrderID
+				userid := statusMsg.OrderID
 				status := statusMsg.Status
-				if status != "" && orderid != "" {
-					go db.UpdateOrderStatus(orderid, status)
-					go UpdateProductService("product", orderid, db, status)
+				if status != "" && userid != "" {
+					go db.UpdateOrderStatus(userid, status)
+					go UpdateProductService("product", userid, db1, status)
 				}
 			}
 		}

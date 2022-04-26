@@ -547,16 +547,6 @@ func (oh OrderHandler) HandleGetOrderInvoice() gin.HandlerFunc {
 			}
 			products = append(products, newproduct)
 		}
-		ctx.JSON(http.StatusAccepted, gin.H{
-			"Invoice": InvoiceDTO{
-				Products:              products,
-				UserID:                order.UserID,
-				Status:                order.Status,
-				TotalCost:             int16(order.TotalCost),
-				RewardspointsConsumed: int16(resp.RewardPointsConsumed),
-				ShippingPrice:         int16(resp.ShippingPrice),
-			},
-		})
 
 		responseDto := ResponseDTO{
 			Status: http.StatusOK,

@@ -49,5 +49,8 @@ Content-Type: application/json
 DELETE http://localhost:8007/order/81e5c913-cb74-4d62-a4da-412cc740a506
 
 ####
-POST http://localhost:8007/confirm/1576570
+POST http://localhost:8007/confirm/b533ab38-97f4-4c43-a891-c43872d9f15a
+
+####
+GET http://localhost:8007/order/invoice/72d56385-d08a-4f51-ac71-3354734e371c
 

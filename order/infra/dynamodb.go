@@ -300,7 +300,7 @@ func (odr OrderDynamoRepository) GetOrderOverview(orderid string) (*domain.Order
 	defer cancel()
 
 	input := &dynamodb.GetItemInput{
-		TableName: aws.String(OrderTableName),
+		TableName: aws.String(OrderOverviewTableName),
 		Key: map[string]*dynamodb.AttributeValue{
 			"order_id": {
 				S: aws.String(orderid),
