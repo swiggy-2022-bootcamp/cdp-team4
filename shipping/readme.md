@@ -1,4 +1,29 @@
-# Shipping Service
+# Shipping Microservie
+
+### Steps to setup locally
+
+#### Using Docker compose
+```
+docker-compose up
+```
+
+#### Without Docker
+```
+# Download golang dependencies
+> go mod download
+
+# Start the server
+> go run main.go
+```
+
+#### Swagger Docs
+```
+# Open the below url
+http://localhost:8012/swagger/index.html#/
+
+# Command to regenerate swagger docs
+> swag init -g main.go --output docs/
+```
 
 PORT=8012
 
