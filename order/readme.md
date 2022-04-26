@@ -1,4 +1,29 @@
-# Order Service
+# Order Microservie
+
+### Steps to setup locally
+
+#### Using Docker compose
+```
+docker-compose up
+```
+
+#### Without Docker
+```
+# Download golang dependencies
+> go mod download
+
+# Start the CMD server
+> go run main.go
+```
+
+#### Swagger Docs
+```
+# Open the below url
+http://localhost:8007/swagger/index.html#/
+
+# Command to regenerate swagger docs
+> swag init -g main.go --output docs/
+```
 
 ![order](https://user-images.githubusercontent.com/39910073/165148554-acd92311-18c3-4852-9dc8-d5ba82e623ba.svg)
 
