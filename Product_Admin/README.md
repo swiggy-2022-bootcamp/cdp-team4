@@ -1,24 +1,49 @@
-Product Admin Service
-This service is responsible for following operations which are written for admin
-    - Get all product details
-    - Get product details by product id 
-    - Add a new product 
-    - Update product details given product id
-    - Delete product by product id 
-    - Search products via category id, manufacturer id, keyword
+# Product Admin Service
+This service is responsible for CRUD operations on products which are written for admin.
+### Steps to setup locally
+##### Using Docker compose
 
-![design diagram](http://url/to/img.png)
-Steps to run the service locally 
--- with docker 
--- without docker
+```
+> docker-compose up
+```
 
-Swagger documentation - 
+##### Using Docker
+```
+# Build docker Image
+> docker build -t cdp-team4/product-admin .
+# Run docker image
+> docker run -p 8004:8004 -d --name product-admin cdp-team4/product-admin
+```
 
-#swagger documentation can be found at below url
-http://localhost:8004/swagger/index.html#/
+##### Without docker 
 
-#update swagger documentation with new changes 
->> swag init 
+```
+# Download golang dependencies
+> go mod download
+# Start the CMD server
+> go run cmd/main.go
+```
+##### Run kafka as subscriber with following topic - 
+```
+cart
+```
+##### Swagger docs - 
+```
+Swagger documentation can be found at the following url - 
+[http://localhost:8004/swagger/index.html#/]
+#Command to regenerate swagger docs
+> swag init -g main.go --output docs/
+```
 
-Reference- 
+### Routes supported
+| Method | Route | Description | 
+| ------ | ------ | ------ | 
+| POST | /products/ | Route for Admin to Create Product | 
+| GET | /products/ | Route for Admin to Get All Products | 
+| GET | /products/:id | Route for Admin to Get Product details given Product ID | 
+| PUT | /products/:id | Route for Admin to Update Product Details given Product ID | 
+| DELETE | /products/:id | Route for Admin to Delete a Product given Product ID | 
+| GET | /products/search/:searchstring | Route for Admin to Search a Product given a search string | 
+
+###### Reference- 
     https://weihungchin.medium.com/how-to-set-up-sonarqube-in-windows-mac-and-linux-using-docker-3959c5a95eb2
