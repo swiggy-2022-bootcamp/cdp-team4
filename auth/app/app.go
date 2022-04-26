@@ -23,7 +23,7 @@ func Start(testMode bool) {
 	RegisterHealthStatusRoute(healthHandler)
 	RegisterAuthHandlerRoute(authHandler)
 
-	err := godotenv.Load(".env")
+	err := godotenv.Load("../.env")
 	if err != nil {
 		log.Fatal(err)
 		return
