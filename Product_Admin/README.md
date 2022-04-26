@@ -38,6 +38,7 @@ Swagger documentation can be found at the following url -
 ### Routes supported
 | Method | Route | Description | 
 | ------ | ------ | ------ | 
+| GET | / | Route for Admin serive health check | 
 | POST | /products/ | Route for Admin to Create Product | 
 | GET | /products/ | Route for Admin to Get All Products | 
 | GET | /products/:id | Route for Admin to Get Product details given Product ID | 
