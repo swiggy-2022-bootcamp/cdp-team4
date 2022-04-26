@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"os"
@@ -15,6 +16,7 @@ import (
 	"github.com/swiggy-2022-bootcamp/cdp-team4/transaction/docs"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/transaction/domain"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/transaction/infra"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/transaction/infra/gokafka"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/transaction/infra/logger"
 
 	swaggerFiles "github.com/swaggo/files"
@@ -59,12 +61,18 @@ func startGrpcTransactionServer(th TransactionHandler) {
 	grpcServer.Serve(l)
 }
 
+func startKafkaConsumer(repo infra.TransactionDynamoRepository) {
+	ctx := context.Background()
+	go gokafka.UpdateTransactionPoints(ctx, "payment", repo)
+}
+
 func Start() {
 	dynamoRepository := infra.NewDynamoRepository()
 	transactionHandler = TransactionHandler{TransactionService: domain.NewTransactionService(dynamoRepository)}
 
 	go startGrpcTransactionServer(transactionHandler)
-
+	startKafkaConsumer(dynamoRepository)
+	
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal(err)

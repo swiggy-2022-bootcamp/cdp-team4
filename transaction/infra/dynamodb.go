@@ -54,19 +54,19 @@ func createTable(svc *dynamodb.DynamoDB) {
 
 func connect() *dynamodb.DynamoDB {
 
-	sess, err := session.NewSession(&aws.Config{
-		Region:      aws.String("us-east-1"),
-		Endpoint:    aws.String("http://localhost:8000"),
-		Credentials: credentials.NewStaticCredentials("AKID", "SECRET_KEY", "TOKEN"),
-	})
+	// sess, err := session.NewSession(&aws.Config{
+	// 	Region:      aws.String("us-east-1"),
+	// 	Endpoint:    aws.String("http://localhost:8000"),
+	// 	Credentials: credentials.NewStaticCredentials("AKID", "SECRET_KEY", "TOKEN"),
+	// })
 
-	if err != nil {
-		panic(err.Error())
-	}
+	// if err != nil {
+	// 	panic(err.Error())
+	// }
 
-	// sess := session.Must(session.NewSessionWithOptions(session.Options{
-	// 	SharedConfigState: session.SharedConfigEnable,
-	// }))
+	sess := session.Must(session.NewSessionWithOptions(session.Options{
+		SharedConfigState: session.SharedConfigEnable,
+	}))
 
 	// create dynamo client
 	svc := dynamodb.New(sess)
