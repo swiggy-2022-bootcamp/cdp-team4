@@ -6,11 +6,11 @@ type CartService interface {
 	CreateCart(string,map[string]Item) (string, *errs.AppError)
 	UpdateCartItemsByUserId(string,map[string]Item) (bool, *errs.AppError)
 	DeleteCartItemByUserId(string,[]string) (bool, *errs.AppError)
-	GetCartById(string) (*Cart, *errs.AppError)
+	// GetCartById(string) (*Cart, *errs.AppError)
 	GetCartByUserId(string) (*Cart, *errs.AppError)
 	GetAllCarts() ([]Cart, *errs.AppError)
-	DeleteCartById(string) (bool, *errs.AppError)
-	DeleteCartByUserId(string) (bool, *errs.AppError)
+	// DeleteCartById(string) (bool, *errs.AppError)
+	 DeleteCartByUserId(string) (bool, *errs.AppError)
 }
 
 type service struct {
@@ -43,13 +43,13 @@ func (s service) DeleteCartItemByUserId(userId string, productIdList []string) (
 }
 
 
-func (s service) GetCartById(cartId string) (*Cart, *errs.AppError) {
-	res, err := s.cartRepository.FindCartById(cartId)
-	if err != nil {
-		return nil, err
-	}
-	return res, nil
-}
+// func (s service) GetCartById(cartId string) (*Cart, *errs.AppError) {
+// 	res, err := s.cartRepository.FindCartById(cartId)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return res, nil
+// }
 
 func (s service) GetCartByUserId(userId string) (*Cart, *errs.AppError) {
 	res, err := s.cartRepository.FindCartByUserId(userId)
@@ -67,13 +67,13 @@ func (s service) GetAllCarts() ([]Cart, *errs.AppError) {
 	return res, nil
 }
 
-func (s service) DeleteCartById(cartId string) (bool, *errs.AppError) {
-	_, err := s.cartRepository.DeleteCartById(cartId)
-	if err != nil {
-		return false, err
-	}
-	return true, nil
-}
+// func (s service) DeleteCartById(cartId string) (bool, *errs.AppError) {
+// 	_, err := s.cartRepository.DeleteCartById(cartId)
+// 	if err != nil {
+// 		return false, err
+// 	}
+// 	return true, nil
+// }
 
 func (s service) DeleteCartByUserId(userId string) (bool, *errs.AppError) {
 	_, err := s.cartRepository.DeleteCartByUserId(userId)

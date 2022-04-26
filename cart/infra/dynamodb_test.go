@@ -1,18 +1,18 @@
 package infra_test
 
-import (
+// import (
 	// "fmt"
 	// "testing"
 
 	//"github.com/google/uuid"
 	//"github.com/stretchr/testify/assert"
 	//"github.com/swiggy-2022-bootcamp/cdp-team4/cart/domain"
-	"github.com/swiggy-2022-bootcamp/cdp-team4/cart/infra"
-)
+	//"github.com/swiggy-2022-bootcamp/cdp-team4/cart/infra"
+// )
 
-var testCartService = infra.NewDynamoRepository()
-var insertedid string
-var inserteduserid string
+// var testCartService = infra.NewDynamoRepository()
+// var insertedid string
+// var inserteduserid string
 
 // func TestShouldCreateNewCartinDynamoDB(t *testing.T) {
 // 	userid := uuid.New().String()

@@ -16,6 +16,7 @@ require (
 )
 
 require (
+	github.com/golang/mock v1.6.0 // indirect
 	github.com/klauspost/compress v1.14.2 // indirect
 	github.com/pierrec/lz4/v4 v4.1.14 // indirect
 	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013 // indirect
