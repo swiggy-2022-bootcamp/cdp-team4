@@ -15,6 +15,7 @@ func Start() {
 	RegisterProductAdminRoutes()
 	RegisterProductFrontStoreRoutes()
 	RegisterCategoryRoutes()
+	RegisterPaymentRoutes()
 
 	err := godotenv.Load(".env")
 	if err != nil {

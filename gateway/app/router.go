@@ -72,11 +72,20 @@ func RegisterProductAdminRoutes() {
 	products.GET("/:id", ValidateAuthToken(), productAdminHandler.GetProductByID)
 	products.PUT("/:id", ValidateAuthToken(), productAdminHandler.UpdateProductByID)
 	products.DELETE("/:id", ValidateAuthToken(), productAdminHandler.DeleteProductByID)
-	
+
 	search := products.Group("/search")
 	search.GET("/category/:categoryid", ValidateAuthToken(), productAdminHandler.SearchByCategoryID)
 	search.GET("/manufacturer/:id", ValidateAuthToken(), productAdminHandler.SearchByManufacturerID)
 	search.GET("/keyword/:keyword", ValidateAuthToken(), productAdminHandler.SearchByKeyword)
+}
+
+func RegisterPaymentRoutes() {
+	paymentHandler := PaymentHandler{}
+	payment := v1.Group("/pay")
+
+	payment.POST("/", ValidateAuthToken(), paymentHandler.InitiatePayment)
+	payment.POST("/paymentMethod", ValidateAuthToken(), paymentHandler.AddPaymentMethod)
+	payment.GET("/paymentMethod/:id", ValidateAuthToken(), paymentHandler.GetPaymentMethod)
 }
 
 func RegisterProductFrontStoreRoutes() {
