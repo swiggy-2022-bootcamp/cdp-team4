@@ -19,12 +19,12 @@ type LoginDTO struct {
 }
 
 // GetAuthToken @Schemes
-// @Description Creates a auth token upon login
-// @Tags users
+// @Description Returns auth token upon login
+// @Tags         auth
 // @Produce json
 // @Accept json
 // @Param        login-credentials  body LoginDTO true "User login"
-// @Success 200 {object} userResponseDTO
+// @Success 200 {object} ResponseDTO
 // @Router /login [post]
 func (ah AuthHandler) GetAuthToken(c *gin.Context) {
 
@@ -53,6 +53,14 @@ func (ah AuthHandler) GetAuthToken(c *gin.Context) {
 	c.JSON(responseDto.Status, responseDto)
 }
 
+// ValidateAuthToken @Schemes
+// @Description validates auth token
+// @Tags         auth
+// @Produce json
+// @Accept json
+// @Success 200 {object} ResponseDTO
+// @Router /validate [get]
+// @Security ApiKeyAuth
 func (ah AuthHandler) ValidateAuthToken(c *gin.Context) {
 	reqToken := c.Request.Header.Get("Authorization")
 	splitToken := strings.Split(reqToken, "Bearer ")
@@ -82,6 +90,14 @@ func (ah AuthHandler) ValidateAuthToken(c *gin.Context) {
 	c.JSON(responseDto.Status, responseDto)
 }
 
+// InvalidateAuthToken @Schemes
+// @Description Invalidates auth token
+// @Tags         auth
+// @Produce json
+// @Accept json
+// @Success 200 {object} ResponseDTO
+// @Router /logout [post]
+// @Security ApiKeyAuth
 func (ah AuthHandler) InvalidateAuthToken(c *gin.Context) {
 	reqToken := c.Request.Header.Get("Authorization")
 	splitToken := strings.Split(reqToken, "Bearer ")

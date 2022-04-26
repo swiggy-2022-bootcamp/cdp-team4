@@ -11,6 +11,9 @@ import "github.com/swiggy-2022-bootcamp/cdp-team4/auth/app"
 
 // @host      localhost:8001
 // @BasePath  /api/v1
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 func main() {
 	app.Start(false)
 }

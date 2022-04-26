@@ -1,5 +1,12 @@
 basePath: /api/v1
 definitions:
+  app.LoginDTO:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
   app.ResponseDTO:
     properties:
       data: {}
@@ -29,4 +36,62 @@ paths:
             $ref: '#/definitions/app.ResponseDTO'
       tags:
       - health
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Returns auth token upon login
+      parameters:
+      - description: User login
+        in: body
+        name: login-credentials
+        required: true
+        schema:
+          $ref: '#/definitions/app.LoginDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.ResponseDTO'
+      tags:
+      - auth
+  /logout:
+    post:
+      consumes:
+      - application/json
+      description: Invalidates auth token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.ResponseDTO'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - auth
+  /validate:
+    get:
+      consumes:
+      - application/json
+      description: validates auth token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.ResponseDTO'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - auth
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
