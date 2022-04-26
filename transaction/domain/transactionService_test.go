@@ -12,13 +12,6 @@ import (
 	"github.com/swiggy-2022-bootcamp/cdp-team4/transaction/utils/errs"
 )
 
-// func TestGetRazorpayTransactionLink(t *testing.T) {
-// 	mockCtrl := gomock.NewController(t)
-// 	mockDynamoRepo := mocks.NewMockTransactionRepository(mockCtrl)
-
-// 	service := domain.NewTransactionService(mockDynamoRepo)
-// }
-
 func TestShouldReturnNewService(t *testing.T) {
 	newService := domain.NewTransactionService(nil)
 	assert.NotNil(t, newService)

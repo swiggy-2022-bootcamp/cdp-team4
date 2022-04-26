@@ -22,8 +22,10 @@ type TransactionRecordDTO struct {
 // @Description  This Handle returns Transaction given userId
 // @Tags         Transaction
 // @Produce      json
-// @Success      200  {object}  map[string]interface{}
-// @Failure      400  {number} 	http.StatusBadRequest
+// @Param   req  query int true "User id"
+// @Success      200  {object}  domain.Transaction
+// @Failure  400 string   	Bad request
+// @Failure  500  string		Internal Server Error
 // @Router       /transaction/:userId    [get]
 func (th TransactionHandler) HandleGetTransactionRecordByUserID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -53,9 +55,11 @@ func (th TransactionHandler) HandleGetTransactionRecordByUserID() gin.HandlerFun
 // @Tags         Transaction
 // @Schemes
 // @Accept json
-// @Produce      json
-// @Success      200  {object}  map[string]interface{}
-// @Failure      400  {number} 	http.StatusBadRequest
+// @Produce json
+// @Param   req  body TransactionRecordDTO true "Transaction details"
+// @Success      200  string  transaction record updated
+// @Failure  400 string   	Bad request
+// @Failure 500  string		Internal Server Error
 // @Router       /transaction/:userId   [put]
 func (th TransactionHandler) HandleUpdateTransactionByUserId() gin.HandlerFunc {
 	return func(ctx *gin.Context) {

@@ -1,4 +1,21 @@
 basePath: /
+definitions:
+  app.TransactionRecordDTO:
+    properties:
+      transaction_points:
+        type: integer
+      user_id:
+        type: string
+    type: object
+  domain.Transaction:
+    properties:
+      id:
+        type: string
+      transaction_points:
+        type: integer
+      user_id:
+        type: string
+    type: object
 host: localhost:8009
 info:
   contact:
@@ -31,6 +48,62 @@ paths:
       summary: Health of Transaction service
       tags:
       - Health
+  /transaction/:userId:
+    get:
+      description: This Handle returns Transaction given userId
+      parameters:
+      - description: User id
+        in: query
+        name: req
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Transaction'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get Transaction by userId
+      tags:
+      - Transaction
+    put:
+      consumes:
+      - application/json
+      description: This Handle Update transaction given user id
+      parameters:
+      - description: Transaction details
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/app.TransactionRecordDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Update transaction points for a userId
+      tags:
+      - Transaction
 schemes:
 - http
 swagger: "2.0"
