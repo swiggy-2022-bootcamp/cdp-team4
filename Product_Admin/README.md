@@ -1,5 +1,6 @@
 # Product Admin Service
 This service is responsible for CRUD operations on products which are written for admin.
+![Design Diagram](https://github.com/swiggy-2022-bootcamp/cdp-team4/blob/product_admin/Product_Admin/DesignDiagram.png)
 ### Steps to setup locally
 ##### Using Docker compose
 
