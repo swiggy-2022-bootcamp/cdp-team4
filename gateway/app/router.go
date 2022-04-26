@@ -61,3 +61,42 @@ func RegisterShippingRoutes() {
 	shippingCost.DELETE("/:city", ValidateAuthToken(), shippingHandler.DeleteShippingCost)
 
 }
+
+func RegisterProductAdminRoutes() {
+	productAdminHandler := productAdminHandler{}
+	products := v1.Group("/products")
+
+	v1.GET("/products", ValidateAuthToken(), productAdminHandler.GetAllProducts)
+
+	products.POST("/", ValidateAuthToken(), productAdminHandler.AddProduct)
+	products.GET("/:id", ValidateAuthToken(), productAdminHandler.GetProductByID)
+	products.PUT("/:id", ValidateAuthToken(), productAdminHandler.UpdateProductByID)
+	products.DELETE("/:id", ValidateAuthToken(), productAdminHandler.DeleteProductByID)
+	
+	search := products.Group("/search")
+	search.GET("/category/:categoryid", ValidateAuthToken(), productAdminHandler.SearchByCategoryID)
+	search.GET("/manufacturer/:id", ValidateAuthToken(), productAdminHandler.SearchByManufacturerID)
+	search.GET("/keyword/:keyword", ValidateAuthToken(), productAdminHandler.SearchByKeyword)
+}
+
+func RegisterProductFrontStoreRoutes() {
+	// productFrontStoreHandler := productFrontStoreHandler{}
+	// products := v1.Group("/products")
+
+	// v1.GET("/products", ValidateAuthToken(), productFrontStoreHandler.HandleGetAllProducts)
+
+	// products.GET("/:id", ValidateAuthToken(), productFrontStoreHandler.HandleGetProductByID)
+	// products.GET("/category/:id", ValidateAuthToken(), productFrontStoreHandler.HandleGetProductsByCategory)
+}
+
+func RegisterCategoryRoutes() {
+	// categoryHandler := categoryHandler{}
+	// categories := v1.Group("/categories")
+
+	// categories.POST("/", ValidateAuthToken(), categoryHandler.HandleAddCategory)
+	// categories.GET("/", ValidateAuthToken(), categoryHandler.HandleGetAllCategories)
+	// categories.GET("/:id", ValidateAuthToken(), categoryHandler.HandleGetCategoryByID)
+	// categories.PUT("/:id", ValidateAuthToken(), categoryHandler.HandleUpdateCategoryByID)
+	// categories.DELETE("/", ValidateAuthToken(), categoryHandler.HandleDeleteCategories)
+	// categories.DELETE("/:id", ValidateAuthToken(), categoryHandler.HandleDeleteCategoryByID)
+}

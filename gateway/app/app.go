@@ -12,6 +12,10 @@ func Start() {
 	RegisterUserRoutes()
 	RegisterOrderRoutes()
 	RegisterShippingRoutes()
+	RegisterProductAdminRoutes()
+	RegisterProductFrontStoreRoutes()
+	RegisterCategoryRoutes()
+
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal(err)
