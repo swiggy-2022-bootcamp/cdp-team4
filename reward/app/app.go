@@ -25,7 +25,7 @@ import (
 var log logrus.Logger = *logger.GetLogger()
 var rewardHandler RewardHandler
 
-func setupRouter(rewardHandler RewardHandler) *gin.Engine {
+func SetupRouter(rewardHandler RewardHandler) *gin.Engine {
 	router := gin.Default()
 	// health check route
 	HealthCheckRouter(router)
@@ -79,7 +79,7 @@ func Start() {
 	PORT := os.Getenv("PORT")
 
 	configureSwaggerDoc()
-	router := setupRouter(rewardHandler)
+	router := SetupRouter(rewardHandler)
 
 	router.Run(":" + PORT)
 	// if err := r.Run(":3000"); err != nil {

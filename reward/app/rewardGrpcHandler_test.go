@@ -1,6 +1,6 @@
 package app
 
-import (
+// import (
 	// "context"
 	// "fmt"
 	// "testing"
@@ -8,7 +8,7 @@ import (
 	// "github.com/stretchr/testify/assert"
 	// pb "github.com/swiggy-2022-bootcamp/cdp-team4/reward/app/protos"
 	// "google.golang.org/grpc"
-)
+// )
 
 // func TestGrpcRewardClient(t *testing.T) {
 // 	// Set up connection with the grpc server

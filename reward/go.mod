@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/aws/aws-sdk-go v1.43.43
 	github.com/gin-gonic/gin v1.7.7
+	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.3.0
 	github.com/joho/godotenv v1.4.0
 	github.com/pkg/errors v0.9.1
@@ -14,6 +15,7 @@ require (
 	github.com/swaggo/files v0.0.0-20210815190702-a29dd2bc99b2
 	github.com/swaggo/gin-swagger v1.4.1
 	github.com/swaggo/swag v1.8.1
+	go.mongodb.org/mongo-driver v1.9.0
 	google.golang.org/grpc v1.46.0
 	google.golang.org/protobuf v1.28.0
 )
