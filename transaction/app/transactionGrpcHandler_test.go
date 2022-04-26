@@ -13,7 +13,7 @@ package app
 // func TestGrpcTransactionClient(t *testing.T) {
 // 	// Set up connection with the grpc server
 
-// 	conn, err := grpc.Dial("localhost:7007", grpc.WithInsecure())
+// 	conn, err := grpc.Dial("localhost:7009", grpc.WithInsecure())
 // 	if err != nil {
 // 		fmt.Printf("Error while making connection, %v\n", err)
 // 	}

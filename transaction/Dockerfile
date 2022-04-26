@@ -26,7 +26,7 @@ COPY --from=build /app/transaction-app /transaction-app
 
 COPY .env /.env
 
-EXPOSE 8007
+EXPOSE 8009
 
 ENTRYPOINT ["/transaction-app"]
 

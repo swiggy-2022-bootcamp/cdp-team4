@@ -1,5 +1,5 @@
 basePath: /
-host: localhost:8007
+host: localhost:8009
 info:
   contact:
     email: support@swagger.io
