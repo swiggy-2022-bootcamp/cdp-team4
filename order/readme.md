@@ -25,7 +25,7 @@ http://localhost:8007/swagger/index.html#/
 > swag init -g main.go --output docs/
 ```
 
-![order](https://user-images.githubusercontent.com/39910073/165148554-acd92311-18c3-4852-9dc8-d5ba82e623ba.svg)
+![order](https://user-images.githubusercontent.com/39910073/165333266-82cf2838-42e9-4ce2-8138-1d04c459ae2d.svg)
 
 
 ### Routes
