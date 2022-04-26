@@ -45,7 +45,7 @@ func Start(testMode bool) {
 	orderHandler := NewOrderHandler(domain.NewOrderService(dynamoRepository), domain.NewOrderOverviewService(dynamoRepositoryOrderOverview))
 	startKafkaConsumer(dynamoRepository, dynamoRepositoryOrderOverview)
 	// grpcserver for testing
-	go testGrpcServer()
+	//go testGrpcServer()
 	ConfigureSwaggerDoc()
 	router := SetupRouter(orderHandler)
 
