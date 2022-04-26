@@ -29,7 +29,7 @@ func GetEnumByIndex(idx int) (Role, *errs.AppError) {
 }
 
 type UserModel struct {
-	UserID   string `json:"user_id"`
+	UserId   string `json:"user_id"`
 	Role     Role   `json:"role"`
 	Username string `json:"username"`
 	Password string `json:"password"`

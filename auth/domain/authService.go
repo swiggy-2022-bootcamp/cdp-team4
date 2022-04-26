@@ -30,7 +30,7 @@ func (as authService) GenerateAuthToken(username string, password string) (strin
 	err2 := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 
 	if err2 == nil {
-		return as.generateJWT(user.UserID, user.Role)
+		return as.generateJWT(user.UserId, user.Role)
 	} else {
 		return "", errs.NewAuthenticationError("invalid credentials")
 	}

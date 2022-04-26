@@ -12,5 +12,5 @@ import "github.com/swiggy-2022-bootcamp/cdp-team4/auth/app"
 // @host      localhost:8001
 // @BasePath  /api/v1
 func main() {
-	app.Start()
+	app.Start(false)
 }

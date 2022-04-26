@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-func Start() {
+func Start(testMode bool) {
 
 	healthHandler := HealthHandler{}
 
@@ -18,12 +18,12 @@ func Start() {
 
 	authService := domain.NewAuthService(userRepo, authRepo)
 	authHandler := AuthHandler{
-		authService: authService,
+		AuthService: authService,
 	}
 	RegisterHealthStatusRoute(healthHandler)
 	RegisterAuthHandlerRoute(authHandler)
 
-	err := godotenv.Load(".env")
+	err := godotenv.Load("../.env")
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -34,8 +34,10 @@ func Start() {
 	}
 	PORT := os.Getenv("PORT")
 
-	err = Router.Run(fmt.Sprintf(":%s", PORT))
-	if err != nil {
-		return
+	if !testMode {
+		err = Router.Run(fmt.Sprintf(":%s", PORT))
+		if err != nil {
+			return
+		}
 	}
 }

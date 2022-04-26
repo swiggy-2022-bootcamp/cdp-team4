@@ -7,24 +7,24 @@ import (
 	"github.com/swiggy-2022-bootcamp/cdp-team4/auth/docs"
 )
 
-var v1 *gin.RouterGroup
+var V1 *gin.RouterGroup
 var Router *gin.Engine
 
 func init() {
 	Router = gin.Default()
 	api := Router.Group("/api")
-	v1 = api.Group("/v1")
+	V1 = api.Group("/v1")
 
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	Router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 }
 
 func RegisterHealthStatusRoute(handler HealthHandler) {
-	v1.GET("/health", handler.GetHealthStatus)
+	V1.GET("/health", handler.GetHealthStatus)
 }
 
 func RegisterAuthHandlerRoute(handler AuthHandler) {
-	v1.POST("/login", handler.GetAuthToken)
-	v1.POST("/logout", handler.InvalidateAuthToken)
-	v1.GET("/validate", handler.ValidateAuthToken)
+	V1.POST("/login", handler.GetAuthToken)
+	V1.POST("/logout", handler.InvalidateAuthToken)
+	V1.GET("/validate", handler.ValidateAuthToken)
 }

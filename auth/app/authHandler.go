@@ -10,12 +10,12 @@ import (
 )
 
 type AuthHandler struct {
-	authService domain.AuthService
+	AuthService domain.AuthService
 }
 
-type loginDTO struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+type LoginDTO struct {
+	Username string `json:"username,omitempty"`
+	Password string `json:"password,omitempty"`
 }
 
 // GetAuthToken @Schemes
@@ -23,12 +23,12 @@ type loginDTO struct {
 // @Tags users
 // @Produce json
 // @Accept json
-// @Param        login-credentials  body loginDTO true "User login"
+// @Param        login-credentials  body LoginDTO true "User login"
 // @Success 200 {object} userResponseDTO
 // @Router /login [post]
 func (ah AuthHandler) GetAuthToken(c *gin.Context) {
 
-	var credentials loginDTO
+	var credentials LoginDTO
 	err := json.NewDecoder(c.Request.Body).Decode(&credentials)
 
 	if err != nil {
@@ -44,7 +44,7 @@ func (ah AuthHandler) GetAuthToken(c *gin.Context) {
 	var username = credentials.Username
 	var password = credentials.Password
 
-	authToken, _ := ah.authService.GenerateAuthToken(username, password)
+	authToken, _ := ah.AuthService.GenerateAuthToken(username, password)
 	responseDto := ResponseDTO{
 		Status: http.StatusOK,
 		Data:   authToken,
@@ -57,7 +57,7 @@ func (ah AuthHandler) ValidateAuthToken(c *gin.Context) {
 	reqToken := c.Request.Header.Get("Authorization")
 	splitToken := strings.Split(reqToken, "Bearer ")
 	authToken := splitToken[1]
-	authModel, err := ah.authService.ValidateAuthToken(authToken)
+	authModel, err := ah.AuthService.ValidateAuthToken(authToken)
 
 	if err != nil {
 		customErr := errs.NewAuthenticationError("Invalid token, Access Denied")
@@ -86,10 +86,10 @@ func (ah AuthHandler) InvalidateAuthToken(c *gin.Context) {
 	reqToken := c.Request.Header.Get("Authorization")
 	splitToken := strings.Split(reqToken, "Bearer ")
 	authToken := splitToken[1]
-	_, err := ah.authService.ValidateAuthToken(authToken)
+	_, err := ah.AuthService.ValidateAuthToken(authToken)
 
 	if err != nil {
-		customErr := errs.NewValidationError("Invalid token, Access Denied")
+		customErr := errs.NewAuthenticationError("Invalid token, Access Denied")
 		responseDto := ResponseDTO{
 			Status:  customErr.Code,
 			Message: customErr.Message,
@@ -98,7 +98,7 @@ func (ah AuthHandler) InvalidateAuthToken(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	err = ah.authService.InvalidateAuthToken(authToken)
+	err = ah.AuthService.InvalidateAuthToken(authToken)
 	if err != nil {
 		customErr := errs.NewValidationError(err.Message)
 		responseDto := ResponseDTO{

@@ -19,10 +19,10 @@ type authRepository struct {
 
 func NewAuthRepository() domain.AuthRepository {
 	svc := connect()
-	return authRepository{Session: svc, TableName: "auth"}
+	return &authRepository{Session: svc, TableName: "auth"}
 }
 
-func (repo authRepository) FindByAuthToken(authToken string) (*domain.AuthModel, *errs.AppError) {
+func (repo *authRepository) FindByAuthToken(authToken string) (*domain.AuthModel, *errs.AppError) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -61,7 +61,7 @@ func (repo authRepository) FindByAuthToken(authToken string) (*domain.AuthModel,
 	return &record, nil
 }
 
-func (repo authRepository) Save(model domain.AuthModel) *errs.AppError {
+func (repo *authRepository) Save(model domain.AuthModel) *errs.AppError {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	payRecord := toPersistedEntity(model)

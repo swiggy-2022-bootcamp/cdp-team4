@@ -19,7 +19,7 @@ type userRepository struct {
 
 func NewUserRepository() domain.UserRepository {
 	svc := connect()
-	return userRepository{Session: svc, TableName: "users"}
+	return &userRepository{Session: svc, TableName: "users"}
 }
 
 func connect() *dynamodb.DynamoDB {
@@ -32,7 +32,7 @@ func connect() *dynamodb.DynamoDB {
 	return dynamodb.New(sess)
 }
 
-func (repo userRepository) FindByUsername(username string) (*domain.UserModel, *errs.AppError) {
+func (repo *userRepository) FindByUsername(username string) (*domain.UserModel, *errs.AppError) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -56,15 +56,12 @@ func (repo userRepository) FindByUsername(username string) (*domain.UserModel, *
 		return nil, errs.NewUnexpectedError(err.Error())
 	}
 
-	//paymentRecords := make([]domain.Payment, 1)
-
 	item := result.Items[0]
 	record := domain.UserModel{}
 	err = dynamodbattribute.UnmarshalMap(item, &record)
 	if err != nil {
 		return nil, errs.NewUnexpectedError(err.Error())
 	}
-	//paymentRecords = append(paymentRecords, record)
 
 	return &record, nil
 }
