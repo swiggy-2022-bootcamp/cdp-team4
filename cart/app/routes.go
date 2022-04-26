@@ -15,4 +15,5 @@ func CartRouter(router *gin.Engine,cartHandler CartHandler) {
 	cartApiGroup.GET("/:userId", cartHandler.HandleGetCartRecordByUserID())
 	cartApiGroup.PUT("/:userId", cartHandler.HandleUpdateCartItemByUserId())
 	cartApiGroup.DELETE("/empty/:userId", cartHandler.HandleDeleteCartByUserId())
+	cartApiGroup.DELETE("/:userId", cartHandler.HandleDeleteCartItemByUserId())
 }

@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	// "github.com/segmentio/kafka-go/protocol/produce"
 	"github.com/stretchr/testify/assert"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/cart/domain"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/cart/mocks"
@@ -13,12 +12,6 @@ import (
 	"github.com/swiggy-2022-bootcamp/cdp-team4/cart/utils/errs"
 )
 
-// func TestGetRazorpayCartLink(t *testing.T) {
-// 	mockCtrl := gomock.NewController(t)
-// 	mockDynamoRepo := mocks.NewMockCartRepository(mockCtrl)
-
-// 	service := domain.NewCartService(mockDynamoRepo)
-// }
 
 func TestShouldReturnNewService(t *testing.T) {
 	newService := domain.NewCartService(nil)

@@ -80,6 +80,33 @@ func (ch CartHandler) HandleUpdateCartItemByUserId() gin.HandlerFunc {
 	}
 }
 
+func (ch CartHandler) HandleDeleteCartItemByUserId() gin.HandlerFunc {
+
+	return func(ctx *gin.Context) {
+		id := ctx.Param("userId")
+		fmt.Println(id)
+		type DeleteItemfromCartRequest struct{
+			ProductList []string `json:"product_list"`
+		}
+		var reqBody DeleteItemfromCartRequest
+		if err := ctx.BindJSON(&reqBody); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			return
+		}
+		fmt.Println(reqBody)
+		res, err := ch.CartService.DeleteCartItemByUserId(
+			id,
+			reqBody.ProductList,
+		)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			return
+		}
+		ctx.JSON(http.StatusAccepted, gin.H{"message": "Cart Record Update","Success Status": res})
+	}
+}
+
+
 // // Get Cart by ID
 // // @Summary      Get Cart by id
 // // @Description  This Handle returns Cart given cart id
