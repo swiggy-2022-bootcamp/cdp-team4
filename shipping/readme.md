@@ -41,7 +41,4 @@ PORT=8012
 | PUT    |   /shippingcost/:id             |  Route for Admin to update shipping cost given city        |
 | DELTE  |   /shippingcost/:id             |  Route for Admin to delte shipping cost given city         |
 
-### Sonarqube Report
-
-![shipping_sonarqube](https://user-images.githubusercontent.com/39910073/165330425-40c1fd70-d955-43e4-9196-287ecf1d97af.JPG)
 
