@@ -1,0 +1,50 @@
+package gokafka
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+
+	kafka "github.com/segmentio/kafka-go"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/cart/infra"
+)
+
+var brokers = []string{
+	"localhost:9090",
+}
+
+func getKafkaReader(ctx context.Context, topic, groupID string, brokers []string) *kafka.Reader {
+	// initialize a new reader with the brokers and topic
+	// the groupID identifies the consumer and prevents
+	// it from receiving duplicate messages
+	r := kafka.NewReader(kafka.ReaderConfig{
+		Brokers: brokers,
+		Topic:   topic,
+		StartOffset: kafka.LastOffset,
+	})
+	return r
+}
+
+type CartMessage struct{
+	UserID string `json:"user_id"`
+}
+
+func EmptyCartAfterOrderProccessed(ctx context.Context, topic string, db infra.CartDynamoRepository) {
+	reader := getKafkaReader(ctx, topic, "Empty-Cart", brokers)
+	for {
+		msg, err := reader.ReadMessage(ctx)
+
+		var cMsg CartMessage
+
+		json.Unmarshal([]byte(msg.Value), &cMsg)
+		if err != nil {
+			fmt.Printf("could not read message %s\n ", err.Error())
+		}
+		if topic == "checkout" {
+			UserId := cMsg.UserID
+			go db.DeleteCartByUserId(UserId)
+		}
+	}
+}
+
+

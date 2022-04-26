@@ -7,6 +7,7 @@ require (
 	github.com/gin-gonic/gin v1.7.7
 	github.com/google/uuid v1.3.0
 	github.com/joho/godotenv v1.4.0
+	github.com/segmentio/kafka-go v0.4.31
 	github.com/stretchr/testify v1.7.0
 	github.com/swaggo/files v0.0.0-20210815190702-a29dd2bc99b2
 	github.com/swaggo/gin-swagger v1.4.1
@@ -14,7 +15,11 @@ require (
 	google.golang.org/grpc v1.46.0
 )
 
-require google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013 // indirect
+require (
+	github.com/klauspost/compress v1.14.2 // indirect
+	github.com/pierrec/lz4/v4 v4.1.14 // indirect
+	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013 // indirect
+)
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect

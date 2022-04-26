@@ -70,7 +70,7 @@ func connect() *dynamodb.DynamoDB {
 	// create dynamo client
 	svc := dynamodb.New(sess)
 
-	//createTable(svc)
+	createTable(svc)
 
 	return svc
 }

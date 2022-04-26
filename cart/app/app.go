@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net"
@@ -9,10 +10,11 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/joho/godotenv"
+	pb "github.com/swiggy-2022-bootcamp/cdp-team4/cart/app/protos"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/cart/docs"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/cart/domain"
 	"github.com/swiggy-2022-bootcamp/cdp-team4/cart/infra"
-	pb "github.com/swiggy-2022-bootcamp/cdp-team4/cart/app/protos"
+	"github.com/swiggy-2022-bootcamp/cdp-team4/cart/infra/gokafka"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
@@ -57,12 +59,18 @@ func configureSwaggerDoc() {
 	docs.SwaggerInfo.Title = "Swagger Payment API"
 }
 
+func startKafkaConsumer(repo infra.CartDynamoRepository) {
+	ctx := context.Background()
+	go gokafka.EmptyCartAfterOrderProccessed(ctx, "checkout", repo)
+}
+
+
 func Start() {
 	dynamoRepository := infra.NewDynamoRepository()
 	cartHandler = CartHandler{CartService: domain.NewCartService(dynamoRepository)}
 
 	go startGrpcCartServer(cartHandler)
-
+	startKafkaConsumer(dynamoRepository)
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal(err)
