@@ -41,7 +41,3 @@ http://localhost:8007/swagger/index.html#/
 | GET    |   /order/invoice/:order_id      |   Route for User to get Invoice of a order                  |
 
 
-### Sonarqube Reports
-
-![shipping_sonarqube](https://user-images.githubusercontent.com/39910073/165330756-26e97eba-bcc8-4c89-8632-b368f3274372.JPG)
-
