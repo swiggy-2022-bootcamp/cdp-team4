@@ -9,6 +9,27 @@ With this service, the User can perform the following operations on the cart
 
 ![Design Diagram](https://github.com/swiggy-2022-bootcamp/cdp-team4/blob/cart/cart/Cart-Design.png)
 
+
+## Cart Model
+
+```
+
+type CartModel struct {
+	Id        string         
+	UserID    string          
+	Items     map[string]Item 
+	CreatedAt time.Time       
+	UpdatedAt time.Time       
+}
+
+type Item struct {
+	Name     string 
+	Cost     int
+	Quantity int 
+}
+
+```
+
 ## Steps to run the service locally 
 #### Using Docker
 ```
