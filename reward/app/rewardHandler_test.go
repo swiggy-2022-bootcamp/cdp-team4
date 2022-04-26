@@ -137,4 +137,3 @@ func TestHandleUpdateRewardRecordByUserID(t *testing.T) {
 
 	assert.Equal(t, 400, recorder.Code)
 }
-
