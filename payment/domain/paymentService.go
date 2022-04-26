@@ -59,12 +59,10 @@ func (service paymentService) GetRazorpayPaymentLink(
 
 	// to get razopay payment link, we have to send request data to the api
 	/*
-		data format:
+				data format:
 				{
 		  "amount": 1000,
 		  "currency": "INR",
-		  "accept_partial": true,
-		  "first_min_partial_amount": 100,
 		  "expire_by": 1691097057,
 		  "reference_id": "TS1989",
 		  "description": "Payment for policy no #23456",
@@ -78,12 +76,13 @@ func (service paymentService) GetRazorpayPaymentLink(
 		    "email": true
 		  },
 		  "reminder_enable": true,
-		  "notes": {
-		    "policy_name": "Jeevan Bima"
-		  },
-		  "callback_url": "https://example-callback-url.com/",
-		  "callback_method": "get"
+		  "notes": {},
+		  "callback_method": "get",
+		  "short_url": "https://rzp.io/i/nxrHnLJ",
+		  "status": "cancelled",
+		  "user_id": "1591097270"
 		}
+
 	*/
 	data := gin.H{
 		"amount":       p.Amount,
