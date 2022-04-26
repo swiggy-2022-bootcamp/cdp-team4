@@ -1,11 +1,8 @@
 # Reward Service 
 
-With this service, the User can perform the following operations on the cart
-   - Get all cart items and information for their own cart
-   - Add products to the cart
-   - Update the number of cart items
-   - Delete item from the cart
-   - Delete the cart entirely
+With this service, the Admin can perform the following operations on the cart
+   - Admin can Get Reward points for user By UserId
+   - Admin can Add/SUbtract Reward Points for user
 
 ![Design Diagram](https://github.com/swiggy-2022-bootcamp/cdp-team4/blob/reward/reward/RewardService_Design.png)
 
