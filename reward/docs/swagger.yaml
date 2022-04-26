@@ -1,4 +1,21 @@
 basePath: /
+definitions:
+  app.RewardRecordDTO:
+    properties:
+      reward_points:
+        type: integer
+      user_id:
+        type: string
+    type: object
+  domain.Reward:
+    properties:
+      id:
+        type: string
+      reward_points:
+        type: integer
+      user_id:
+        type: string
+    type: object
 host: localhost:8010
 info:
   contact:
@@ -34,18 +51,27 @@ paths:
   /reward/:userId:
     get:
       description: This Handle returns Reward given userId
+      parameters:
+      - description: User id
+        in: query
+        name: req
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/domain.Reward'
         "400":
           description: Bad Request
           schema:
-            type: number
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
       summary: Get Reward by userId
       tags:
       - Reward
@@ -53,18 +79,28 @@ paths:
       consumes:
       - application/json
       description: This Handle Update reward given user id
+      parameters:
+      - description: Reward details
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/app.RewardRecordDTO'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            additionalProperties: true
-            type: object
+            type: string
         "400":
           description: Bad Request
           schema:
-            type: number
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
       summary: Update reward points for a userId
       tags:
       - Reward

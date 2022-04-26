@@ -22,8 +22,10 @@ type RewardRecordDTO struct {
 // @Description  This Handle returns Reward given userId
 // @Tags         Reward
 // @Produce      json
-// @Success      200  {object}  map[string]interface{}
-// @Failure      400  {number} 	http.StatusBadRequest
+// @Param   req  query int true "User id"
+// @Success      200  {object}  domain.Reward
+// @Failure  400 string   	Bad request
+// @Failure  500  string		Internal Server Error
 // @Router       /reward/:userId    [get]
 func (rh RewardHandler) HandleGetRewardRecordByUserID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -39,7 +41,7 @@ func (rh RewardHandler) HandleGetRewardRecordByUserID() gin.HandlerFunc {
 		if err != nil {
 			log.WithFields(logrus.Fields{"message": err.Message, "status": http.StatusBadRequest}).
 				Error("Record not found")
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Record not found: "+err.Message})
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Record not found: " + err.Message})
 			return
 		}
 		rewarddto := convertRewardModeltoRewardDTO(*res)
@@ -53,9 +55,11 @@ func (rh RewardHandler) HandleGetRewardRecordByUserID() gin.HandlerFunc {
 // @Tags         Reward
 // @Schemes
 // @Accept json
-// @Produce      json
-// @Success      200  {object}  map[string]interface{}
-// @Failure      400  {number} 	http.StatusBadRequest
+// @Produce json
+// @Param   req  body RewardRecordDTO true "Reward details"
+// @Success      200  string  reward record updated
+// @Failure  400 string   	Bad request
+// @Failure 500  string		Internal Server Error
 // @Router       /reward/:userId   [put]
 func (oh RewardHandler) HandleUpdateRewardByUserId() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
