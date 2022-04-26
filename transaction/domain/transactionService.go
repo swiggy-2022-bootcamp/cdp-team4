@@ -4,7 +4,7 @@ import "github.com/swiggy-2022-bootcamp/cdp-team4/transaction/utils/errs"
 
 type TransactionService interface {
 	CreateTransaction(string, int) (string, *errs.AppError)
-	GetTransactionById(string) (*Transaction, *errs.AppError)
+	//GetTransactionById(string) (*Transaction, *errs.AppError)
 	GetTransactionByUserId(string) (*Transaction, *errs.AppError)
 	UpdateTransactionByUserId(string, int) (bool, *errs.AppError)
 }
@@ -22,13 +22,13 @@ func (s service) CreateTransaction(userId string, transactionPoints int) (string
 	return resultId, nil
 }
 
-func (s service) GetTransactionById(transactionId string) (*Transaction, *errs.AppError) {
-	res, err := s.transactionRepository.FindTransactionById(transactionId)
-	if err != nil {
-		return nil, err
-	}
-	return res, nil
-}
+// func (s service) GetTransactionById(transactionId string) (*Transaction, *errs.AppError) {
+// 	res, err := s.transactionRepository.FindTransactionById(transactionId)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return res, nil
+// }
 
 func (s service) GetTransactionByUserId(userId string) (*Transaction, *errs.AppError) {
 	res, err := s.transactionRepository.FindTransactionByUserId(userId)

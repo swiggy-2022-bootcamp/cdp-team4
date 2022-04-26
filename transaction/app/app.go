@@ -26,7 +26,7 @@ import (
 var log logrus.Logger = *logger.GetLogger()
 var transactionHandler TransactionHandler
 
-func setupRouter() *gin.Engine {
+func SetupRouter(transactionHandler TransactionHandler) *gin.Engine {
 	router := gin.Default()
 	// health check route
 	HealthCheckRouter(router)
@@ -72,7 +72,7 @@ func Start() {
 
 	go startGrpcTransactionServer(transactionHandler)
 	startKafkaConsumer(dynamoRepository)
-	
+
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal(err)
@@ -81,7 +81,7 @@ func Start() {
 	PORT := os.Getenv("PORT")
 
 	configureSwaggerDoc()
-	router := setupRouter()
+	router := SetupRouter(transactionHandler)
 
 	router.Run(":" + PORT)
 	// if err := r.Run(":3000"); err != nil {
