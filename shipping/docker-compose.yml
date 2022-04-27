@@ -1,0 +1,12 @@
+version: "3.3"
+services:
+  order:
+      build: .
+      image: shipping
+      container_name: shipping
+      restart: always
+      ports:
+       - "8012:8012"
+       - "7012:7012"
+      volumes:
+       - /home/ubuntu/.aws:/root/.aws:ro                                               

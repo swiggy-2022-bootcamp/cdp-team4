@@ -1,0 +1,15 @@
+syntax = "proto3";
+option go_package ="./;protobuf";
+
+message ProductAvailabilityGetRequest{
+    string productID = 1;
+    uint32 quantityNeeded = 2;
+}
+
+message ProductAvailabilityGetResponse{
+    bool isAvailable = 1;
+}
+
+service Product{
+    rpc GetProductAvailability(ProductAvailabilityGetRequest) returns (ProductAvailabilityGetResponse);
+}

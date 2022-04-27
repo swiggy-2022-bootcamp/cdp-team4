@@ -1,0 +1,12 @@
+version: "3.3"
+services:
+  order:
+      build: .
+      image: payment
+      container_name: payment
+      restart: always
+      ports:
+       - "8008:8008"
+       - "7008:7008"
+      volumes:
+       - /home/ubuntu/.aws:/root/.aws:ro  
