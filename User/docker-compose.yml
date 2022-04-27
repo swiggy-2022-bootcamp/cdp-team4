@@ -1,0 +1,12 @@
+version: "3.3"
+services:
+  user:
+      build: .
+      image: user
+      container_name: user
+      restart: always
+      ports:
+       - "8002:8002"
+       - "7002:7002"
+      volumes:
+       - /home/ubuntu/.aws:/root/.aws:ro    
