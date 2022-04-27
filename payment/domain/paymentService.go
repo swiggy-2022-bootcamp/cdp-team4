@@ -48,7 +48,7 @@ func GenerateUniqueId() string {
 func (service paymentService) GetRazorpayPaymentLink(
 	p Payment,
 ) (map[string]interface{}, error) {
-	err := godotenv.Load("../.env")
+	err := godotenv.Load(".env")
 	if err != nil {
 		return nil, err
 	}
@@ -88,13 +88,13 @@ func (service paymentService) GetRazorpayPaymentLink(
 		"amount":       p.Amount,
 		"currency":     p.Currency,
 		"reference_id": GenerateUniqueId(),
-		"customer": struct {
-			userId  string
-			orderId string
-		}{
-			userId:  p.UserID,
-			orderId: p.OrderID,
-		},
+		// "customer": struct {
+		// 	userId  string
+		// 	orderId string
+		// }{
+		// 	userId:  p.UserID,
+		// 	orderId: p.OrderID,
+		// },
 	}
 	body, err := client.PaymentLink.Create(data, nil)
 

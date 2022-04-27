@@ -52,7 +52,7 @@ func Start(testMode bool) {
 	ConfigureSwaggerDoc()
 	router := SetupRouter(paymentHandler)
 
-	err := godotenv.Load("../.env")
+	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal(err)
 		return

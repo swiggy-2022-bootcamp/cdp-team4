@@ -21,7 +21,7 @@ func GetLogger() *logrus.Logger {
 			func() {
 				logger = logrus.New()
 
-				err := godotenv.Load("../../.env")
+				err := godotenv.Load(".env")
 				if err != nil {
 					return
 				}
