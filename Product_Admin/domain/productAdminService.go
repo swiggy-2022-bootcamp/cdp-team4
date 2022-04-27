@@ -23,6 +23,7 @@ type productAdminService struct {
 	ProductAdminDynamoRepository ProductAdminDynamoRepository
 }
 
+
 // function to generate unique id which internally uses the primitive's Object id
 // that is used in MongoDb to automatically create an ID.
 func GenerateUniqueId() string {

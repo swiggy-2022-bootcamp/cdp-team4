@@ -19,6 +19,7 @@ type ProductAdminDynamoRepository struct {
 	Session *dynamodb.DynamoDB
 }
 
+
 // function to connect with dynamoDB with the credentials stored in
 // the local system
 func connect() *dynamodb.DynamoDB {
@@ -35,7 +36,6 @@ func connect() *dynamodb.DynamoDB {
 }
 
 // inserting the record in dynamoDB
-
 func (padr ProductAdminDynamoRepository) Insert(product domain.Product) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -276,6 +276,7 @@ func (padr ProductAdminDynamoRepository) DeleteByID(productID string) (bool, err
 	return true, nil
 }
 
+
 func (padr ProductAdminDynamoRepository) GetProductAvailability(productId string, QuantityNeeded int64) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -425,7 +426,6 @@ func _toDynamoProductModel(p *domain.Product) ProductModel {
 	for _, item := range p.ProductCategories {
 		productCategoriesModel = append(productCategoriesModel, item)
 	}
-
 	return ProductModel{
 		Id:                  p.Id,
 		Model:               p.Model,

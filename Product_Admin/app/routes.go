@@ -8,6 +8,7 @@ func HealthCheckRouter(gin *gin.Engine) {
 	gin.GET("/", HealthCheck())
 }
 
+
 // function that is used to register all the routes and their
 // respective handler methods
 func ProductAdminRouter(gin *gin.Engine) {

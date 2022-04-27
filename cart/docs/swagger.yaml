@@ -1,0 +1,197 @@
+basePath: /
+definitions:
+  app.CartRecordDTO:
+    properties:
+      products:
+        items:
+          $ref: '#/definitions/app.ProductRecordDTO'
+        type: array
+      user_id:
+        type: string
+    type: object
+  app.ProductRecordDTO:
+    properties:
+      cost:
+        type: integer
+      id:
+        type: string
+      name:
+        type: string
+      quantity:
+        type: integer
+    type: object
+  domain.Cart:
+    properties:
+      id:
+        type: string
+      items:
+        additionalProperties:
+          $ref: '#/definitions/domain.Item'
+        type: object
+      user_id:
+        type: string
+    type: object
+  domain.Item:
+    properties:
+      cost:
+        type: integer
+      name:
+        type: string
+      quantity:
+        type: integer
+    type: object
+host: localhost:8005
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: Cart Service.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Gin Swagger Example API
+  version: "2.0"
+paths:
+  /:
+    get:
+      description: Endpoint to check the health of Cart Microserice
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Health of Cart service
+      tags:
+      - Health
+  /cart:
+    post:
+      consumes:
+      - application/json
+      description: This Handle allows admin to create new Cart
+      parameters:
+      - description: Cart details
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/app.CartRecordDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: Create Cart
+      tags:
+      - Cart
+  /cart/:userId:
+    delete:
+      description: This Handle deletes cart given User ID
+      parameters:
+      - description: User id
+        in: query
+        name: req
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: Delete cart By User Id
+      tags:
+      - Cart
+    get:
+      description: This Handle returns Cart given cart UserId
+      parameters:
+      - description: User id
+        in: query
+        name: req
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Cart'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: Get Cart by UserId
+      tags:
+      - Cart
+    put:
+      consumes:
+      - application/json
+      description: This Handle allows to add new items/update items to cart
+      parameters:
+      - description: User id
+        in: query
+        name: req
+        required: true
+        type: integer
+      - description: Cart details
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/app.CartRecordDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: Update Cart items
+      tags:
+      - Cart
+  /carts:
+    get:
+      description: This Handle returns all of the carts
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Cart'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: Get All Cart records
+      tags:
+      - Cart
+schemes:
+- http
+swagger: "2.0"

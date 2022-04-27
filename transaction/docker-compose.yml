@@ -1,0 +1,12 @@
+version: "3.3"
+services:
+  order:
+      build: .
+      image: transaction
+      container_name: transaction
+      restart: always
+      ports:
+       - "8010:8010"
+       - "7010:7010"
+      volumes:
+       - /home/ubuntu/.aws:/root/.aws:ro                                               

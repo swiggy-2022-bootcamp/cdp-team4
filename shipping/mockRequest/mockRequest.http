@@ -1,0 +1,77 @@
+# Add Shipping Address
+
+# curl -H "X-API-Key: e0aaf890" -X POST https://my.api.mockaroo.com/shippingaddress
+POST https://my.api.mockaroo.com/shippingaddress
+X-API-Key: e0aaf890
+
+{
+ "firstname": "Naveen",
+ "lastname": "Kumar",
+ "city": "Bengaluru",
+ "address_1": "Demo",
+ "address_2": "Demo",
+ "country_id": "81",
+ "postcode": "560053",
+}
+
+###
+
+# Get Shipping Address
+
+# curl -H "X-API-Key: e0aaf890" https://my.api.mockaroo.com/shippingaddress
+GET https://my.api.mockaroo.com/shippingaddress
+X-API-Key: e0aaf890
+
+###
+
+# Add shipping cost
+
+
+# curl -H "X-API-Key: e0aaf890" -X POST https://my.api.mockaroo.com/shippingcost
+POST https://my.api.mockaroo.com/shippingcost
+X-API-Key: e0aaf890
+
+{
+    "city": "Noida",
+    "shipping_cost":500
+}
+
+###
+
+# Get shipping cost of all cities
+
+# curl -H "X-API-Key: e0aaf890" https://my.api.mockaroo.com/shippingcost/all
+GET https://my.api.mockaroo.com/shippingcost/all
+X-API-Key: e0aaf890
+
+###
+
+# Get shipping cost of a city
+
+# curl -H "X-API-Key: e0aaf890" https://my.api.mockaroo.com/shippingcost/delhi
+GET https://my.api.mockaroo.com/shippingcost/delhi
+X-API-Key: e0aaf890
+
+
+###
+
+# Update shipping cost of a city
+
+# curl -H "X-API-Key: e0aaf890" -X POST https://my.api.mockaroo.com/shippingcost
+PUT https://my.api.mockaroo.com/shippingcost
+X-API-Key: e0aaf890
+
+{
+    "city": "delhi",
+    "shipping_cost":501
+}
+
+###
+
+# Delete shipping cost of a city
+
+# curl -H "X-API-Key: e0aaf890" -X POST https://my.api.mockaroo.com/shippingcost
+DELETE  https://my.api.mockaroo.com/shippingcost/delhi
+X-API-Key: e0aaf890
+
+###

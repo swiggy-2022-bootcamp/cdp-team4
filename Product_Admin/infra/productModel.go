@@ -1,5 +1,6 @@
 package infra
 
+
 // Product record data model that is going to store in dynamo database
 type ProductSEOURLModel struct {
 	Keyword    string `json:"keyword"`
@@ -15,6 +16,10 @@ type ProductDescriptionModel struct {
 	MetaDescription string `json:"meta_description"`
 	MetaKeyword     string `json:"meta_keyword"`
 	Tag             string `json:"tag"`
+}
+
+type ProductCategoryModel struct {
+	CategoryID string
 }
 
 type ProductModel struct {
@@ -42,4 +47,5 @@ type ProductModel struct {
 type ProductCategory struct {
 	CategoryId string `json:"category_id"`
 	ProductId  string `json:"product_id"`
+	ProductCategories   []ProductCategoryModel    `json:"product_categories"`
 }
