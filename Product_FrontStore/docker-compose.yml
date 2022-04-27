@@ -1,0 +1,11 @@
+version: "3.3"
+services:
+  order:
+      build: .
+      image: product-front-store
+      container_name: product-front-store
+      restart: always
+      ports:
+       - "8003:8003"
+      volumes:
+       - /home/ubuntu/.aws:/root/.aws:ro                                               
