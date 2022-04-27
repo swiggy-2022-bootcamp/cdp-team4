@@ -1,0 +1,97 @@
+basePath: /api/v1
+definitions:
+  app.LoginDTO:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  app.ResponseDTO:
+    properties:
+      data: {}
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
+host: localhost:8001
+info:
+  contact:
+    email: murtaza896@gmail.com
+    name: Murtaza Sadriwala
+  description: This is a authentication/authorization service.
+  title: Auth Microservice API
+  version: "1.0"
+paths:
+  /health:
+    get:
+      description: Returns health status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.ResponseDTO'
+      tags:
+      - health
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Returns auth token upon login
+      parameters:
+      - description: User login
+        in: body
+        name: login-credentials
+        required: true
+        schema:
+          $ref: '#/definitions/app.LoginDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.ResponseDTO'
+      tags:
+      - auth
+  /logout:
+    post:
+      consumes:
+      - application/json
+      description: Invalidates auth token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.ResponseDTO'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - auth
+  /validate:
+    get:
+      consumes:
+      - application/json
+      description: validates auth token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.ResponseDTO'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - auth
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
