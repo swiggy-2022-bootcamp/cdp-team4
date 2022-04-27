@@ -1,0 +1,313 @@
+basePath: /
+definitions:
+  app.InvoiceDTO:
+    properties:
+      products:
+        items:
+          $ref: '#/definitions/app.ProductRecordDTO'
+        type: array
+      reward_points:
+        type: integer
+      shipping_price:
+        type: integer
+      status:
+        type: string
+      total_cost:
+        type: integer
+      user_id:
+        type: string
+    type: object
+  app.OrderConfirmResponseDTO:
+    properties:
+      order_id:
+        type: string
+      reward_points:
+        type: integer
+      shipping_price:
+        type: integer
+      status:
+        type: string
+      total_cost:
+        type: integer
+      user_id:
+        type: string
+    type: object
+  app.OrderRecordDTO:
+    properties:
+      order_id:
+        type: string
+      products:
+        items:
+          $ref: '#/definitions/app.ProductRecordDTO'
+        type: array
+      status:
+        type: string
+      total_cost:
+        type: integer
+      user_id:
+        type: string
+    type: object
+  app.ProductRecordDTO:
+    properties:
+      cost:
+        type: integer
+      name:
+        type: string
+      quantity:
+        type: integer
+    type: object
+  app.RequestDTO:
+    properties:
+      id:
+        type: string
+      status:
+        type: string
+    type: object
+host: localhost:7000
+info:
+  contact:
+    email: suhas7thfeb2000@gmail.com
+    name: Suhas R
+  description: Order Service.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Gin Swagger
+  version: "2.0"
+paths:
+  /:
+    get:
+      description: use tocheck whether order service is up and running or not
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Health of order service
+      tags:
+      - Health
+  /confirm/:userid:
+    post:
+      description: This Handle adds order from checkout
+      parameters:
+      - description: user id
+        in: path
+        name: userid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.OrderConfirmResponseDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: number
+      summary: Confirm Order
+      tags:
+      - Order
+  /order:
+    post:
+      description: This Handle allows admin to create new Order
+      parameters:
+      - description: Create order
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/app.OrderRecordDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: number
+        "500":
+          description: Internal Server Error
+          schema:
+            type: number
+      summary: Create Order
+      tags:
+      - Order
+  /order/:id:
+    delete:
+      description: This Handle deletes order given order id
+      parameters:
+      - description: order id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: number
+        "500":
+          description: Internal Server Error
+          schema:
+            type: number
+      summary: Delete order
+      tags:
+      - Order
+    get:
+      description: This Handle returns Order given order id
+      parameters:
+      - description: order id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.OrderRecordDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: number
+      summary: Get Order by id
+      tags:
+      - Order
+  /order/invoice/:orderid:
+    get:
+      description: This generated invoice given order id
+      parameters:
+      - description: order id
+        in: path
+        name: orderid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.InvoiceDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: number
+      summary: Get Order Invoice given order id
+      tags:
+      - Order
+  /order/status:
+    put:
+      description: This Handle Update order status given order id
+      parameters:
+      - description: Update order
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/app.RequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: number
+        "500":
+          description: Internal Server Error
+          schema:
+            type: number
+      summary: Update order status
+      tags:
+      - Order
+  /order/status/:status:
+    get:
+      description: This Handle returns Order given status
+      parameters:
+      - description: status
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/app.OrderRecordDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: number
+      summary: Get Order by status
+      tags:
+      - Order
+  /order/user/:userid:
+    get:
+      description: This Handle returns Order given user id
+      parameters:
+      - description: user id
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/app.OrderRecordDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: number
+      summary: Get Order by user id
+      tags:
+      - Order
+  /orders:
+    get:
+      description: This Handle returns all of the orders
+      parameters:
+      - description: order id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/app.OrderRecordDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: number
+      summary: Get All Order records
+      tags:
+      - Order
+schemes:
+- http
+swagger: "2.0"
