@@ -14,7 +14,7 @@ import "github.com/swiggy-2022-bootcamp/cdp-team4/Product_Admin/app"
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @BasePath /
+// @BasePath /localhost:8004
 func main() {
 	app.Start()
 }

@@ -1,4 +1,78 @@
-basePath: /
+basePath: /localhost:8004
+definitions:
+  app.ProductDTO:
+    properties:
+      height:
+        type: number
+      image_url:
+        type: string
+      is_shippable:
+        type: boolean
+      length:
+        type: number
+      manufacturer_id:
+        type: string
+      minimum_quantity:
+        type: integer
+      model:
+        type: string
+      points:
+        type: integer
+      price:
+        type: number
+      product_categories:
+        items:
+          type: string
+        type: array
+      product_description:
+        items:
+          $ref: '#/definitions/app.ProductDescriptionDTO'
+        type: array
+      product_seo_url:
+        items:
+          $ref: '#/definitions/app.ProductSEOURLDTO'
+        type: array
+      quantity:
+        type: integer
+      related_products:
+        items:
+          type: string
+        type: array
+      reward:
+        type: integer
+      sku:
+        type: string
+      weight:
+        type: number
+      width:
+        type: number
+    type: object
+  app.ProductDescriptionDTO:
+    properties:
+      description:
+        type: string
+      language_id:
+        type: string
+      meta_description:
+        type: string
+      meta_keyword:
+        type: string
+      meta_title:
+        type: string
+      name:
+        type: string
+      tag:
+        type: string
+    type: object
+  app.ProductSEOURLDTO:
+    properties:
+      keyword:
+        type: string
+      language_id:
+        type: string
+      store_id:
+        type: string
+    type: object
 info:
   contact:
     email: support@swagger.io
@@ -31,4 +105,126 @@ paths:
       summary: Health of product_admin service
       tags:
       - Health
+  /products/:
+    get:
+      consumes:
+      - application/json
+      description: This Handle allows admin to fetch all the products in the datastore
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Get all Products
+      tags:
+      - Product Admin
+    post:
+      consumes:
+      - application/json
+      description: This Handle allows admin to create a new product
+      parameters:
+      - description: product request structure
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/app.ProductDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Add Product
+      tags:
+      - Product Admin
+  /products/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: This Handles deletion of a product given product id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Delete product
+      tags:
+      - Product Admin
+    get:
+      description: This Handle allows admin to get a product, given Id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Get Product details by Id
+      tags:
+      - Product Admin
+    put:
+      consumes:
+      - application/json
+      description: This Handles Updation of product details given product id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Update product details
+      tags:
+      - Product Admin
+  /products/search/{id}:
+    get:
+      consumes:
+      - application/json
+      description: This Handles search of a product given category id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+      summary: Search product
+      tags:
+      - Product Admin
 swagger: "2.0"

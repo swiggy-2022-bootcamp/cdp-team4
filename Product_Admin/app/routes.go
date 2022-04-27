@@ -8,6 +8,9 @@ func HealthCheckRouter(gin *gin.Engine) {
 	gin.GET("/", HealthCheck())
 }
 
+
+// function that is used to register all the routes and their
+// respective handler methods
 func ProductAdminRouter(gin *gin.Engine) {
 	productApiGroup := gin.Group("/products")
 	productApiGroup.POST("/", productAdminHandler.HandleAddProduct())
@@ -16,6 +19,9 @@ func ProductAdminRouter(gin *gin.Engine) {
 	productApiGroup.PUT("/:id", productAdminHandler.HandleUpdateProduct())
 	productApiGroup.DELETE("/:id", productAdminHandler.HandleDeleteProductByID())
 
-	productApiGroup.GET("/search/{search}", productAdminHandler.HandleSearchProduct())
+	searchRoutes := productApiGroup.Group("/search")
+	searchRoutes.GET("/category/:categoryid", productAdminHandler.HandleSearchByCategoryID())
+	searchRoutes.GET("/manufacturer/:id", productAdminHandler.HandleSearchByManufacturerID())
+	searchRoutes.GET("/keyword/:keyword", productAdminHandler.HandleSearchByKeyword())
 
 }

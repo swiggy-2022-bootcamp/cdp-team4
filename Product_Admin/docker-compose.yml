@@ -1,0 +1,11 @@
+version: "3.3"
+services:
+  order:
+      build: .
+      image: product-admin
+      container_name: product-admin
+      restart: always
+      ports:
+       - "8004:8004"
+      volumes:
+       - /home/ubuntu/.aws:/root/.aws:ro                                               

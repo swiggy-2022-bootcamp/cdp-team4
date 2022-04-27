@@ -51,6 +51,301 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/products/": {
+            "get": {
+                "description": "This Handle allows admin to fetch all the products in the datastore",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Product Admin"
+                ],
+                "summary": "Get all Products",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "This Handle allows admin to create a new product",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Product Admin"
+                ],
+                "summary": "Add Product",
+                "parameters": [
+                    {
+                        "description": "product request structure",
+                        "name": "product",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/app.ProductDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                }
+            }
+        },
+        "/products/search/{id}": {
+            "get": {
+                "description": "This Handles search of a product given category id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Product Admin"
+                ],
+                "summary": "Search product",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                }
+            }
+        },
+        "/products/{id}": {
+            "get": {
+                "description": "This Handle allows admin to get a product, given Id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Product Admin"
+                ],
+                "summary": "Get Product details by Id",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "This Handles Updation of product details given product id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Product Admin"
+                ],
+                "summary": "Update product details",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "This Handles deletion of a product given product id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Product Admin"
+                ],
+                "summary": "Delete product",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "app.ProductDTO": {
+            "type": "object",
+            "properties": {
+                "height": {
+                    "type": "number"
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "is_shippable": {
+                    "type": "boolean"
+                },
+                "length": {
+                    "type": "number"
+                },
+                "manufacturer_id": {
+                    "type": "string"
+                },
+                "minimum_quantity": {
+                    "type": "integer"
+                },
+                "model": {
+                    "type": "string"
+                },
+                "points": {
+                    "type": "integer"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "product_categories": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "product_description": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.ProductDescriptionDTO"
+                    }
+                },
+                "product_seo_url": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.ProductSEOURLDTO"
+                    }
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "related_products": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "reward": {
+                    "type": "integer"
+                },
+                "sku": {
+                    "type": "string"
+                },
+                "weight": {
+                    "type": "number"
+                },
+                "width": {
+                    "type": "number"
+                }
+            }
+        },
+        "app.ProductDescriptionDTO": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "language_id": {
+                    "type": "string"
+                },
+                "meta_description": {
+                    "type": "string"
+                },
+                "meta_keyword": {
+                    "type": "string"
+                },
+                "meta_title": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "tag": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.ProductSEOURLDTO": {
+            "type": "object",
+            "properties": {
+                "keyword": {
+                    "type": "string"
+                },
+                "language_id": {
+                    "type": "string"
+                },
+                "store_id": {
+                    "type": "string"
+                }
+            }
         }
     }
 }`
@@ -59,7 +354,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "",
-	BasePath:         "/",
+	BasePath:         "/localhost:8004",
 	Schemes:          []string{},
 	Title:            "Product_Admain Service",
 	Description:      "Product_Admin Service.",
