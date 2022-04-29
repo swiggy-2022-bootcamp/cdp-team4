@@ -109,3 +109,28 @@ func RegisterCategoryRoutes() {
 	// categories.DELETE("/", ValidateAuthToken(), categoryHandler.HandleDeleteCategories)
 	// categories.DELETE("/:id", ValidateAuthToken(), categoryHandler.HandleDeleteCategoryByID)
 }
+
+func RegisterRewardRouter() {
+	rewardHandler := RewardHandler{}
+	rewardApiGroup := v1.Group("/reward")
+	rewardApiGroup.GET("/:userId", ValidateAuthToken(), rewardHandler.GetRewardByUserID)
+	rewardApiGroup.PUT("/:userId", ValidateAuthToken(), rewardHandler.UpdateReward)
+}
+
+func RegisterCartRouter() {
+	cartHandler := CartHandler{}
+	cartApiGroup := v1.Group("/cart")
+	cartApiGroup.GET("/:userId", ValidateAuthToken(), cartHandler.GetCartByUserID)
+	cartApiGroup.POST("/", ValidateAuthToken(), cartHandler.CreateCart)
+	cartApiGroup.PUT("/:userId", ValidateAuthToken(), cartHandler.UpdateCartByUserID)
+	cartApiGroup.DELETE("/empty/:userId", ValidateAuthToken(), cartHandler.DeleteCartByUserID)
+	cartApiGroup.DELETE("/:userId", ValidateAuthToken(), cartHandler.DeleteCartItemByUserId)
+	// cartApiGroup.GET("/", cartHandler.HandleGetAllRecords())
+}
+
+func RegisterTransactionRouter() {
+	transactionHandler := TransactionHandler{}
+	transactionApiGroup := v1.Group("/transaction")
+	transactionApiGroup.GET("/:userId", ValidateAuthToken(), transactionHandler.GetTransactionByUserID)
+	transactionApiGroup.PUT("/:userId", ValidateAuthToken(), transactionHandler.UpdateTransaction)
+}
