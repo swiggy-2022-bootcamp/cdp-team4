@@ -24,7 +24,7 @@ WORKDIR /
 
 COPY --from=build /app/user-app /user-app
 
-COPY .env /user-app
+COPY .env .env
 
 EXPOSE 8002
 EXPOSE 7002
