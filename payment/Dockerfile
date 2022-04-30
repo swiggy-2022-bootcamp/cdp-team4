@@ -27,5 +27,6 @@ COPY --from=build /app/payment-service /payment-service
 COPY .env /.env
 
 EXPOSE 8008
+EXPOSE 7008
 
 ENTRYPOINT ["/payment-service"]
