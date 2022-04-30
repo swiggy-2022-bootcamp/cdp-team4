@@ -1,18 +1,32 @@
-FROM golang:1.17-alpine
+##
+## Build
+##
 
-RUN apk update && apk add --no-cache git build-base
+FROM golang:1.16-alpine AS build
 
-WORKDIR /go/github.com/swiggy-2022-bootcamp/cdp-team4/User
+WORKDIR /app
 
-COPY . /go/github.com/swiggy-2022-bootcamp/cdp-team4/User
+COPY go.mod .
+COPY go.sum .
+RUN go mod download
 
-# get all the dependencies
-RUN go get ./... 
+COPY . .
 
-# build
-RUN go build -o /userService
+RUN go build -o user-app main.go
+
+##
+## Deploy
+##
+
+FROM alpine
+
+WORKDIR /
+
+COPY --from=build /app/user-app /user-app
+
+COPY .env /user-app
 
 EXPOSE 8002
 EXPOSE 7002
 
-CMD [ "/userService" ]
+ENTRYPOINT ["/user-app"]
