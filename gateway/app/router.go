@@ -64,12 +64,12 @@ func RegisterShippingRoutes() {
 
 func RegisterProductAdminRoutes() {
 	productAdminHandler := productAdminHandler{}
+	productHandler := productHandler{}
 	products := v1.Group("/products")
 
-	v1.GET("/products", ValidateAuthToken(), productAdminHandler.GetAllProducts)
-
+	products.GET("/", ValidateAuthToken(), productHandler.GetAllProducts)
 	products.POST("/", ValidateAuthToken(), productAdminHandler.AddProduct)
-	products.GET("/:id", ValidateAuthToken(), productAdminHandler.GetProductByID)
+	products.GET("/:id", ValidateAuthToken(), productHandler.GetProductByID)
 	products.PUT("/:id", ValidateAuthToken(), productAdminHandler.UpdateProductByID)
 	products.DELETE("/:id", ValidateAuthToken(), productAdminHandler.DeleteProductByID)
 
@@ -92,9 +92,8 @@ func RegisterProductFrontStoreRoutes() {
 	productFrontStoreHandler := productFrontStoreHandler{}
 	products := v1.Group("/products")
 
-	v1.GET("/products", ValidateAuthToken(), productFrontStoreHandler.GetAllProducts)
-
-	products.GET("/:id", ValidateAuthToken(), productFrontStoreHandler.GetProductByID)
+	//products.GET("/", ValidateAuthToken(), productFrontStoreHandler.GetAllProducts)
+	//products.GET("/:id", ValidateAuthToken(), productFrontStoreHandler.GetProductByID)
 	products.GET("/category/:id", ValidateAuthToken(), productFrontStoreHandler.GetProductsByCategory)
 }
 

@@ -17,12 +17,6 @@ type productAdminHandler struct {
 }
 
 func (pah productAdminHandler) GetAllProducts(c *gin.Context) {
-	isAdmin := c.Request.Header.Get("admin")
-	if isAdmin == "false" {
-		c.JSON(http.StatusUnauthorized, gin.H{})
-		c.Abort()
-		return
-	}
 	productAdminServiceURI := os.Getenv("PRODUCT_ADMIN_SERVICE_URI") + "/products"
 
 	req, err := http.NewRequest("GET", productAdminServiceURI, nil)
