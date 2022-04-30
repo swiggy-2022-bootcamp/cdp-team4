@@ -89,23 +89,23 @@ func RegisterPaymentRoutes() {
 }
 
 func RegisterProductFrontStoreRoutes() {
-	// productFrontStoreHandler := productFrontStoreHandler{}
-	// products := v1.Group("/products")
+	productFrontStoreHandler := productFrontStoreHandler{}
+	products := v1.Group("/products")
 
-	// v1.GET("/products", ValidateAuthToken(), productFrontStoreHandler.HandleGetAllProducts)
+	v1.GET("/products", ValidateAuthToken(), productFrontStoreHandler.GetAllProducts)
 
-	// products.GET("/:id", ValidateAuthToken(), productFrontStoreHandler.HandleGetProductByID)
-	// products.GET("/category/:id", ValidateAuthToken(), productFrontStoreHandler.HandleGetProductsByCategory)
+	products.GET("/:id", ValidateAuthToken(), productFrontStoreHandler.GetProductByID)
+	products.GET("/category/:id", ValidateAuthToken(), productFrontStoreHandler.GetProductsByCategory)
 }
 
 func RegisterCategoryRoutes() {
-	// categoryHandler := categoryHandler{}
-	// categories := v1.Group("/categories")
+	categoryHandler := categoryHandler{}
+	categories := v1.Group("/categories")
 
-	// categories.POST("/", ValidateAuthToken(), categoryHandler.HandleAddCategory)
-	// categories.GET("/", ValidateAuthToken(), categoryHandler.HandleGetAllCategories)
-	// categories.GET("/:id", ValidateAuthToken(), categoryHandler.HandleGetCategoryByID)
-	// categories.PUT("/:id", ValidateAuthToken(), categoryHandler.HandleUpdateCategoryByID)
-	// categories.DELETE("/", ValidateAuthToken(), categoryHandler.HandleDeleteCategories)
-	// categories.DELETE("/:id", ValidateAuthToken(), categoryHandler.HandleDeleteCategoryByID)
+	categories.POST("/", ValidateAuthToken(), categoryHandler.AddCategory)
+	categories.GET("/", ValidateAuthToken(), categoryHandler.GetAllCategories)
+	categories.GET("/:id", ValidateAuthToken(), categoryHandler.GetCategoryByID)
+	categories.PUT("/:id", ValidateAuthToken(), categoryHandler.UpdateCategoryByID)
+	categories.DELETE("/", ValidateAuthToken(), categoryHandler.DeleteCategories)
+	categories.DELETE("/:id", ValidateAuthToken(), categoryHandler.DeleteCategoryByID)
 }
