@@ -1,17 +1,31 @@
-FROM golang:1.17-alpine
+##
+## Build
+##
 
-RUN apk update && apk add --no-cache git build-base
+FROM golang:1.16-alpine AS build
 
-WORKDIR /go/github.com/swiggy-2022-bootcamp/cdp-team4/payment
+WORKDIR /app
 
-COPY . /go/github.com/swiggy-2022-bootcamp/cdp-team4/payment
+COPY go.mod .
+COPY go.sum .
+RUN go mod download
 
-# get all the dependencies
-RUN go get ./... 
+COPY . .
 
-# build
-RUN go build -o /paymentService
+RUN go build -o payment-service main.go
 
-EXPOSE 8081
+##
+## Deploy
+##
 
-CMD [ "/paymentService" ]
+FROM alpine
+
+WORKDIR /
+
+COPY --from=build /app/payment-service /payment-service
+
+COPY .env /.env
+
+EXPOSE 8008
+
+ENTRYPOINT ["/payment-service"]
