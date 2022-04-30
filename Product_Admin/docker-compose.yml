@@ -7,5 +7,6 @@ services:
       restart: always
       ports:
        - "8004:8004"
+       - "7003:7003"
       volumes:
        - /home/ubuntu/.aws:/root/.aws:ro                                               

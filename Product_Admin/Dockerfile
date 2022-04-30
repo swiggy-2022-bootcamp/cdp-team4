@@ -1,17 +1,32 @@
-FROM golang:1.17-alpine
+##
+## Build
+##
 
-RUN apk update && apk add --no-cache git build-base
+FROM golang:1.17-alpine AS build
 
-WORKDIR /go/github.com/swiggy-2022-bootcamp/cdp-team4/Product_Admin
+WORKDIR /app
 
-COPY . /go/github.com/swiggy-2022-bootcamp/cdp-team4/Product_Admin
+COPY go.mod .
+COPY go.sum .
+RUN go mod download
 
-# get all the dependencies
-RUN go get ./... 
+COPY . .
 
-# build
-RUN go build -o /ProductAdminService
+RUN go build -o product-admin-service main.go
 
-EXPOSE 8081
+##
+## Deploy
+##
 
-CMD [ "/ProductAdminService" ]
+FROM alpine
+
+WORKDIR /
+
+COPY --from=build /app/product-admin-service /product-admin-service
+
+COPY .env .env
+
+EXPOSE 8004
+EXPOSE 7003
+
+ENTRYPOINT ["/product-admin-service"]
