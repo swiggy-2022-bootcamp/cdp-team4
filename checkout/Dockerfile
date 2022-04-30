@@ -1,17 +1,33 @@
-FROM golang:1.17-alpine
+##
+## Build
+##
 
-RUN apk update && apk add --no-cache git build-base
+FROM golang:1.16-alpine AS build
 
-WORKDIR /go/github.com/swiggy-2022-bootcamp/cdp-team4/Checkout
+WORKDIR /app
 
-COPY . /go/github.com/swiggy-2022-bootcamp/cdp-team4/Checkout
+COPY go.mod .
+COPY go.sum .
+RUN go mod download
 
-# get all the dependencies
-RUN go get ./... 
+COPY . .
 
-# build
-RUN go build -o /CheckoutService
+RUN go build -o checkout-service main.go
 
-EXPOSE 8081
+##
+## Deploy
+##
 
-CMD [ "/CheckoutService" ]
+FROM alpine
+
+WORKDIR /
+
+COPY --from=build /app/checkout-service /checkout-service
+
+COPY .env /.env
+
+EXPOSE 8011
+EXPOSE 7011
+
+ENTRYPOINT ["/checkout-service"]
+
